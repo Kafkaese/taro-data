@@ -1,221 +1,216 @@
 ,Value
-,72148.0
-Afghanistan,2952.0
-Albania,456.0
-Algeria,26092.0
-Andorra,12.0
-Angola,1623.0
-Antigua & Barbuda,2.0
-Argentina,3995.0
-Armenia,346.0
-Aruba,1.0
-Australia,33681.0
-Austria,5151.0
-Azerbaijan,5541.0
-Bahamas,32.0
-Bahrain,2099.0
-Bangladesh,6506.0
-Barbados,5.0
-Belarus,12.0
-Belgium,19232.0
-Belize,5.0
-Benin,115.0
-Bermuda,1.0
-Bhutan,1.0
-Bolivia,658.0
-"Bonaire, Sint Eustatius & Saba",1.0
-Bosnia & Herzegovina,320.0
-Botswana,3620.0
-Brazil,36388.0
-British Virgin Islands,0.0
-Brunei Darussalam,3143.0
-Bulgaria,9330.0
-Burkina Faso,538.0
-Burundi,76.0
-Cambodia,140.0
-Cameroon,898.0
-Canada,29756.0
-Cape Verde,3.0
-Cayman Islands,1.0
-Central African Republic,44.0
-Chad,819.0
-Channel Islands,0.0
-Chile,11499.0
-China,8414.0
-Colombia,9607.0
-Comoros,30.0
-Congo,128.0
-Costa Rica,19.0
-Croatia,975.0
-Cuba,4.0
-Curaçao,5.0
-Cyprus,4848.0
-Czech Republic,10410.0
-Democratic Republic of Congo,203.0
-Denmark,6232.0
-Djibouti,987.0
-Dominica,0.0
-Dominican Republic,284.0
-East Timor,9.0
-Ecuador,2063.0
-Egypt,101169.0
-El Salvador,12.0
-Equatorial Guinea,79.0
-Eritrea,13.0
-Estonia,2866.0
-Ethiopia,911.0
-Falklands,2.0
-Faroe Islands,1.0
-Federal Republic of Yugoslavia,28.0
-Fiji,2.0
-Finland,14792.0
-France,42617.0
-French Polynesia,23.0
-French Saint Martin,0.0
-Gabon,782.0
-Gambia,11.0
-Georgia,2516.0
-Germany,65951.0
-Ghana,1040.0
-Gibraltar,2.0
-Greece,37863.0
-Greenland,69.0
-Grenada,1.0
-Guatemala,53.0
-Guernsey,1.0
-Guinea,133.0
-Guinea-Bissau,0.0
-Guyana,173.0
-Haiti,6.0
-Honduras,66.0
-Hong Kong,66.0
-Hungary,4824.0
-Iceland,131.0
-India,107215.0
-Indonesia,26860.0
-Iran,950.0
-Iraq,9746.0
-Ireland,1927.0
-Israel,9114.0
-Italy,24839.0
-Ivory Coast,986.0
-Jamaica,391.0
-Japan,7662.0
-Jersey,4.0
-Jordan,3761.0
-Kazakhstan,3924.0
-Kenya,2242.0
-Kosovo,46.0
-Kuwait,22686.0
-Kyrgyzstan,92.0
-Lao,2.0
-Latvia,1672.0
-Lebanon,4151.0
-Lesotho,71.0
-Liberia,4.0
-Libya,2050.0
-Liechtenstein,6.0
-Lithuania,2823.0
-Luxembourg,4900.0
-Macao,6.0
-Macedonia,339.0
-Madagascar,130.0
-Malawi,15.0
-Malaysia,28730.0
-Maldives,77.0
-Mali,690.0
-Malta,292.0
-Marshall Islands,0.0
-Mauritania,314.0
-Mauritius,121.0
-Mayotte,0.0
-Mexico,11525.0
-Moldova,91.0
-Monaco,10.0
-Mongolia,112.0
-Montenegro,164.0
-Morocco,15164.0
-Mozambique,79.0
-Myanmar,4.0
-Namibia,43.0
-Nauru,0.0
-Nepal,115.0
-Netherlands,21551.0
-Netherlands Antilles,2.0
-New Caledonia,41.0
-New Zealand,3758.0
-Nicaragua,5.0
-Niger,537.0
-Nigeria,3753.0
-North Korea,537.0
-Northern Cyprus,0.0
-Norway,21208.0
-Oman,21333.0
-Pakistan,21389.0
-Palau,0.0
-Palestine,0.0
-Panama,185.0
-Papua New Guinea,2.0
-Paraguay,578.0
-Peru,12495.0
-Philippines,12033.0
-Poland,20440.0
-Portugal,6610.0
-Qatar,69793.0
-Romania,12541.0
-Russia,4523.0
-Rwanda,146.0
-Saint Barthélemy,0.0
-"Saint Helena, Ascension & Tristan Da Cunha",0.0
-Saint Kitts & Nevis,0.0
-Saint Lucia,2.0
-Saint Vincent & The Grenadines,3.0
-Samoa,0.0
-San Marino,5.0
-Sao Tome & Principe,0.0
-Saudi Arabia,141299.0
-Senegal,1630.0
-Serbia,3798.0
-Seychelles,6.0
-Sierra Leone,23.0
-Singapore,37139.0
-Slovakia,3260.0
-Slovenia,1034.0
-Solomon Islands,0.0
-Somalia,46.0
-South Africa,12062.0
-South Korea,37978.0
-South Sudan,17.0
-Spain,25451.0
-Sri Lanka,324.0
-Sudan,32.0
-Suriname,83.0
-Swaziland,3.0
-Sweden,15727.0
-Switzerland,16900.0
-Syria,80.0
-Taiwan,2593.0
-Tajikistan,58.0
-Tanzania,532.0
-Thailand,11575.0
-Togo,252.0
-Tonga,0.0
-Trinidad & Tobago,678.0
-Tunisia,2295.0
-Turkey,27412.0
-Turkmenistan,4239.0
-Turks & Caicos Islands,0.0
-Uganda,806.0
-Ukraine,3543.0
-United Arab Emirates,121992.0
-United Kingdom,74854.0
-United States,100448.0
-Uruguay,525.0
-Uzbekistan,2633.0
-Vanuatu,1.0
-Vatican,2.0
-Venezuela,4022.0
-Vietnam,4677.0
-Yemen,563.0
-Zambia,375.0
-Zimbabwe,1.0
+,72223.0
+AD,12.0
+AE,121992.0
+AF,2952.0
+AG,2.0
+AL,456.0
+AM,346.0
+AO,1623.0
+AR,3995.0
+AT,5151.0
+AU,33681.0
+AW,1.0
+AZ,5541.0
+BA,320.0
+BB,5.0
+BD,6506.0
+BE,19232.0
+BF,538.0
+BG,9330.0
+BH,2099.0
+BI,76.0
+BJ,115.0
+BL,0.0
+BM,1.0
+BN,3143.0
+BO,658.0
+BQ,1.0
+BR,36388.0
+BS,32.0
+BT,1.0
+BW,3620.0
+BY,12.0
+BZ,5.0
+CA,29756.0
+CD,203.0
+CF,44.0
+CG,128.0
+CH,16900.0
+CI,986.0
+CL,11499.0
+CM,898.0
+CN,8414.0
+CO,9607.0
+CR,19.0
+CU,4.0
+CV,3.0
+CW,5.0
+CY,4848.0
+CZ,10410.0
+DE,65951.0
+DJ,987.0
+DK,6232.0
+DM,0.0
+DO,284.0
+DZ,26092.0
+EC,2063.0
+EE,2866.0
+EG,101169.0
+ER,13.0
+ES,25451.0
+ET,911.0
+FI,14792.0
+FJ,2.0
+FK,2.0
+FO,1.0
+FR,42617.0
+GA,782.0
+GB,74854.0
+GD,1.0
+GE,2516.0
+GG,1.0
+GH,1040.0
+GI,2.0
+GL,69.0
+GM,11.0
+GN,133.0
+GQ,79.0
+GR,37863.0
+GT,53.0
+GW,0.0
+GY,173.0
+HK,66.0
+HN,66.0
+HR,975.0
+HT,6.0
+HU,4824.0
+ID,26860.0
+IE,1927.0
+IL,9114.0
+IN,107215.0
+IQ,9746.0
+IR,950.0
+IS,131.0
+IT,24839.0
+JE,4.0
+JM,391.0
+JO,3761.0
+JP,7662.0
+KE,2242.0
+KG,92.0
+KH,140.0
+KM,30.0
+KN,0.0
+KP,537.0
+KR,37978.0
+KW,22686.0
+KY,1.0
+KZ,3924.0
+LA,2.0
+LB,4151.0
+LC,2.0
+LI,6.0
+LK,324.0
+LR,4.0
+LS,71.0
+LT,2823.0
+LU,4900.0
+LV,1672.0
+LY,2050.0
+MA,15164.0
+MC,10.0
+MD,91.0
+ME,164.0
+MF,0.0
+MG,130.0
+MH,0.0
+MK,339.0
+ML,690.0
+MM,4.0
+MN,112.0
+MO,6.0
+MR,314.0
+MT,292.0
+MU,121.0
+MV,77.0
+MW,15.0
+MX,11525.0
+MY,28730.0
+MZ,79.0
+NA,43.0
+NC,41.0
+NE,537.0
+NG,3753.0
+NI,5.0
+NL,21551.0
+NO,21208.0
+NP,115.0
+NR,0.0
+NZ,3758.0
+OM,21333.0
+PA,185.0
+PE,12495.0
+PF,23.0
+PG,2.0
+PH,12033.0
+PK,21389.0
+PL,20440.0
+PS,0.0
+PT,6610.0
+PW,0.0
+PY,578.0
+QA,69793.0
+RO,12541.0
+RS,3798.0
+RU,4523.0
+RW,146.0
+SA,141299.0
+SB,0.0
+SC,6.0
+SD,32.0
+SE,15727.0
+SG,37139.0
+SH,0.0
+SI,1034.0
+SK,3260.0
+SL,23.0
+SM,5.0
+SN,1630.0
+SO,46.0
+SR,83.0
+SS,17.0
+ST,0.0
+SV,12.0
+SY,80.0
+SZ,3.0
+TC,0.0
+TD,819.0
+TG,252.0
+TH,11575.0
+TJ,58.0
+TL,9.0
+TM,4239.0
+TN,2295.0
+TO,0.0
+TR,27412.0
+TT,678.0
+TW,2593.0
+TZ,532.0
+UA,3543.0
+UG,806.0
+US,100448.0
+UY,525.0
+UZ,2633.0
+VA,2.0
+VC,3.0
+VE,4022.0
+VG,0.0
+VN,4677.0
+VU,1.0
+WS,0.0
+YE,563.0
+YT,0.0
+ZA,12062.0
+ZM,375.0
+ZW,1.0
