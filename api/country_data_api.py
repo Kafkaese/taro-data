@@ -50,8 +50,8 @@ async def name(country_code):
     except:
         return {'value': 'no data'}
     
-@app.get("metadata/democracy_index")
-async def total(country_code, year):
+@app.get("/metadata/democracy_index")
+async def democracy_index(country_code, year):
     #print(country_name)
     #print(democracy_index_data.loc[country_name, year])
     
@@ -63,8 +63,8 @@ async def total(country_code, year):
 
 # exports path endpoints
 
-@app.get("exports/total")
-async def total(country_code):
+@app.get("/exports/total")
+async def exports_total(country_code):
     #print(country_name)
     #print(data.loc[country_name, 'Value'])
     
@@ -76,8 +76,8 @@ async def total(country_code):
 
 # import path endpoints
 
-@app.get("/total_imports")
-async def total(country_code):
+@app.get("/imports/total")
+async def imports_total(country_code):
     #print(country_name)
     #print(data.loc[country_name, 'Value'])
     
