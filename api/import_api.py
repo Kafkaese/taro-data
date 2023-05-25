@@ -28,21 +28,21 @@ async def root():
     return {'status': 200}
 
 @app.get("/total_imports")
-async def total(country_name):
+async def total(country_code):
     #print(country_name)
     #print(data.loc[country_name, 'Value'])
     
     try:
-        return {'value': str(total_imports_data.loc[country_name, 'Value'])}
+        return {'value': str(total_imports_data.loc[country_code, 'Value'])}
     except:
         return {'value': 'no data'}
     
 @app.get("/democracy_index")
-async def total(country_name, year):
+async def total(country_code, year):
     #print(country_name)
     #print(democracy_index_data.loc[country_name, year])
     
     try:
-        return {'value': str(democracy_index_data.loc[country_name, year])}
+        return {'value': str(democracy_index_data.loc[country_code, year])}
     except:
         return {'value': 'no data'}
