@@ -1,0 +1,13 @@
+services:
+  taro-postgres:
+    image: postgres
+    env_file:
+      - '.env'
+    networks:
+      - taro
+    ports:
+      - ${POSTGRES_PORT}:5432
+
+networks:
+  taro:
+    driver: bridge
