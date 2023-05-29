@@ -22,6 +22,7 @@ app.add_middleware(
 # metadata
 metadata = pd.read_csv('data/metadata.csv',  index_col=0)
 democracy_index_data = pd.read_csv('data/democracy_index.csv',  index_col=0)
+peace_index_data = pd.read_csv('data/peace_index.csv', index_col=0)
 
 # exports data
 export_total_data = pd.read_csv('data/total_exports.csv',  index_col=0)
@@ -57,6 +58,16 @@ async def democracy_index(country_code, year):
     
     try:
         return {'value': str(democracy_index_data.loc[country_code, year])}
+    except:
+        return {'value': 'no data'}
+    
+@app.get("/metadata/peace_index")
+async def peace_index(country_code, year):
+    #print(country_name)
+    #print(democracy_index_data.loc[country_name, year])
+    
+    try:
+        return {'value': str(peace_index_data.loc[country_code, year])}
     except:
         return {'value': 'no data'}
 
