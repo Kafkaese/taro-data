@@ -1,4 +1,4 @@
-import src.scraper as sc
+import taro.scraper as sc
 
 def test_democracy_index_scraper():
     df = sc.democracy_index()
