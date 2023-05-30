@@ -1,7 +1,9 @@
 import requests
 from bs4 import BeautifulSoup
+import pandas as pd
+import csv
 
-def democracy_inxex():
+def democracy_inxex(write_to = None):
     url = 'https://en.wikipedia.org/wiki/Democracy_Index'
     
     response = requests.get(url)
@@ -58,10 +60,13 @@ def democracy_inxex():
         except:
             print(country)
             
-    with open('data/democracy_index.csv', 'w') as file:
-        writer = csv.DictWriter(file, fieldnames=table[0].keys())
-        
-        writer.writeheader()
-        
-        for row in table:
-            writer.writerow(row)
+    if write_to == 'csv':
+        with open('data/democracy_index.csv', 'w') as file:
+            writer = csv.DictWriter(file, fieldnames=table[0].keys())
+            
+            writer.writeheader()
+            
+            for row in table:
+                writer.writerow(row)
+    
+    return pd.DataFrame(table)
