@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 import pandas as pd
 
-api = FastAPI()
+app = FastAPI()
 
 
 origins = [
@@ -11,7 +11,7 @@ origins = [
     "http://localhost:3000",
 ]
 
-api.add_middleware(
+app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
@@ -19,18 +19,19 @@ api.add_middleware(
     allow_headers=["*"],
 )
 
-data = pd.read_csv('data/democracy_index.csv',  index_col=0)
+metadata = pd.read_csv('data/metadata.csv',  index_col=0)
 
-@api.get("/")
+@app.get("/")
 async def root():
     return {'status': 200}
 
-@api.get("/index")
-async def total(country_name, year):
-    #print(country_name)
-    #print(data.loc[country_name, 'Value'])
+@app.get("/info/name")
+async def name(country_code):
+    print(country_code)
+    print(metadata.loc[country_code, 'name'])
     
     try:
-        return {'value': str(data.loc[country_name, year])}
+        return {'value': str(metadata.loc[country_code, 'name'])}
     except:
         return {'value': 'no data'}
+    
