@@ -1,1 +1,4 @@
 pytest
+
+pandas
+bs4
