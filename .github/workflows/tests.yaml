@@ -10,7 +10,9 @@ jobs:
     steps:
       - name: Get code
         uses: actions/checkout@v3
-      - name: Install pytest
-        run: pip install pytest
+      - name: update pip
+        run: pip install --upgrade pip
+      - name: Install package
+        run: pip install .
       - name: Run tests
         run: pytest tests
