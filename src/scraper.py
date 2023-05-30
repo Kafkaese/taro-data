@@ -3,15 +3,15 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import csv
 
-def democracy_inxex(write_to = None):
-    url = 'https://en.wikipedia.org/wiki/Democracy_Index'
+def democracy_index(write_to = None):
+    url = 'https://en.wikipedia.org/w/index.php?title=The_Economist_Democracy_Index&oldid=1157018749'
     
     response = requests.get(url)
     
     soup = BeautifulSoup(response.content, 'html.parser')
     
-    # Get all table rows represnting countries from the correct table (index 6)
-    countries = soup.find_all('table')[6].find_all('tr')
+    # Get all table rows represnting countries from the correct table (index 5)
+    countries = soup.find_all('table')[5].find_all('tr')
     
     
     def get_country_data(country, columns):
