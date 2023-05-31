@@ -15,9 +15,17 @@ conn1 = psycopg2.connect(
     port= '5432'
 )
 
+cursor = conn1.cursor()
+
 def test_democracy_index_pipeline():
     
     democracy_index_pipeline(source='scraper', dest='postgres', db_conn = conn)
     
+    # fetching all rows
+    sql1='''select * from democracy_index;'''
+    cursor.execute(sql1)
+    for i in cursor.fetchall():
+        print(i)
+        
 if __name__ == '__main__':
     test_democracy_index_pipeline()
