@@ -1,5 +1,5 @@
 from taro.pipeline import democracy_index_pipeline
-
+import pandas as pd
 from sqlalchemy import create_engine
 import psycopg2
 
@@ -23,9 +23,16 @@ def test_democracy_index_pipeline():
     
     # fetching all rows
     sql1='''select * from democracy_index;'''
-    cursor.execute(sql1)
-    for i in cursor.fetchall():
-        print(i)
+    
+    df = pd.read_sql_query(sql1, conn, index_col='index')
+    
+    assert df.shape == (167, 17)
+    assert (df.columns == ['Country', 'Regime type', '2022', '2021', '2020', '2019', '2018',
+       '2017', '2016', '2015', '2014', '2013', '2012', '2011', '2010', '2008',
+       '2006']).sum() == 17
+
+    
+    
         
 if __name__ == '__main__':
     test_democracy_index_pipeline()
