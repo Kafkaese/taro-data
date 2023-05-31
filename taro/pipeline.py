@@ -1,7 +1,7 @@
 import psycopg2
 from taro.scraper import democracy_index_scraper
 
-def democracy_index(source: str = 'scraper', dest: str = 'postgres', **kwargs) -> bool:
+def democracy_index_pipeline(source: str = 'scraper', dest: str = 'postgres', **kwargs) -> bool:
     '''
     Gets democracy index data from source and writes to dest.
     
@@ -24,7 +24,10 @@ def democracy_index(source: str = 'scraper', dest: str = 'postgres', **kwargs) -
         data.to_csv('../data/dem_id_TEST.csv')
     
     elif dest == 'postgres':
-        if 'db_con' not in kwargs.keys():
+        
+        print(kwargs.keys())
+        
+        if 'db_conn' not in kwargs.keys():
             raise TypeError("If dest = 'postgres' is passed, keyword arguement db_conn is required")
         
         db_conn = kwargs['db_conn']
