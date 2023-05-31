@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import csv
 
-def democracy_index(write_to = None):
+def democracy_index_scraper(out: str):
     url = 'https://en.wikipedia.org/w/index.php?title=The_Economist_Democracy_Index&oldid=1157018749'
     
     response = requests.get(url)
@@ -60,7 +60,7 @@ def democracy_index(write_to = None):
         except:
             print(country)
             
-    if write_to == 'csv':
+    if out == 'csv':
         with open('data/democracy_index.csv', 'w') as file:
             writer = csv.DictWriter(file, fieldnames=table[0].keys())
             
@@ -68,5 +68,7 @@ def democracy_index(write_to = None):
             
             for row in table:
                 writer.writerow(row)
-    
-    return pd.DataFrame(table)
+    elif out == 'df' :
+        return pd.DataFrame(table)
+    else:
+        raise ValueError("out needs to be one of ('csv', 'df')")
