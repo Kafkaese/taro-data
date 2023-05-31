@@ -25,8 +25,6 @@ def democracy_index_pipeline(source: str = 'scraper', dest: str = 'postgres', **
     
     elif dest == 'postgres':
         
-        print(kwargs.keys())
-        
         if 'db_conn' not in kwargs.keys():
             raise TypeError("If dest = 'postgres' is passed, keyword arguement db_conn is required")
         
