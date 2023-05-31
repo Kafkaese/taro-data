@@ -1,5 +1,6 @@
 import psycopg2
 from taro.scraper import democracy_index_scraper
+import pandas as pd
 
 def democracy_index_pipeline(source: str = 'scraper', dest: str = 'postgres', **kwargs) -> bool:
     '''
@@ -34,3 +35,19 @@ def democracy_index_pipeline(source: str = 'scraper', dest: str = 'postgres', **
 
     else:
         pass
+    
+def peace_index_pipe(source: str = 'csv', dest: str = 'postgres', **kwargs) -> bool:
+    
+    
+    if source == 'csv':
+        if 'csv_path' not in kwargs.keys():
+            raise TypeError("If source = 'csv' is passed, keyword arguement csv_path is required")
+        
+        csv_path = kwargs['csv_path']
+        
+        peace_df = pd.read_csv(csv_path, header=3)
+        
+        # replace with corresponding pipe
+        codes = pd.read_csv('../data/countries_info.csv', index_col=0)
+        
+        ...
