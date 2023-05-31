@@ -1,4 +1,4 @@
-from taro.pipeline import democracy_index_pipeline
+from taro.pipeline import democracy_index_pipeline, peace_index_pipe
 import pandas as pd
 from sqlalchemy import create_engine
 import psycopg2
@@ -32,6 +32,9 @@ def test_democracy_index_pipeline():
        '2006']).sum() == 17
 
     
+def test_peace_index_pipe():
+    data = peace_index_pipe()
+    assert data.sum().sum() == 2591
     
         
 if __name__ == '__main__':
