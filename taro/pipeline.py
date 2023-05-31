@@ -1,7 +1,7 @@
 import psycopg2
-from taro.scraper import democracy_index
+from taro.scraper import democracy_index_scraper
 
-def democracy_index(source: str = 'scraper', dest: str = 'postgres', **kwargs) -> None:
+def democracy_index(source: str = 'scraper', dest: str = 'postgres', **kwargs) -> bool:
     '''
     Gets democracy index data from source and writes to dest.
     
@@ -13,10 +13,12 @@ def democracy_index(source: str = 'scraper', dest: str = 'postgres', **kwargs) -
     csv_src_path -- path to source csv file. Only if source = 'csv'
     csv_dest_path -- path to destination csv. Only if dest = 'csv'
 
+    Returns:
+    0 if data was successfully written to dest, 1 if not
     '''    
     # Run scraper
     if source == 'scraper':
-        data = democracy_index()
+        data = democracy_index_scraper('df')
 
     if dest == 'csv':
         data.to_csv('../data/dem_id_TEST.csv')
@@ -27,5 +29,7 @@ def democracy_index(source: str = 'scraper', dest: str = 'postgres', **kwargs) -
         
         db_conn = kwargs['db_conn']
 
+        data.to_sql('democracy_index', db_conn, if_exists='replace')
 
+    else:
         pass
