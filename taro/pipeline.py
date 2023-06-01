@@ -50,4 +50,12 @@ def peace_index_pipe(source: str = 'csv', dest: str = 'postgres', **kwargs) -> b
         # replace with corresponding pipe
         codes = pd.read_csv('../data/countries_info.csv', index_col=0)
         
-        ...
+        ''' 
+        Gets dataframe with peace index values for years 2008 - 2022
+        - merge on iso 3 country code column
+        - select only first 21 columns, removes most of the irrelevant information
+        -  drop remaining unneeded columns
+        - set iso 2 country code as index
+        '''
+        peace_index_df = peace_df.merge(codes, left_on='iso3c', right_on='Alpha-3 code').iloc[:,:21].drop(columns = ['iso3c', 'Country','Country name', 'Official state name', 'Sovereignty']).set_index('Alpha-2 code')
+    
