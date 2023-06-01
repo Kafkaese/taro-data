@@ -2,6 +2,7 @@ from taro.pipeline import democracy_index_pipeline, peace_index_pipe
 import pandas as pd
 from sqlalchemy import create_engine
 import psycopg2
+import os
 
 conn_string = 'postgresql://postgres:password@localhost/postgres'
 
@@ -33,12 +34,12 @@ def test_democracy_index_pipeline():
 
     
 def test_peace_index_pipe():
-    peace_index_pipe(source='csv', dest='postgres', csv_path='../data/GPI-2022-overall-scores-and-domains-2008-2022.csv', db_conn=conn)
+    peace_index_pipe(source='csv', dest='postgres', csv_path=os.path.join(os.path.dirname(__file__),'../data/GPI-2022-overall-scores-and-domains-2008-2022.csv'), db_conn=conn)
     
     # fetching all rows
     sql1='''select * from peace_index;'''
     
-    df = pd.read_sql_query(sql1, conn, index_col='index')
+    df = pd.read_sql_query(sql1, conn, index_col='Alpha-2 code')
     
     assert df.sum().sum() == 2591
     
