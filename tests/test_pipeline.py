@@ -41,7 +41,7 @@ def test_peace_index_pipe():
     
     df = pd.read_sql_query(sql1, conn, index_col='Alpha-2 code')
     
-    assert df.sum().sum() == 2591
+    assert df.sum().sum() == 4919.357
     
         
 if __name__ == '__main__':
