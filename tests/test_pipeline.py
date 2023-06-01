@@ -33,7 +33,7 @@ def test_democracy_index_pipeline():
 
     
 def test_peace_index_pipe():
-    peace_index_pipe()
+    peace_index_pipe(source='csv', dest='postgres', csv_path='../data/GPI-2022-overall-scores-and-domains-2008-2022.csv', db_conn=conn)
     
     # fetching all rows
     sql1='''select * from peace_index;'''
