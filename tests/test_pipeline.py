@@ -33,8 +33,14 @@ def test_democracy_index_pipeline():
 
     
 def test_peace_index_pipe():
-    data = peace_index_pipe()
-    assert data.sum().sum() == 2591
+    peace_index_pipe()
+    
+    # fetching all rows
+    sql1='''select * from peace_index;'''
+    
+    df = pd.read_sql_query(sql1, conn, index_col='index')
+    
+    assert df.sum().sum() == 2591
     
         
 if __name__ == '__main__':
