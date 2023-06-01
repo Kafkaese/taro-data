@@ -34,13 +34,15 @@ def test_democracy_index_pipeline():
 
     
 def test_peace_index_pipe():
-    peace_index_pipe(source='csv', dest='postgres', csv_path=os.path.join(os.path.dirname(__file__),'../data/GPI-2022-overall-scores-and-domains-2008-2022.csv'), db_conn=conn)
+    peace_index_pipe(source='csv', dest='postgres', csv_path=os.path.join(os.path.dirname(__file__),'../raw_data/GPI-2022-overall-scores-and-domains-2008-2022.csv'), db_conn=conn)
     
     # fetching all rows
     sql1='''select * from peace_index;'''
     
     df = pd.read_sql_query(sql1, conn, index_col='Alpha-2 code')
     
+    assert df.columns == ['2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016',
+       '2017', '2018', '2019', '2020', '2021', '2022']
     assert df.sum().sum() == 4919.357
     
         
