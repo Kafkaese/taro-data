@@ -1,7 +1,8 @@
-from taro.pipeline import democracy_index_pipeline
+from taro.pipeline import democracy_index_pipeline, country_code_pipeline
 import pandas as pd
 from sqlalchemy import create_engine
 import psycopg2
+import os
 
 conn_string = 'postgresql://postgres:password@localhost/postgres'
 
@@ -32,7 +33,17 @@ def test_democracy_index_pipeline():
        '2006']).sum() == 17
 
     
+def test_country_code_pipeline():
     
+    country_code_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path = os.path.join(os.path.dirname(__file__), '../data/iso_code_csv.csv'))
+    
+    # fetching all rows
+    sql1='''select * from country_code;'''
+    
+    df = pd.read_sql_query(sql1, conn, index_col='index')
+    
+    assert df.shape == (248, 2)
+
         
 if __name__ == '__main__':
     test_democracy_index_pipeline()
