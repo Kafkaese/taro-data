@@ -8,6 +8,13 @@ services:
     ports:
       - ${POSTGRES_PORT}:5432
 
+  taro-api:
+    image: taro-api
+    networks:
+      - taro
+    ports:
+    - ${API_PORT}:8000
+
 networks:
   taro:
     driver: bridge
