@@ -51,7 +51,7 @@ def test_peace_index_pipe():
     # fetching all rows
     sql1='''select * from peace_index;'''
     
-    df = pd.read_sql_query(sql1, conn, index_col='index')
+    df = pd.read_sql_query(sql1, conn, index_col='Alpha-2 code')
     
     assert df.shape == (248, 2)
 

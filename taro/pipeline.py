@@ -148,10 +148,12 @@ def country_info_pipeline(source: str = 'csv', dest: str = 'postgres', **kwargs)
         
         csv_path = kwargs['csv_path']
         
-        code_df = pd.read_csv(csv_path, header=1)
+        code_df = pd.read_csv(csv_path, header=0, index_col=0)
         
         
     if dest == 'postgres':
+        
+        print(code_df)
         
         if 'db_conn' not in kwargs.keys():
             raise TypeError("If dest = 'postgres' is passed, keyword arguement db_conn is required")
