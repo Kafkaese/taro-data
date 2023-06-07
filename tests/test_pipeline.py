@@ -1,8 +1,5 @@
-<<<<<<< HEAD
-from taro.pipeline import democracy_index_pipeline, peace_index_pipe
-=======
-from taro.pipeline import democracy_index_pipeline, country_code_pipeline
->>>>>>> main
+
+from taro.pipeline import democracy_index_pipeline, peace_index_pipe, country_code_pipeline
 import pandas as pd
 from sqlalchemy import create_engine
 import psycopg2
