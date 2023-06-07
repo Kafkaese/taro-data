@@ -9,4 +9,4 @@ COPY requirements_api.txt requirements.txt
 
 RUN pip install -r requirements.txt
 
-ENTRYPOINT ["uvicorn" "--host" "0.0.0.0" "api.country_data_api:app"]
+CMD ["uvicorn", "--host", "0.0.0.0", "api.country_data_api:app"]
