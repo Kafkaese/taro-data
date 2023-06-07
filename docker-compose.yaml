@@ -1,3 +1,5 @@
+version: "3"
+
 services:
   taro-postgres:
     image: postgres
@@ -7,6 +9,20 @@ services:
       - taro
     ports:
       - ${POSTGRES_PORT}:5432
+
+  taro-api:
+    image: taro-api
+    networks:
+      - taro
+    ports:
+      - ${API_PORT}:8000
+
+  taro-frontend:
+    image: taro-frontend
+    networks:
+      - taro
+    ports:
+      - ${REACT_PORT}:3000
 
 networks:
   taro:
