@@ -70,7 +70,7 @@ def country_code_pipeline(source: str = 'csv', dest: str = 'postgres', **kwargs)
         
         db_conn = kwargs['db_conn']
 
-        code_df.to_sql('peace_index', db_conn, if_exists='replace')
+        code_df.to_sql('country_ocde', db_conn, if_exists='replace')
 
     else:
         pass
