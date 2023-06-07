@@ -13,7 +13,14 @@ services:
     networks:
       - taro
     ports:
-    - ${API_PORT}:8000
+      - ${API_PORT}:8000
+
+  taro-frontend:
+    image: taro-frontend
+    networks:
+      - taro
+    ports:
+      - ${REACT_PORT}:3000
 
 networks:
   taro:
