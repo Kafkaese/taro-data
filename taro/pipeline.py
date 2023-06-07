@@ -101,7 +101,7 @@ def peace_index_pipe(source: str = 'csv', dest: str = 'postgres', **kwargs) -> b
         peace_df = pd.read_csv(csv_path, header=3)
         
         # replace with corresponding pipe
-        codes = pd.read_csv(os.path.join(os.path.dirname(__file__),'../data/countries_info.csv'), index_col=0)
+        codes = pd.read_csv(os.path.join(os.path.dirname(__file__),'data/countries_info.csv'), index_col=0)
         
         ''' 
         Gets dataframe with peace index values for years 2008 - 2022
