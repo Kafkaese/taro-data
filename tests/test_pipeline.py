@@ -1,5 +1,5 @@
 
-from taro.pipeline import democracy_index_pipeline, peace_index_pipe, country_code_pipeline
+from taro.pipeline import democracy_index_pipeline, peace_index_pipe, country_code_pipeline, country_info_pipeline
 import pandas as pd
 from sqlalchemy import create_engine
 import psycopg2
@@ -49,7 +49,7 @@ def test_peace_index_pipe():
     country_code_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path = os.path.join(os.path.dirname(__file__), '../data/iso_code_csv.csv'))
     
     # fetching all rows
-    sql1='''select * from country_code;'''
+    sql1='''select * from peace_index;'''
     
     df = pd.read_sql_query(sql1, conn, index_col='index')
     
@@ -65,6 +65,17 @@ def test_country_code_pipeline():
     df = pd.read_sql_query(sql1, conn, index_col='index')
     
     assert df.shape == (248, 2)
+
+def test_country_info_pipeline():
+    
+    country_info_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path = os.path.join(os.path.dirname(__file__), '../data/countries_info.csv'))
+    
+    # fetching all rows
+    sql1='''select * from country_info;'''
+    
+    df = pd.read_sql_query(sql1, conn, index_col='index')
+    
+    assert df.shape == (271, 8)
         
 if __name__ == '__main__':
     test_democracy_index_pipeline()
