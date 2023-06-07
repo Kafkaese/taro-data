@@ -41,7 +41,7 @@ def test_peace_index_pipe():
     
     df = pd.read_sql_query(sql1, conn, index_col='Alpha-2 code')
     
-    assert df.columns == ['2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016',
+    assert list(df.columns) == ['2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016',
        '2017', '2018', '2019', '2020', '2021', '2022']
     assert df.sum().sum() == 4919.357
     
