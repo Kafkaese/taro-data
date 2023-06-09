@@ -261,9 +261,9 @@ if __name__ == "__main__":
     
     # Run all pipelines
     
-    import_data_pipeline(db_conn = conn, csv_path = '..data/imports.csv')
+    import_data_pipeline(db_conn = conn, csv_path = '../data/imports.csv')
     
-    export_data_pipeline(db_conn = conn, csv_path = '..data/exports.csv')
+    export_data_pipeline(db_conn = conn, csv_path = '../data/exports.csv')
     
     democracy_index_pipeline(source='scraper', dest='postgres', db_conn = conn)
     
