@@ -27,20 +27,6 @@ db = create_engine(conn_string)
 conn = db.connect()
 
 
-
-# metadata
-metadata = pd.read_csv('data/metadata.csv',  index_col=0)
-democracy_index_data = pd.read_csv('data/democracy_index.csv',  index_col=0)
-peace_index_data = pd.read_csv('data/peace_index.csv', index_col=0)
-
-# exports data
-export_total_data = pd.read_csv('data/total_exports.csv',  index_col=0)
-
-# import data
-total_imports_data = pd.read_csv('data/total_imports.csv',  index_col=0)
-
-
-
 # root endpoint
 
 @app.get("/")
