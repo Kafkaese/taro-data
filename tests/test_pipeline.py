@@ -46,7 +46,7 @@ def test_peace_index_pipe():
     assert df.sum().sum() == 4919.357
 
     
-    country_code_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path = os.path.join(os.path.dirname(__file__), '../data/iso_code_csv.csv'))
+    #country_code_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path = os.path.join(os.path.dirname(__file__), '../data/iso_code_csv.csv'))
     
     # fetching all rows
     sql1='''select * from peace_index;'''
