@@ -13,14 +13,18 @@ services:
       - "data:/var/lib/postgresql/data"
 
   taro-api:
-    image: taro-api
+    build: 
+      context: .
+      dockerfile: ./api.Dockerfile
     networks:
       - taro
     ports:
       - ${API_PORT}:8000
 
   taro-frontend:
-    image: taro-frontend
+    build:
+      context: ../taro_map
+      dockerfile: Dockerfile_dev
     networks:
       - taro
     ports:

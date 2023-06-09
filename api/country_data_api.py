@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import psycopg2
+from sqlalchemy import create_engine, sql
 
 import pandas as pd
 
@@ -19,23 +21,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# metadata
-metadata = pd.read_csv('data/metadata.csv',  index_col=0)
-democracy_index_data = pd.read_csv('data/democracy_index.csv',  index_col=0)
-peace_index_data = pd.read_csv('data/peace_index.csv', index_col=0)
-
-# exports data
-export_total_data = pd.read_csv('data/total_exports.csv',  index_col=0)
-
-# import data
-total_imports_data = pd.read_csv('data/total_imports.csv',  index_col=0)
-
+# database connection
+conn_string = 'postgresql://postgres:password@taro-postgres/postgres'
+db = create_engine(conn_string)
+conn = db.connect()
 
 
 # root endpoint
 
 @app.get("/")
 async def root():
+    
     return {'status': 200}
 
 
@@ -43,57 +39,147 @@ async def root():
 
 @app.get("/metadata/name")
 async def name(country_code):
-    print(country_code)
-    print(metadata.loc[country_code, 'name'])
+    query = sql.text('''select short_name from country_names where "Alpha-2 code" = :c;''')
     
     try:
-        return {'value': str(metadata.loc[country_code, 'name'])}
+        cursor = conn.execute(query, parameters = {'c': country_code})
+        
+        result = cursor.fetchall()
+    
+        if result == []:
+            return {'value': 'no data'}
+        
+        return {'value': result[0][0]} 
+    
+    # if year < 2008 throws error because columns does not exist
     except:
         return {'value': 'no data'}
     
 @app.get("/metadata/democracy_index")
 async def democracy_index(country_code, year):
-    #print(country_name)
-    #print(democracy_index_data.loc[country_name, year])
+
+    query = sql.text('''select :y from peace_index where "Alpha-2 code" = :c;''')
     
     try:
-        return {'value': str(democracy_index_data.loc[country_code, year])}
+        cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
+        
+        result = cursor.fetchall()
+    
+        if result == []:
+            return {'value': 'no data'}
+        
+        return {'value': result[0][0]} 
+    
+    # if year < 2008 throws error because columns does not exist
     except:
         return {'value': 'no data'}
     
 @app.get("/metadata/peace_index")
 async def peace_index(country_code, year):
-    #print(country_name)
-    #print(democracy_index_data.loc[country_name, year])
+
+    query = sql.text('''select :y from peace_index where "Alpha-2 code" = :c;''')
     
     try:
-        return {'value': str(peace_index_data.loc[country_code, year])}
+        cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
+        
+        result = cursor.fetchall()
+    
+        if result == []:
+            return {'value': 'no data'}
+        
+        return {'value': result[0][0]} 
+    
+    # if year < 2008 throws error because columns does not exist
     except:
         return {'value': 'no data'}
-
+    
+    
 
 # exports path endpoints
 
-@app.get("/exports/total")
-async def exports_total(country_code):
-    #print(country_name)
-    #print(data.loc[country_name, 'Value'])
+@app.get("/exports/arms/total")
+async def exports_arms_total(country_code):
+
+    query = sql.text('''select SUM("Value") from exports where "Source country" = :c;''')
     
-    try:
-        return {'value': str(export_total_data.loc[country_code, 'Value'])}
-    except:
+    cursor = conn.execute(query, parameters = {'c': country_code})
+    
+    result = cursor.fetchall()
+    
+    if result == []:
         return {'value': 'no data'}
+    
+    return {'value': result[0][0]}  
+
+@app.get("/exports/arms/year")
+async def exports_arms_year(country_code, year):
+   
+    query = sql.text('''select "Value" from exports where "Source country" = :c and "Year" = :y;''')
+    
+    cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
+    
+    result = cursor.fetchall()
+    
+    if result == []:
+        return {'value': 'no data'}
+    
+    return {'value': result[0][0]}    
+
+@app.get("/exports/merchandise/total")
+async def exports_merchandise_total(country_code):
+
+    query = sql.text('''select SUM("export_alue") from merchandise_exports where "country_id" = :c;''')
+    
+    cursor = conn.execute(query, parameters = {'c': country_code})
+    
+    result = cursor.fetchall()
+    
+    if result == []:
+        return {'value': 'no data'}
+    
+    return {'value': result[0][0]}  
+
+@app.get("/exports/merchandise/year")
+async def exports_merchandise_year(country_code, year):
+   
+    query = sql.text('''select "export_value" from exports where "country_id" = :c and "year" = :y;''')
+    
+    cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
+    
+    result = cursor.fetchall()
+    
+    if result == []:
+        return {'value': 'no data'}
+    
+    return {'value': result[0][0]}    
 
 
 # import path endpoints
 
-@app.get("/imports/total")
-async def imports_total(country_code):
-    #print(country_name)
-    #print(data.loc[country_name, 'Value'])
+@app.get("/imports/arms/total")
+async def imports_arms_total(country_code):
+
+    query = sql.text('''select SUM("Value") from imports where "Destination country" = :c;''')
     
-    try:
-        return {'value': str(total_imports_data.loc[country_code, 'Value'])}
-    except:
+    cursor = conn.execute(query, parameters = {'c': country_code})
+    
+    result = cursor.fetchall()
+    
+    if result == []:
         return {'value': 'no data'}
+    
+    return {'value': result[0][0]}  
+
+@app.get("/imports/year")
+async def imports_arms_year(country_code, year):
+    
+    query = sql.text('''select "Value" from imports where "Destination country" = :c and "Year" = :y;''')
+    
+    cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
+    result = cursor.fetchall()
+    
+    if result == []:
+        return {'value': 'no data'}
+    
+    return {'value': result[0][0]}
     
