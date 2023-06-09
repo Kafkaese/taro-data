@@ -72,13 +72,17 @@ async def peace_index(country_code, year):
 
 @app.get("/exports/total")
 async def exports_total(country_code):
-    #print(country_name)
-    #print(data.loc[country_name, 'Value'])
+
+    query = sql.text('''select SUM("Value") from exports where "Source country" = :c;''')
     
-    try:
-        return {'value': str(export_total_data.loc[country_code, 'Value'])}
-    except:
+    cursor = conn.execute(query, parameters = {'c': country_code})
+    
+    result = cursor.fetchall()
+    
+    if result == []:
         return {'value': 'no data'}
+    
+    return {'value': result[0][0]}  
 
 @app.get("/exports/year")
 async def exports_year(country_code, year):
@@ -95,6 +99,20 @@ async def exports_year(country_code, year):
     return {'value': result[0][0]}    
 
 # import path endpoints
+
+@app.get("/imports/total")
+async def imports_total(country_code):
+
+    query = sql.text('''select SUM("Value") from imports where "Destination country" = :c;''')
+    
+    cursor = conn.execute(query, parameters = {'c': country_code})
+    
+    result = cursor.fetchall()
+    
+    if result == []:
+        return {'value': 'no data'}
+    
+    return {'value': result[0][0]}  
 
 @app.get("/imports/year")
 async def imports_year(country_code, year):
