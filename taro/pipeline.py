@@ -165,3 +165,79 @@ def country_info_pipeline(source: str = 'csv', dest: str = 'postgres', **kwargs)
     else:
         pass
     
+def import_data_pipeline(source: str = 'csv', dest: str = 'postgres', **kwargs) -> bool:
+    '''
+    Gets export data from 'source' and writes to 'dest'
+    
+    Keyword arguments:
+    source -- either one of ('csv')
+    dest -- either one of ('postgres', 'csv')
+    
+    db_conn -- postgres database connection. Only if dest = 'postgres'
+    csv_src_path -- path to source csv file. Only if source = 'csv'
+    csv_dest_path -- path to destination csv. Only if dest = 'csv'
+
+    Returns:
+    0 if data was successfully written to dest, 1 if not
+    
+    '''
+
+    if source == 'csv':
+        if 'csv_path' not in kwargs.keys():
+            raise TypeError("If source = 'csv' is passed, keyword arguement csv_path is required")
+        
+        csv_path = kwargs['csv_path']
+        
+        imports_df = pd.read_csv(csv_path, header=0, index_col=0)
+        
+        
+    if dest == 'postgres':
+        
+        if 'db_conn' not in kwargs.keys():
+            raise TypeError("If dest = 'postgres' is passed, keyword arguement db_conn is required")
+        
+        db_conn = kwargs['db_conn']
+
+        imports_df.to_sql('imports', db_conn, if_exists='replace')
+
+    else:
+        pass
+    
+def export_data_pipeline(source: str = 'csv', dest: str = 'postgres', **kwargs) -> bool:
+    '''
+    Gets export data from 'source' and writes to 'dest'
+    
+    Keyword arguments:
+    source -- either one of ('csv')
+    dest -- either one of ('postgres', 'csv')
+    
+    db_conn -- postgres database connection. Only if dest = 'postgres'
+    csv_src_path -- path to source csv file. Only if source = 'csv'
+    csv_dest_path -- path to destination csv. Only if dest = 'csv'
+
+    Returns:
+    0 if data was successfully written to dest, 1 if not
+    
+    '''
+
+    if source == 'csv':
+        if 'csv_path' not in kwargs.keys():
+            raise TypeError("If source = 'csv' is passed, keyword arguement csv_path is required")
+        
+        csv_path = kwargs['csv_path']
+        
+        export_df = pd.read_csv(csv_path, header=0, index_col=0)
+        
+        
+    if dest == 'postgres':
+        
+        if 'db_conn' not in kwargs.keys():
+            raise TypeError("If dest = 'postgres' is passed, keyword arguement db_conn is required")
+        
+        db_conn = kwargs['db_conn']
+
+        export_df.to_sql('exports', db_conn, if_exists='replace')
+
+    else:
+        pass
+    
