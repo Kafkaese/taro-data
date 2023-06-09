@@ -241,3 +241,31 @@ def export_data_pipeline(source: str = 'csv', dest: str = 'postgres', **kwargs) 
     else:
         pass
     
+if __name__ == "__main__":
+    import psycopg2
+    from sqlalchemy import create_engine
+    
+    conn_string = 'postgresql://postgres:password@localhost/postgres'
+
+    db = create_engine(conn_string)
+    conn = db.connect()
+    conn1 = psycopg2.connect(
+        database="postgres",
+        user='postgres', 
+        password='password', 
+        host='127.0.0.1', 
+        port= '5432'
+    )
+
+    cursor = conn1.cursor()
+    
+    # Run all pipelines
+    
+    import_data_pipeline(db_conn = conn, csv_path = '..data/imports.csv')
+    
+    export_data_pipeline(db_conn = conn, csv_path = '..data/exports.csv')
+    
+    democracy_index_pipeline(source='scraper', dest='postgres', db_conn = conn)
+    
+    peace_index_pipe(source='csv', dest='postgres', csv_path=os.path.join(os.path.dirname(__file__),'../raw_data/GPI-2022-overall-scores-and-domains-2008-2022.csv'), db_conn=conn)
+    
