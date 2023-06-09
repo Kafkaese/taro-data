@@ -95,13 +95,14 @@ async def exports_total(country_code):
         return {'value': 'no data'}
 
 @app.get("/exports/year")
-async def exports_total(country_code, year):
-
+async def exports_year(country_code, year):
+    print(country_code)
+    print(year)
     query = sql.text('''select * from exports where "Source country" = :c and "Year" = :y;''')
     
     cursor = conn.execute(query, c=country_code, y=year)
     result = cursor.fetchall()
-    
+    print(result)
     if result == []:
         return {'value': 'no data'}
     
@@ -109,8 +110,8 @@ async def exports_total(country_code, year):
 
 # import path endpoints
 
-@app.get("/imports/total")
-async def imports_total(country_code, year):
+@app.get("/imports/year")
+async def imports_year(country_code, year):
     
     query = sql.text('''select * from imports where "Destination country" = :c and "Year" = :y;''')
     
