@@ -1,4 +1,5 @@
 import psycopg2
+from sqlalchemy import create_engine, types
 from taro.scraper import democracy_index_scraper
 import pandas as pd
 import os
@@ -198,7 +199,7 @@ def import_data_pipeline(source: str = 'csv', dest: str = 'postgres', **kwargs) 
         
         db_conn = kwargs['db_conn']
 
-        imports_df.to_sql('imports', db_conn, if_exists='replace')
+        imports_df.to_sql('imports', db_conn, if_exists='replace',dtype= {'Destination country': types.VARCHAR, 'Year': types.INTEGER, 'Value' : types.BIGINT})
 
     else:
         pass
@@ -236,14 +237,13 @@ def export_data_pipeline(source: str = 'csv', dest: str = 'postgres', **kwargs) 
         
         db_conn = kwargs['db_conn']
 
-        export_df.to_sql('exports', db_conn, if_exists='replace')
+        export_df.to_sql('exports', db_conn, if_exists='replace', dtype={'Source country': types.VARCHAR, 'Year': types.INTEGER, 'Value' : types.BIGINT})
 
     else:
         pass
     
 if __name__ == "__main__":
-    import psycopg2
-    from sqlalchemy import create_engine
+
     
     conn_string = 'postgresql://postgres:password@localhost/postgres'
 
