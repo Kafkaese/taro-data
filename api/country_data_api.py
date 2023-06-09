@@ -22,7 +22,7 @@ app.add_middleware(
 )
 
 # database connection
-conn_string = 'postgresql://postgres:password@localhost/postgres'
+conn_string = 'postgresql://postgres:password@taro-postgres/postgres'
 db = create_engine(conn_string)
 conn = db.connect()
 
@@ -100,7 +100,7 @@ async def exports_year(country_code, year):
     print(year)
     query = sql.text('''select * from exports where "Source country" = :c and "Year" = :y;''')
     
-    cursor = conn.execute(query, c=country_code, y=year)
+    cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
     result = cursor.fetchall()
     print(result)
     if result == []:
@@ -115,7 +115,7 @@ async def imports_year(country_code, year):
     
     query = sql.text('''select * from imports where "Destination country" = :c and "Year" = :y;''')
     
-    cursor = conn.execute(query, c=country_code, y=year)
+    cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
     result = cursor.fetchall()
     
     if result == []:
