@@ -315,5 +315,5 @@ if __name__ == "__main__":
     
     #peace_index_pipe(source='csv', dest='postgres', csv_path=os.path.join(os.path.dirname(__file__),'../raw_data/GPI-2022-overall-scores-and-domains-2008-2022.csv'), db_conn=conn)
     
-    country_name_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path='../data/wikipedia-iso-country-codes.csv')
+    country_name_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path='../data/countries_info.csv')
     
