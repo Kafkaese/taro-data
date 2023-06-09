@@ -22,7 +22,14 @@ def democracy_index_pipeline(source: str = 'scraper', dest: str = 'postgres', **
     # Run scraper
     if source == 'scraper':
         data = democracy_index_scraper('df')
-
+    elif source == 'csv':
+        if 'csv_path' not in kwargs.keys():
+            raise TypeError("If source = 'csv' is passed, keyword arguement csv_path is required")
+        
+        csv_path = kwargs['csv_path']
+        
+        data = pd.read_csv(csv_path, header=0)
+    
     if dest == 'csv':
         data.to_csv('../data/dem_id_TEST.csv')
     
@@ -261,11 +268,13 @@ if __name__ == "__main__":
     
     # Run all pipelines
     
-    import_data_pipeline(db_conn = conn, csv_path = '../data/imports.csv')
+    #import_data_pipeline(db_conn = conn, csv_path = '../data/imports.csv')
     
-    export_data_pipeline(db_conn = conn, csv_path = '../data/exports.csv')
+    #export_data_pipeline(db_conn = conn, csv_path = '../data/exports.csv')
     
-    democracy_index_pipeline(source='scraper', dest='postgres', db_conn = conn)
+    #democracy_index_pipeline(source='scraper', dest='postgres', db_conn = conn)
     
-    peace_index_pipe(source='csv', dest='postgres', csv_path=os.path.join(os.path.dirname(__file__),'../raw_data/GPI-2022-overall-scores-and-domains-2008-2022.csv'), db_conn=conn)
+    #peace_index_pipe(source='csv', dest='postgres', csv_path=os.path.join(os.path.dirname(__file__),'../raw_data/GPI-2022-overall-scores-and-domains-2008-2022.csv'), db_conn=conn)
+    
+    democracy_index_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path='../data/democracy_index.csv')
     
