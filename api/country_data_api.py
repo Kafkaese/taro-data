@@ -39,11 +39,19 @@ async def root():
 
 @app.get("/metadata/name")
 async def name(country_code):
-    print(country_code)
-    print(metadata.loc[country_code, 'name'])
+    query = sql.text('''select short_name from country_names where "Alpha-2 code" = :c;''')
     
     try:
-        return {'value': str(metadata.loc[country_code, 'name'])}
+        cursor = conn.execute(query, parameters = {'c': country_code})
+        
+        result = cursor.fetchall()
+    
+        if result == []:
+            return {'value': 'no data'}
+        
+        return {'value': result[0][0]} 
+    
+    # if year < 2008 throws error because columns does not exist
     except:
         return {'value': 'no data'}
     
