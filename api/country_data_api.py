@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import psycopg2
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, sql
 
 import pandas as pd
 
@@ -25,14 +25,8 @@ app.add_middleware(
 conn_string = 'postgresql://postgres:password@localhost/postgres'
 db = create_engine(conn_string)
 conn = db.connect()
-conn1 = psycopg2.connect(
-    database="postgres",
-    user='postgres', 
-    password='password', 
-    host='127.0.0.1', 
-    port= '5432'
-)
-cursor = conn1.cursor()
+
+
 
 # metadata
 metadata = pd.read_csv('data/metadata.csv',  index_col=0)
@@ -102,23 +96,29 @@ async def exports_total(country_code):
 
 @app.get("/exports/year")
 async def exports_total(country_code, year):
-    #print(country_name)
-    #print(data.loc[country_name, 'Value'])
+
+    query = sql.text('''select * from exports where "Source country" = :c and "Year" = :y;''')
     
-    try:
-        return {'value': str(export_total_data.loc[country_code, 'Value'])}
-    except:
+    cursor = conn.execute(query, c=country_code, y=year)
+    result = cursor.fetchall()
+    
+    if result == []:
         return {'value': 'no data'}
+    
+    return {'value': result[0][0]}    
 
 # import path endpoints
 
 @app.get("/imports/total")
-async def imports_total(country_code):
-    #print(country_name)
-    #print(data.loc[country_name, 'Value'])
+async def imports_total(country_code, year):
     
-    try:
-        return {'value': str(total_imports_data.loc[country_code, 'Value'])}
-    except:
+    query = sql.text('''select * from imports where "Destination country" = :c and "Year" = :y;''')
+    
+    cursor = conn.execute(query, c=country_code, y=year)
+    result = cursor.fetchall()
+    
+    if result == []:
         return {'value': 'no data'}
+    
+    return {'value': result[0][0]}
     
