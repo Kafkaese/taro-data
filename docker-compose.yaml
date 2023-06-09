@@ -9,6 +9,8 @@ services:
       - taro
     ports:
       - ${POSTGRES_PORT}:5432
+    volumes:
+      - "data:/var/lib/postgresql/data"
 
   taro-api:
     build: 
@@ -27,6 +29,9 @@ services:
       - taro
     ports:
       - ${REACT_PORT}:3000
+
+volumes:
+  data:
 
 networks:
   taro:
