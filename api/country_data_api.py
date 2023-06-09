@@ -49,24 +49,43 @@ async def name(country_code):
     
 @app.get("/metadata/democracy_index")
 async def democracy_index(country_code, year):
-    #print(country_name)
-    #print(democracy_index_data.loc[country_name, year])
+
+    query = sql.text('''select :y from peace_index where "Alpha-2 code" = :c;''')
     
     try:
-        return {'value': str(democracy_index_data.loc[country_code, year])}
+        cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
+        
+        result = cursor.fetchall()
+    
+        if result == []:
+            return {'value': 'no data'}
+        
+        return {'value': result[0][0]} 
+    
+    # if year < 2008 throws error because columns does not exist
     except:
         return {'value': 'no data'}
     
 @app.get("/metadata/peace_index")
 async def peace_index(country_code, year):
-    #print(country_name)
-    #print(democracy_index_data.loc[country_name, year])
+
+    query = sql.text('''select :y from peace_index where "Alpha-2 code" = :c;''')
     
     try:
-        return {'value': str(peace_index_data.loc[country_code, year])}
+        cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
+        
+        result = cursor.fetchall()
+    
+        if result == []:
+            return {'value': 'no data'}
+        
+        return {'value': result[0][0]} 
+    
+    # if year < 2008 throws error because columns does not exist
     except:
         return {'value': 'no data'}
-
+    
+    
 
 # exports path endpoints
 
