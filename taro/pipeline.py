@@ -272,7 +272,7 @@ def country_name_pipeline(source: str = 'scraper', dest: str = 'postgres', **kwa
         
         csv_path = kwargs['csv_path']
         
-        data = pd.read_csv(csv_path, header=0)
+        data = pd.read_csv(csv_path, header=0, index_col=0)
     
     if dest == 'csv':
         data.to_csv('../data/dem_id_TEST.csv')
