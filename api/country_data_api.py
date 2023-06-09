@@ -97,8 +97,8 @@ async def peace_index(country_code, year):
 
 # exports path endpoints
 
-@app.get("/exports/total")
-async def exports_total(country_code):
+@app.get("/exports/arms/total")
+async def exports_arms_total(country_code):
 
     query = sql.text('''select SUM("Value") from exports where "Source country" = :c;''')
     
@@ -111,8 +111,8 @@ async def exports_total(country_code):
     
     return {'value': result[0][0]}  
 
-@app.get("/exports/year")
-async def exports_year(country_code, year):
+@app.get("/exports/arms/year")
+async def exports_arms_year(country_code, year):
    
     query = sql.text('''select "Value" from exports where "Source country" = :c and "Year" = :y;''')
     
@@ -125,10 +125,39 @@ async def exports_year(country_code, year):
     
     return {'value': result[0][0]}    
 
+@app.get("/exports/merchandise/total")
+async def exports_merchandise_total(country_code):
+
+    query = sql.text('''select SUM("export_alue") from merchandise_exports where "country_id" = :c;''')
+    
+    cursor = conn.execute(query, parameters = {'c': country_code})
+    
+    result = cursor.fetchall()
+    
+    if result == []:
+        return {'value': 'no data'}
+    
+    return {'value': result[0][0]}  
+
+@app.get("/exports/merchandise/year")
+async def exports_merchandise_year(country_code, year):
+   
+    query = sql.text('''select "export_value" from exports where "country_id" = :c and "year" = :y;''')
+    
+    cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
+    
+    result = cursor.fetchall()
+    
+    if result == []:
+        return {'value': 'no data'}
+    
+    return {'value': result[0][0]}    
+
+
 # import path endpoints
 
-@app.get("/imports/total")
-async def imports_total(country_code):
+@app.get("/imports/arms/total")
+async def imports_arms_total(country_code):
 
     query = sql.text('''select SUM("Value") from imports where "Destination country" = :c;''')
     
@@ -142,7 +171,7 @@ async def imports_total(country_code):
     return {'value': result[0][0]}  
 
 @app.get("/imports/year")
-async def imports_year(country_code, year):
+async def imports_arms_year(country_code, year):
     
     query = sql.text('''select "Value" from imports where "Destination country" = :c and "Year" = :y;''')
     
