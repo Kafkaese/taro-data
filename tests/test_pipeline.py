@@ -53,7 +53,7 @@ def test_peace_index_pipe():
     
     df = pd.read_sql_query(sql1, conn, index_col='Alpha-2 code')
     
-    assert df.shape == (248, 2)
+    assert df.shape == (162, 16)
 
 def test_country_code_pipeline():
     
