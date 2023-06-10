@@ -131,7 +131,9 @@ async def exports_arms_year(country_code, year):
 @app.get("/exports/merchandise/total")
 async def exports_merchandise_total(country_code):
 
-    query = sql.text('''select SUM("export_alue") from merchandise_exports where "country_id" = :c;''')
+    query = sql.text('''select SUM(export_value) from merchandise_exports
+join country_names as cn on "country_id" = cn."index"
+where "Alpha-2 code" = :c;''')
     
     cursor = conn.execute(query, parameters = {'c': country_code})
     
@@ -145,7 +147,9 @@ async def exports_merchandise_total(country_code):
 @app.get("/exports/merchandise/year")
 async def exports_merchandise_year(country_code, year):
    
-    query = sql.text('''select "export_value" from merchandise_exports where "country_id" = :c and "year" = :y;''')
+    query = sql.text('''select SUM(export_value) from merchandise_exports
+join country_names as cn on "country_id" = cn."index"
+where "Alpha-2 code" = :c and year = :y;''')
     
     cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
     
