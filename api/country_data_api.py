@@ -17,7 +17,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET"],
     allow_headers=["*"],
 )
 
@@ -145,7 +145,7 @@ async def exports_merchandise_total(country_code):
 @app.get("/exports/merchandise/year")
 async def exports_merchandise_year(country_code, year):
    
-    query = sql.text('''select "export_value" from exports where "country_id" = :c and "year" = :y;''')
+    query = sql.text('''select "export_value" from merchandise_exports where "country_id" = :c and "year" = :y;''')
     
     cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
     
