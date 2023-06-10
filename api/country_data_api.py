@@ -58,10 +58,11 @@ async def name(country_code):
 @app.get("/metadata/democracy_index")
 async def democracy_index(country_code, year):
 
-    query = sql.text('''select :y from peace_index where "Alpha-2 code" = :c;''')
+    # columns cannot be passed as parameters
+    query = sql.text(f'''select "{year}" from peace_index where "Alpha-2 code" = :c;''')
     
     try:
-        cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
+        cursor = conn.execute(query, parameters = {'c': country_code})
         
         result = cursor.fetchall()
     
@@ -77,10 +78,12 @@ async def democracy_index(country_code, year):
 @app.get("/metadata/peace_index")
 async def peace_index(country_code, year):
 
-    query = sql.text('''select :y from peace_index where "Alpha-2 code" = :c;''')
+
+    # columns cannot be passed as parameters
+    query = sql.text(f'''select "{year}" from peace_index where "Alpha-2 code" = :c;''')
     
     try:
-        cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
+        cursor = conn.execute(query, parameters = {'c': country_code})
         
         result = cursor.fetchall()
     
