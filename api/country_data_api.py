@@ -59,7 +59,7 @@ async def name(country_code):
 async def democracy_index(country_code, year):
 
     # columns cannot be passed as parameters
-    query = sql.text(f'''select "{year}" from peace_index where "Alpha-2 code" = :c;''')
+    query = sql.text(f'''select "{year}" from democracy_index where "Alpha-2 code" = :c;''')
     
     try:
         cursor = conn.execute(query, parameters = {'c': country_code})
