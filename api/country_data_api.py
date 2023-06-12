@@ -105,44 +105,53 @@ async def exports_arms_total(country_code):
 
     query = sql.text('''select SUM("Value") from exports where "Source country" = :c;''')
     
-    cursor = conn.execute(query, parameters = {'c': country_code})
-    
-    result = cursor.fetchall()
-    
-    if result == []:
+    try:
+        cursor = conn.execute(query, parameters = {'c': country_code})
+        
+        result = cursor.fetchall()
+        
+        if result == []:
+            return {'value': 'no data'}
+        
+        return {'value': result[0][0]}  
+    except:
         return {'value': 'no data'}
-    
-    return {'value': result[0][0]}  
 
 @app.get("/exports/arms/year")
 async def exports_arms_year(country_code, year):
    
     query = sql.text('''select "Value" from exports where "Source country" = :c and "Year" = :y;''')
     
-    cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
-    
-    result = cursor.fetchall()
-    
-    if result == []:
+    try:
+        cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
+        
+        result = cursor.fetchall()
+        
+        if result == []:
+            return {'value': 'no data'}
+        
+        return {'value': result[0][0]}    
+    except:
         return {'value': 'no data'}
-    
-    return {'value': result[0][0]}    
 
 @app.get("/exports/merchandise/total")
 async def exports_merchandise_total(country_code):
 
     query = sql.text('''select SUM(export_value) from merchandise_exports
-join country_names as cn on "country_id" = cn."index"
-where "Alpha-2 code" = :c;''')
+        join country_names as cn on "country_id" = cn."index"
+        where "Alpha-2 code" = :c;''')
     
-    cursor = conn.execute(query, parameters = {'c': country_code})
-    
-    result = cursor.fetchall()
-    
-    if result == []:
+    try:
+        cursor = conn.execute(query, parameters = {'c': country_code})
+        
+        result = cursor.fetchall()
+        
+        if result == []:
+            return {'value': 'no data'}
+        
+        return {'value': result[0][0]}  
+    except:
         return {'value': 'no data'}
-    
-    return {'value': result[0][0]}  
 
 @app.get("/exports/merchandise/year")
 async def exports_merchandise_year(country_code, year):
@@ -153,12 +162,15 @@ where "Alpha-2 code" = :c and year = :y;''')
     
     cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
     
-    result = cursor.fetchall()
-    
-    if result == []:
+    try:
+        result = cursor.fetchall()
+        
+        if result == []:
+            return {'value': 'no data'}
+        
+        return {'value': result[0][0]}    
+    except:
         return {'value': 'no data'}
-    
-    return {'value': result[0][0]}    
 
 
 # import path endpoints
@@ -168,25 +180,31 @@ async def imports_arms_total(country_code):
 
     query = sql.text('''select SUM("Value") from imports where "Destination country" = :c;''')
     
-    cursor = conn.execute(query, parameters = {'c': country_code})
-    
-    result = cursor.fetchall()
-    
-    if result == []:
+    try:
+        cursor = conn.execute(query, parameters = {'c': country_code})
+        
+        result = cursor.fetchall()
+        
+        if result == []:
+            return {'value': 'no data'}
+        
+        return {'value': result[0][0]}  
+    except:
         return {'value': 'no data'}
-    
-    return {'value': result[0][0]}  
 
 @app.get("/imports/year")
 async def imports_arms_year(country_code, year):
     
     query = sql.text('''select "Value" from imports where "Destination country" = :c and "Year" = :y;''')
     
-    cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
-    result = cursor.fetchall()
-    
-    if result == []:
+    try:
+        cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
+        result = cursor.fetchall()
+        
+        if result == []:
+            return {'value': 'no data'}
+        
+        return {'value': result[0][0]}
+    except:
         return {'value': 'no data'}
-    
-    return {'value': result[0][0]}
     
