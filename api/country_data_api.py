@@ -39,6 +39,9 @@ async def root():
 
 @app.get("/metadata/name")
 async def name(country_code):
+    
+    global conn
+    
     query = sql.text('''select short_name from country_names where "Alpha-2 code" = :c;''')
     
     try:
@@ -53,11 +56,15 @@ async def name(country_code):
     
     # if year < 2008 throws error because columns does not exist
     except:
+        conn.close()
+        conn = db.connect()
         return {'value': 'no data'}
     
 @app.get("/metadata/democracy_index")
 async def democracy_index(country_code, year):
 
+    global conn
+    
     # columns cannot be passed as parameters
     query = sql.text(f'''select "{year}" from democracy_index where "Alpha-2 code" = :c;''')
     
@@ -73,11 +80,14 @@ async def democracy_index(country_code, year):
     
     # if year < 2008 throws error because columns does not exist
     except:
+        conn.close()
+        conn = db.connect()
         return {'value': 'no data'}
     
 @app.get("/metadata/peace_index")
 async def peace_index(country_code, year):
 
+    global conn
 
     # columns cannot be passed as parameters
     query = sql.text(f'''select "{year}" from peace_index where "Alpha-2 code" = :c;''')
@@ -94,6 +104,8 @@ async def peace_index(country_code, year):
     
     # if year < 2008 throws error because columns does not exist
     except:
+        conn.close()
+        conn = db.connect()
         return {'value': 'no data'}
     
     
@@ -103,6 +115,8 @@ async def peace_index(country_code, year):
 @app.get("/exports/arms/total")
 async def exports_arms_total(country_code):
 
+    global conn
+    
     query = sql.text('''select SUM("Value") from exports where "Source country" = :c;''')
     
     try:
@@ -115,10 +129,14 @@ async def exports_arms_total(country_code):
         
         return {'value': result[0][0]}  
     except:
+        conn.close()
+        conn = db.connect()
         return {'value': 'no data'}
 
 @app.get("/exports/arms/year")
 async def exports_arms_year(country_code, year):
+   
+    global conn
    
     query = sql.text('''select "Value" from exports where "Source country" = :c and "Year" = :y;''')
     
@@ -132,10 +150,14 @@ async def exports_arms_year(country_code, year):
         
         return {'value': result[0][0]}    
     except:
+        conn.close()
+        conn = db.connect()
         return {'value': 'no data'}
 
 @app.get("/exports/merchandise/total")
 async def exports_merchandise_total(country_code):
+    
+    global conn
 
     query = sql.text('''select SUM(export_value) from merchandise_exports
         join country_names as cn on "country_id" = cn."index"
@@ -151,11 +173,15 @@ async def exports_merchandise_total(country_code):
         
         return {'value': result[0][0]}  
     except:
+        conn.close()
+        conn = db.connect()
         return {'value': 'no data'}
 
 @app.get("/exports/merchandise/year")
 async def exports_merchandise_year(country_code, year):
    
+    global conn
+    
     query = sql.text('''select SUM(export_value) from merchandise_exports
 join country_names as cn on "country_id" = cn."index"
 where "Alpha-2 code" = :c and year = :y;''')
@@ -170,6 +196,8 @@ where "Alpha-2 code" = :c and year = :y;''')
         
         return {'value': result[0][0]}    
     except:
+        conn.close()
+        conn = db.connect()
         return {'value': 'no data'}
 
 
@@ -178,6 +206,8 @@ where "Alpha-2 code" = :c and year = :y;''')
 @app.get("/imports/arms/total")
 async def imports_arms_total(country_code):
 
+    global conn
+    
     query = sql.text('''select SUM("Value") from imports where "Destination country" = :c;''')
     
     try:
@@ -190,10 +220,14 @@ async def imports_arms_total(country_code):
         
         return {'value': result[0][0]}  
     except:
+        conn.close()
+        conn = db.connect()
         return {'value': 'no data'}
 
 @app.get("/imports/year")
 async def imports_arms_year(country_code, year):
+    
+    global conn
     
     query = sql.text('''select "Value" from imports where "Destination country" = :c and "Year" = :y;''')
     
@@ -206,5 +240,7 @@ async def imports_arms_year(country_code, year):
         
         return {'value': result[0][0]}
     except:
+        conn.close()
+        conn = db.connect()
         return {'value': 'no data'}
     
