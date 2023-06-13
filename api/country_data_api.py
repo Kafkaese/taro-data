@@ -37,8 +37,8 @@ async def root():
 
 # metadata path endpoints
 
-@app.get("/metadata/name")
-async def name(country_code):
+@app.get("/metadata/name/short")
+async def short_name(country_code):
     
     global conn
     
