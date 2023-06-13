@@ -326,7 +326,43 @@ def merch_export_pipeline(source: str = 'scraper', dest: str = 'postgres', **kwa
     else:
         pass
     
+def arms_pipeline(source: str = 'scraper', dest: str = 'postgres', **kwargs) -> bool:
+    '''
+    Gets total arms export and import for all years data from source and writes to dest.
     
+    Keyword arguments:
+    source -- either one of ('scraper', 'csv')
+    dest -- either one of ('postgres', 'csv')
+    
+    db_conn -- postgres database connection. Only if dest = 'postgres'
+    csv_src_path -- path to source csv file. Only if source = 'csv'
+    csv_dest_path -- path to destination csv. Only if dest = 'csv'
+
+    Returns:
+    0 if data was successfully written to dest, 1 if not
+    '''    
+    
+    if source == 'csv':
+        if 'csv_path' not in kwargs.keys():
+            raise TypeError("If source = 'csv' is passed, keyword arguement csv_path is required")
+        
+        csv_path = kwargs['csv_path']
+        
+        data = pd.read_csv(csv_path, header=0, index_col=0)
+    
+    
+    if dest == 'postgres':
+        
+        if 'db_conn' not in kwargs.keys():
+            raise TypeError("If dest = 'postgres' is passed, keyword arguement db_conn is required")
+        
+        db_conn = kwargs['db_conn']
+
+        data.to_sql('arms', db_conn, if_exists='replace')
+
+    else:
+        pass
+       
 if __name__ == "__main__":
 
     
@@ -354,5 +390,6 @@ if __name__ == "__main__":
     
     #peace_index_pipe(source='csv', dest='postgres', csv_path=os.path.join(os.path.dirname(__file__),'../raw_data/GPI-2022-overall-scores-and-domains-2008-2022.csv'), db_conn=conn)
     
-    merch_export_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path='../data/total_merchandise_exports.csv')
+    #merch_export_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path='../data/total_merchandise_exports.csv')
     
+    arms_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path = '../data/arms.csv')
