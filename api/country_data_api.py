@@ -37,8 +37,8 @@ async def root():
 
 # metadata path endpoints
 
-@app.get("/metadata/name")
-async def name(country_code):
+@app.get("/metadata/name/short")
+async def short_name(country_code):
     
     global conn
     
@@ -244,3 +244,23 @@ async def imports_arms_year(country_code, year):
         conn = db.connect()
         return {'value': 'no data'}
     
+@app.get("/imports/arms/year_all")
+async def imports_arms_year_all(country_code, year):
+    global conn
+    
+    query = sql.text('''select "Source country", "Value" from arms
+        where "Destination country" = :c and "Year" = :y
+        order by "Value" desc;''')
+    
+    try:
+        cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
+        result = cursor.fetchall()
+        
+        if result == []:
+            return {'value': 'no data'}
+        
+        return {'value': result[0][0]}
+    except:
+        conn.close()
+        conn = db.connect()
+        return {'value': 'no data'}
