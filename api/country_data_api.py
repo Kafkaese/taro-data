@@ -259,7 +259,7 @@ async def imports_arms_year_all(country_code, year):
         if result == []:
             return {'value': 'no data'}
         
-        return {'value': result[0][0]}
+        return [{'name': country[0], 'value': country[1]} for country in result]
     except:
         conn.close()
         conn = db.connect()
