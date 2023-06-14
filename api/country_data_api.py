@@ -245,15 +245,15 @@ async def imports_arms_year(country_code, year):
         return {'value': 'no data'}
     
 @app.get("/imports/arms/year_all")
-async def imports_arms_year_all(country_code, year):
+async def imports_arms_year_all(country_code, year, limit=300):
     global conn
     
     query = sql.text('''select "Source country", "Value" from arms
         where "Destination country" = :c and "Year" = :y
-        order by "Value" desc;''')
+        order by "Value" desc limit :l;''')
     
     try:
-        cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
+        cursor = conn.execute(query, parameters = {'c': country_code, 'y': year, 'l': limit})
         result = cursor.fetchall()
         
         if result == []:
