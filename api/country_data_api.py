@@ -244,6 +244,7 @@ async def imports_arms_year(country_code, year):
         conn = db.connect()
         return {'value': 'no data'}
     
+# Gets import data for a country on a given year, listing values for source counries seperately
 @app.get("/imports/arms/year_all")
 async def imports_arms_year_all(country_code, year, limit=300):
     global conn
@@ -260,6 +261,29 @@ async def imports_arms_year_all(country_code, year, limit=300):
             return {'value': 'no data'}
         
         return [{'name': country[0], 'value': country[1]} for country in result]
+    except:
+        conn.close()
+        conn = db.connect()
+        return {'value': 'no data'}
+    
+@app.get("/imports/arms/timeseries")
+async def imports_arms_timeseries(country_code):
+    global conn
+    
+    query = sql.text('''select "Year", SUM("Value") from arms
+                where "Destination country" = 'CN'
+                group by "Year"
+                order by "Year" asc ;''')
+    
+    try:
+        cursor = conn.execute(query, parameters = {'c': country_code})
+        result = cursor.fetchall()
+        
+        if result == []:
+            return {'value': 'no data'}
+      
+        return [{'year': year[0], 'value': int(year[1])} for year in result]
+    
     except:
         conn.close()
         conn = db.connect()
