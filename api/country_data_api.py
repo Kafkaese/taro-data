@@ -145,7 +145,7 @@ async def exports_arms_year(country_code, year):
         
         result = cursor.fetchall()
         
-        if result == []:
+        if result[0] == (None,):
             return {'value': 'no data'}
         
         return {'value': result[0][0]}    
