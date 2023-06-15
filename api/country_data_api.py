@@ -271,7 +271,7 @@ async def imports_arms_timeseries(country_code):
     global conn
     
     query = sql.text('''select "Year", SUM("Value") from arms
-                where "Destination country" = 'CN'
+                where "Destination country" = :c
                 group by "Year"
                 order by "Year" asc ;''')
     
