@@ -273,13 +273,13 @@ async def imports_arms_year(country_code, year):
     
     global conn
     
-    query = sql.text('''select "Value" from imports where "Destination country" = :c and "Year" = :y;''')
+    query = sql.text('''select SUM("Value") from arms where "Destination country" = :c and "Year" = :y;''')
     
     try:
         cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
         result = cursor.fetchall()
         
-        if result == []:
+        if result[0] == (None,):
             return {'value': 'no data'}
         
         return {'value': result[0][0]}
