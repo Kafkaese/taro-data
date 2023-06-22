@@ -151,10 +151,21 @@ async def arms_exports_total(country_code, year):
 async def arms_exports_timeseries(country_code):
     global conn
     
-    query = sql.text('''select "Year", SUM("Value") from arms
-                where "Source country" = :c
-                group by "Year"
-                order by "Year" asc ;''')
+    query = sql.text('''select coalesce (arms."Year", exports."Year"), coalesce (arms.sum, exports.sum) from 
+        (
+        select "Year", SUM("Value") from arms
+                        where "Source country" = :c
+                        group by "Year"
+                        order by "Year" asc
+        ) as arms
+        full outer join
+        (
+        select "Year", SUM("Value") from exports
+        where "Source country" = :c
+        group by "Year"
+        order by "Year" asc 
+        ) as exports
+        on arms."Year" = exports."Year" ;''')
     
     try:
         cursor = conn.execute(query, parameters = {'c': country_code})
@@ -242,10 +253,21 @@ async def arms_imports_by_country(country_code, year, limit=300):
 async def arms_imports_timeseries(country_code):
     global conn
     
-    query = sql.text('''select "Year", SUM("Value") from arms
-                where "Destination country" = :c
-                group by "Year"
-                order by "Year" asc ;''')
+    query = sql.text('''select coalesce (arms."Year", imports."Year"), coalesce (arms.sum, imports.sum) from 
+        (
+        select "Year", SUM("Value") from arms
+                        where "Destination country" = :c
+                        group by "Year"
+                        order by "Year" asc
+        ) as arms
+        full outer join
+        (
+        select "Year", SUM("Value") from imports
+        where "Destination country" = :c
+        group by "Year"
+        order by "Year" asc 
+        ) as imports
+        on arms."Year" = imports."Year" ;''')
     
     try:
         cursor = conn.execute(query, parameters = {'c': country_code})
