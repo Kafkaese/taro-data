@@ -110,31 +110,12 @@ async def peace_index(country_code, year):
     
     
 
-# exports path endpoints
+# arms path endpoints
 
-@app.get("/exports/arms/total")
-async def exports_arms_total(country_code):
+# arms/export
 
-    global conn
-    
-    query = sql.text('''select SUM("Value") from exports where "Source country" = :c;''')
-    
-    try:
-        cursor = conn.execute(query, parameters = {'c': country_code})
-        
-        result = cursor.fetchall()
-        
-        if result == []:
-            return {'value': 'no data'}
-        
-        return {'value': result[0][0]}  
-    except:
-        conn.close()
-        conn = db.connect()
-        return {'value': 'no data'}
-
-@app.get("/exports/arms/year")
-async def exports_arms_year(country_code, year):
+@app.get("/arms/exports/total")
+async def arms_exports_total(country_code, year):
    
     global conn
    
@@ -154,54 +135,10 @@ async def exports_arms_year(country_code, year):
         conn = db.connect()
         return {'value': 'no data'}
 
-@app.get("/exports/merchandise/total")
-async def exports_merchandise_total(country_code):
-    
-    global conn
 
-    query = sql.text('''select SUM(export_value) from merchandise_exports
-        join country_names as cn on "country_id" = cn."index"
-        where "Alpha-2 code" = :c;''')
-    
-    try:
-        cursor = conn.execute(query, parameters = {'c': country_code})
-        
-        result = cursor.fetchall()
-        
-        if result == []:
-            return {'value': 'no data'}
-        
-        return {'value': result[0][0]}  
-    except:
-        conn.close()
-        conn = db.connect()
-        return {'value': 'no data'}
 
-@app.get("/exports/merchandise/year")
-async def exports_merchandise_year(country_code, year):
-   
-    global conn
-    
-    query = sql.text('''select SUM(export_value) from merchandise_exports
-join country_names as cn on "country_id" = cn."index"
-where "Alpha-2 code" = :c and year = :y;''')
-    
-    cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
-    
-    try:
-        result = cursor.fetchall()
-        
-        if result == []:
-            return {'value': 'no data'}
-        
-        return {'value': result[0][0]}    
-    except:
-        conn.close()
-        conn = db.connect()
-        return {'value': 'no data'}
-
-@app.get("/exports/arms/timeseries")
-async def exports_arms_timeseries(country_code):
+@app.get("/arms/exports/timeseries")
+async def arms_exports_timeseries(country_code):
     global conn
     
     query = sql.text('''select "Year", SUM("Value") from arms
@@ -224,8 +161,8 @@ async def exports_arms_timeseries(country_code):
         return {'value': 'no data'}
 
 # Gets export data for a country on a given year, listing values for source counries seperately
-@app.get("/exports/arms/year_all")
-async def exports_arms_year_all(country_code, year, limit=300):
+@app.get("/arms/exports/by_country")
+async def arms_exports_by_country(country_code, year, limit=300):
     global conn
     
     query = sql.text('''select "Destination country", "Value" from arms
@@ -245,31 +182,10 @@ async def exports_arms_year_all(country_code, year, limit=300):
         conn = db.connect()
         return {'value': 'no data'}
     
-# import path endpoints
+# arms/import path endpoints
 
-@app.get("/imports/arms/total")
-async def imports_arms_total(country_code):
-
-    global conn
-    
-    query = sql.text('''select SUM("Value") from imports where "Destination country" = :c;''')
-    
-    try:
-        cursor = conn.execute(query, parameters = {'c': country_code})
-        
-        result = cursor.fetchall()
-        
-        if result == []:
-            return {'value': 'no data'}
-        
-        return {'value': result[0][0]}  
-    except:
-        conn.close()
-        conn = db.connect()
-        return {'value': 'no data'}
-
-@app.get("/imports/year")
-async def imports_arms_year(country_code, year):
+@app.get("/arms/imports/total")
+async def arms_imports_total(country_code, year):
     
     global conn
     
@@ -289,8 +205,8 @@ async def imports_arms_year(country_code, year):
         return {'value': 'no data'}
     
 # Gets import data for a country on a given year, listing values for source counries seperately
-@app.get("/imports/arms/year_all")
-async def imports_arms_year_all(country_code, year, limit=300):
+@app.get("/arms/imports/by_country")
+async def arms_imports_by_country(country_code, year, limit=300):
     global conn
     
     query = sql.text('''select "Source country", "Value" from arms
@@ -311,8 +227,8 @@ async def imports_arms_year_all(country_code, year, limit=300):
         return {'value': 'no data'}
     
 # Gets time series of total import values per year for a given country
-@app.get("/imports/arms/timeseries")
-async def imports_arms_timeseries(country_code):
+@app.get("/arms/imports/timeseries")
+async def arms_imports_timeseries(country_code):
     global conn
     
     query = sql.text('''select "Year", SUM("Value") from arms
@@ -329,6 +245,32 @@ async def imports_arms_timeseries(country_code):
       
         return [{'year': year[0], 'value': int(year[1])} for year in result]
     
+    except:
+        conn.close()
+        conn = db.connect()
+        return {'value': 'no data'}
+    
+    
+# merchandise path endpoints
+
+@app.get("/merchandise/exports/total")
+async def exports_merchandise_year(country_code, year):
+
+    global conn
+    
+    query = sql.text('''select SUM(export_value) from merchandise_exports
+        join country_names as cn on "country_id" = cn."index"
+        where "Alpha-2 code" = :c and year = :y;''')
+    
+    cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
+    
+    try:
+        result = cursor.fetchall()
+        
+        if result == []:
+            return {'value': 'no data'}
+        
+        return {'value': result[0][0]}    
     except:
         conn.close()
         conn = db.connect()
