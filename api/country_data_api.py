@@ -126,6 +126,7 @@ async def arms_exports_total(country_code, year):
         
         result = cursor.fetchall()
         
+        # If aggregate function is used, result will not be empty, but NULL
         if result[0] == (None,):
             return {'value': 'no data'}
         
@@ -195,6 +196,7 @@ async def arms_imports_total(country_code, year):
         cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
         result = cursor.fetchall()
         
+         # If aggregate function is used, result will not be empty, but NULL
         if result[0] == (None,):
             return {'value': 'no data'}
         
