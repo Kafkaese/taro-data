@@ -119,8 +119,10 @@ async def arms_exports_total(country_code, year):
    
     global conn
    
+    print('HERE')
     query = sql.text('''select SUM("Value") from arms where "Source country" = :c and "Year" = :y;''')
-    
+    backup_query = sql.text('''select "Value" from exports where "Source country" = :c and "Year" = :y;''')
+
     try:
         cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
         
@@ -128,7 +130,14 @@ async def arms_exports_total(country_code, year):
         
         # If aggregate function is used, result will not be empty, but NULL
         if result[0] == (None,):
-            return {'value': 'no data'}
+            
+            # Query exports table if no data was found on arms table
+            cursor = conn.execute(backup_query, parameters = {'c': country_code, 'y': year})
+            result = cursor.fetchall()
+            
+            # Still nothing? -> no data
+            if result == []:
+                return {'value': 'no data'}
         
         return {'value': result[0][0]}    
     except:
@@ -191,13 +200,13 @@ async def arms_imports_total(country_code, year):
     global conn
     
     query = sql.text('''select SUM("Value") from arms where "Destination country" = :c and "Year" = :y;''')
-    
     try:
         cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
         result = cursor.fetchall()
         
          # If aggregate function is used, result will not be empty, but NULL
         if result[0] == (None,):
+            
             return {'value': 'no data'}
         
         return {'value': result[0][0]}
