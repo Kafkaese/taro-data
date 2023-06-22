@@ -119,7 +119,7 @@ async def arms_exports_total(country_code, year):
    
     global conn
    
-    query = sql.text('''select "Value" from exports where "Source country" = :c and "Year" = :y;''')
+    query = sql.text('''select SUM("Value") from arms where "Source country" = :c and "Year" = :y;''')
     
     try:
         cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
