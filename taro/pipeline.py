@@ -365,24 +365,26 @@ def arms_pipeline(source: str = 'scraper', dest: str = 'postgres', **kwargs) -> 
        
 if __name__ == "__main__":
 
+    # Connection string info
     
-    conn_string = 'postgresql://postgres:password@localhost/postgres'
+    host = "taro-server.postgres.database.azure.com"
+    dbname = "taro-db"
+    user = "postgres"
+    password = os.environ['POSTGRES_PASSWORD']
+    sslmode = "require"
 
+    # Construct connection string
+
+    conn_string = "host={0} user={1} dbname={2} password={3} sslmode={4}".format(host, user, dbname, password, sslmode)
+    conn_string = f"postgresql+psycopg2://{user}:{password}@{host}:{5432}/{dbname}"
+    print(conn_string)
     db = create_engine(conn_string)
     conn = db.connect()
-    conn1 = psycopg2.connect(
-        database="postgres",
-        user='postgres', 
-        password='password', 
-        host='127.0.0.1', 
-        port= '5432'
-    )
-
-    cursor = conn1.cursor()
+    print("Connection established")
     
     # Run all pipelines
     
-    #import_data_pipeline(db_conn = conn, csv_path = '../data/imports.csv')
+    import_data_pipeline(db_conn = db, csv_path = '../data/imports.csv')
     
     #export_data_pipeline(db_conn = conn, csv_path = '../data/exports.csv')
     
@@ -392,4 +394,4 @@ if __name__ == "__main__":
     
     #merch_export_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path='../data/total_merchandise_exports.csv')
     
-    arms_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path = '../data/arms.csv')
+    #arms_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path = '../data/arms.csv')
