@@ -8,7 +8,7 @@ import os
 if os.environ['ENV'] == 'dev':
     conn_string = 'postgresql://postgres:password@localhost/postgres'
 elif os.environ['ENV'] == 'test':
-    pass
+    conn_string = 'postgresql://postgres:password@localhost/postgres'
 else:
     host = "taro-server.postgres.database.azure.com"
     dbname = "taro-db"
