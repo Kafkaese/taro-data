@@ -375,12 +375,15 @@ if __name__ == "__main__":
 
     # Construct connection string
 
-    conn_string = "host={0} user={1} dbname={2} password={3} sslmode={4}".format(host, user, dbname, password, sslmode)
-    conn_string = f"postgresql+psycopg2://{user}:{password}@{host}:{5432}/{dbname}"
-    print(conn_string)
+    if os.environ['ENV'] == 'dev':
+        conn_string = 'postgresql://postgres:password@localhost/postgres'
+    elif os.environ['ENV'] == 'test':
+        pass
+    else:
+        conn_string = f"postgresql+psycopg2://{user}:{password}@{host}:{5432}/{dbname}"
+    
     db = create_engine(conn_string)
     conn = db.connect()
-    print("Connection established")
     
     # Run all pipelines
     
