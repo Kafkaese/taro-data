@@ -369,27 +369,28 @@ if __name__ == "__main__":
     
     host = "taro-server.postgres.database.azure.com"
     dbname = "taro-db"
-    user = "postgres"
-    password = os.environ['POSTGRES_PASSWORD']
+    user = os.environ['TF_VAR_postgres_user']
+    password = os.environ['TF_VAR_postgres_password']
     sslmode = "require"
+    
+    print("{" + password + "}")
 
     # Construct connection string
     print(f"USING ENV: {os.environ['ENV']}")
     if os.environ['ENV'] == 'dev':
         conn_string = 'postgresql://postgres:password@localhost/postgres'
     elif os.environ['ENV'] == 'test':
-        pass
+        conn_string = f"postgresql+psycopg2://{user}:{password}@{host}:{5432}/{dbname}"
     else:
         conn_string = f"postgresql+psycopg2://{user}:{password}@{host}:{5432}/{dbname}"
     
-    print(f"Connecting to: {conn_string}")
-    
     db = create_engine(conn_string)
     conn = db.connect()
-    
+
+ 
     # Run all pipelines
     
-    import_data_pipeline(db_conn = db, csv_path = '../data/imports.csv')
+    import_data_pipeline(db_conn = conn, csv_path = '../data/imports.csv')
     
     export_data_pipeline(db_conn = conn, csv_path = '../data/exports.csv')
     
