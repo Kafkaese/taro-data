@@ -3,18 +3,14 @@ FROM python:latest
 # Upgrade pip
 RUN pip install pip --upgrade
 
-# Install requirements
+# Install taro package
+COPY setup.py setup.py
+COPY taro/ taro
 COPY requirements.txt requirements.txt
-RUN pip install -r requirements.txt
+RUN pip install .
 
 # Copy csv data
 COPY data/ data
 
-# Copy pipeline
-COPY taro/ taro
-
-# Set workdir to taro
-WORKDIR /taro
-
 # Run pipelines
-CMD ["python", "pipeline.py"]
+CMD ["python", "/taro/pipeline.py"]
