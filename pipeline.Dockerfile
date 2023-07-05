@@ -11,6 +11,10 @@ RUN pip install -r requirements.txt
 COPY data/ data
 
 # Copy pipeline
-COPY taro/pipeline.py pipeline.py
+COPY taro/ taro
 
+# Set workdir to taro
+WORKDIR /taro
+
+# Run pipelines
 CMD ["python", "pipeline.py"]
