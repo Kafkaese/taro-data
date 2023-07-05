@@ -5,6 +5,7 @@ from sqlalchemy import create_engine
 import psycopg2
 import os
 
+print(f"USING ENV: {os.environ['ENV']}")
 if os.environ['ENV'] == 'dev':
     conn_string = 'postgresql://postgres:password@localhost/postgres'
 elif os.environ['ENV'] == 'test':
