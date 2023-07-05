@@ -5,19 +5,22 @@ from sqlalchemy import create_engine
 import psycopg2
 import os
 
-conn_string = 'postgresql://postgres:password@localhost/postgres'
+print(f"USING ENV: {os.environ['ENV']}")
+if os.environ['ENV'] == 'dev':
+    conn_string = 'postgresql://postgres:password@localhost/postgres'
+elif os.environ['ENV'] == 'test':
+    conn_string = 'postgresql://postgres:password@localhost/postgres'
+else:
+    host = "taro-server.postgres.database.azure.com"
+    dbname = "taro-db"
+    user = "postgres"
+    password = os.environ['POSTGRES_PASSWORD']
+    sslmode = "require"
+    conn_string = f"postgresql+psycopg2://{user}:{password}@{host}:{5432}/{dbname}"
+
 
 db = create_engine(conn_string)
 conn = db.connect()
-conn1 = psycopg2.connect(
-    database="postgres",
-    user='postgres', 
-    password='password', 
-    host='127.0.0.1', 
-    port= '5432'
-)
-
-cursor = conn1.cursor()
 
 def test_democracy_index_pipeline():
     

@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import psycopg2
 from sqlalchemy import create_engine, sql
-
+import os
 import pandas as pd
 
 app = FastAPI()
@@ -22,7 +22,24 @@ app.add_middleware(
 )
 
 # database connection
-conn_string = 'postgresql://postgres:password@taro-postgres/postgres'
+
+host = "taro-server.postgres.database.azure.com"
+dbname = "taro-db"
+user = "postgres"
+password = os.environ['POSTGRES_PASSWORD']
+sslmode = "require"
+
+# Construct connection string
+print(f"USING ENV: {os.environ['ENV']}")
+if os.environ['ENV'] == 'dev':
+    conn_string = 'postgresql://postgres:password@localhost/postgres'
+elif os.environ['ENV'] == 'test':
+    pass
+else:
+    conn_string = f"postgresql+psycopg2://{user}:{password}@{host}:{5432}/{dbname}"
+
+print(f"Connecting to: {conn_string}")
+
 db = create_engine(conn_string)
 conn = db.connect()
 

@@ -365,31 +365,38 @@ def arms_pipeline(source: str = 'scraper', dest: str = 'postgres', **kwargs) -> 
        
 if __name__ == "__main__":
 
+    # Connection string info
     
-    conn_string = 'postgresql://postgres:password@localhost/postgres'
+    host = "taro-server.postgres.database.azure.com"
+    dbname = "taro-db"
+    user = "postgres"
+    password = os.environ['POSTGRES_PASSWORD']
+    sslmode = "require"
 
+    # Construct connection string
+    print(f"USING ENV: {os.environ['ENV']}")
+    if os.environ['ENV'] == 'dev':
+        conn_string = 'postgresql://postgres:password@localhost/postgres'
+    elif os.environ['ENV'] == 'test':
+        pass
+    else:
+        conn_string = f"postgresql+psycopg2://{user}:{password}@{host}:{5432}/{dbname}"
+    
+    print(f"Connecting to: {conn_string}")
+    
     db = create_engine(conn_string)
     conn = db.connect()
-    conn1 = psycopg2.connect(
-        database="postgres",
-        user='postgres', 
-        password='password', 
-        host='127.0.0.1', 
-        port= '5432'
-    )
-
-    cursor = conn1.cursor()
     
     # Run all pipelines
     
-    #import_data_pipeline(db_conn = conn, csv_path = '../data/imports.csv')
+    #import_data_pipeline(db_conn = db, csv_path = '../data/imports.csv')
     
-    #export_data_pipeline(db_conn = conn, csv_path = '../data/exports.csv')
+    export_data_pipeline(db_conn = conn, csv_path = '../data/exports.csv')
     
-    #democracy_index_pipeline(source='scraper', dest='postgres', db_conn = conn)
+    democracy_index_pipeline(source='scraper', dest='postgres', db_conn = conn)
     
-    #peace_index_pipe(source='csv', dest='postgres', csv_path=os.path.join(os.path.dirname(__file__),'../raw_data/GPI-2022-overall-scores-and-domains-2008-2022.csv'), db_conn=conn)
+    peace_index_pipe(source='csv', dest='postgres', csv_path=os.path.join(os.path.dirname(__file__),'../raw_data/GPI-2022-overall-scores-and-domains-2008-2022.csv'), db_conn=conn)
     
-    #merch_export_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path='../data/total_merchandise_exports.csv')
+    merch_export_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path='../data/total_merchandise_exports.csv')
     
     arms_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path = '../data/arms.csv')
