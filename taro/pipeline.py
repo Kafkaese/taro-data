@@ -389,7 +389,7 @@ if __name__ == "__main__":
     
     # Run all pipelines
     
-    #import_data_pipeline(db_conn = db, csv_path = '../data/imports.csv')
+    import_data_pipeline(db_conn = db, csv_path = '../data/imports.csv')
     
     export_data_pipeline(db_conn = conn, csv_path = '../data/exports.csv')
     
