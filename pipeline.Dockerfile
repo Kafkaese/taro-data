@@ -11,6 +11,7 @@ RUN pip install .
 
 # Copy csv data
 COPY data/ data
+COPY raw_data/ raw_data
 
 # Run pipelines
 CMD ["python", "/taro/pipeline.py"]
