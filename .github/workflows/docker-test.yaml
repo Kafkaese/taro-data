@@ -33,4 +33,6 @@ jobs:
         - name: Run the container
           uses: addnab/docker-run-action@v3
           with:
-              image: kafkaese/taro:pipeline
+            username: ${{ secrets.DOCKERHUB_USERNAME }}
+            password: ${{ secrets.DOCKERHUB_TOKEN }}
+            image: kafkaese/taro:pipeline
