@@ -15,7 +15,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: 'Terraform Setup'
-        working-directory: ./terraform
         uses: hashicorp/setup-terraform@v1
       - name: 'Initialize Terraform'
         working-directory: ./terraform
