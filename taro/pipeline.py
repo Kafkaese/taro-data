@@ -367,8 +367,8 @@ if __name__ == "__main__":
 
     # Connection string info
     
-    host = "taro-server.postgres.database.azure.com"
-    dbname = "taro-db"
+    host = os.environ['POSTGRES_HOST']
+    dbname = os.environ['POSTGRES_PORT']
     user = os.environ['TF_VAR_postgres_user']
     password = os.environ['TF_VAR_postgres_password']
     sslmode = "require"
@@ -379,8 +379,6 @@ if __name__ == "__main__":
     print(f"USING ENV: {os.environ['ENV']}")
     if os.environ['ENV'] == 'dev':
         conn_string = 'postgresql://postgres:password@localhost/postgres'
-    elif os.environ['ENV'] == 'test':
-        conn_string = f"postgresql+psycopg2://{user}:{password}@{host}:{5432}/{dbname}"
     else:
         conn_string = f"postgresql+psycopg2://{user}:{password}@{host}:{5432}/{dbname}"
     
