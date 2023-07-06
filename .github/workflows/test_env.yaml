@@ -25,6 +25,8 @@ jobs:
       - name: 'Initialize Terraform'
         working-directory: ./terraform
         run: terraform init
+      - name: 'Get state'
+        run: terraform plan -refresh-only
       - name: 'Make plan'
         working-directory: ./terraform
         run: terraform plan -out test.tfplan
@@ -52,6 +54,8 @@ jobs:
       - name: 'Initialize Terraform'
         working-directory: ./terraform
         run: terraform init
+      - name: 'Get state'
+        run: terraform plan -refresh-only
       - name: 'Make plan'
         working-directory: ./terraform
         run: terraform plan -destroy -out test.tfplan
