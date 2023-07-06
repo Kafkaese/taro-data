@@ -14,15 +14,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: 'Change to Terraform directory'
-        run: cd terraform
-      - name: check dir
-        run: ls
       - name: 'Terraform Setup'
+        working-directory: ./terraform
         uses: hashicorp/setup-terraform@v1
       - name: 'Initialize Terraform'
+        working-directory: ./terraform
         run: terraform init
       - name: 'Make plan'
+        working-directory: ./terraform
         run: terraform plan -out test.tfplan
       - name: 'Apply plan'
+        working-directory: ./terraform
         run: terraform apply test.tfplan
