@@ -26,6 +26,7 @@ jobs:
         working-directory: ./terraform
         run: terraform init
       - name: 'Get state'
+        working-directory: ./terraform
         run: terraform plan -refresh-only
       - name: 'Make plan'
         working-directory: ./terraform
@@ -55,6 +56,7 @@ jobs:
         working-directory: ./terraform
         run: terraform init
       - name: 'Get state'
+        working-directory: ./terraform
         run: terraform plan -refresh-only
       - name: 'Make plan'
         working-directory: ./terraform
