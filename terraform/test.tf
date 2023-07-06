@@ -21,10 +21,9 @@ resource "azurerm_postgresql_flexible_server_database" "pg-db" {
   collation = "en_US.utf8"
 }
 
-resource "azurerm_postgresql_firewall_rule" "pg-server-open" {
+resource "azurerm_postgresql_flexible_server_firewall_rule" "pg-server-open" {
   name                = "allpublic"
-  resource_group_name = azurerm_resource_group.rg.name
-  server_name         = azurerm_postgresql_flexible_server.pg-server.name
+  server_id           = azurerm_postgresql_flexible_server.pg-server.id
   start_ip_address    = "0.0.0.0"
   end_ip_address      = "255.255.255.255"
 }
