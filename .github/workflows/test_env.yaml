@@ -11,11 +11,15 @@ jobs:
   tf-setup:
     name: 'Provision test environemnt'
     runs-on: ubuntu-latest
+    environment: test
     env:
         ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
         ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
         ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
         ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+        TF_VAR_postgres_user: ${{ secrets.TF_VAR_postgres_user }}
+        TF_VAR_postgres_password: ${{ secrets.TF_VAR_postgres_password }}
+    
 
     steps:
       - name: Checkout
@@ -41,12 +45,13 @@ jobs:
     if: ${{ always() }}
     needs: tf-setup
     runs-on: ubuntu-latest
+    environment: test
     env:
         ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
         ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
         ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
         ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v3
