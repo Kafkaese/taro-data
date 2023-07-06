@@ -22,7 +22,7 @@ resource "azurerm_postgresql_flexible_server_database" "pg-db" {
 }
 
 resource "azurerm_postgresql_firewall_rule" "pg-server-open" {
-  name                = "all public"
+  name                = "allpublic"
   resource_group_name = azurerm_resource_group.rg.name
   server_name         = azurerm_postgresql_flexible_server.pg-server.name
   start_ip_address    = "0.0.0.0"
