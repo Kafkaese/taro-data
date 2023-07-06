@@ -1,17 +1,17 @@
-name: Test environment
+name: Staging 
 
 on: 
   pull_request:
     types: [opened, reopened, synchronize]
 
 env: 
-  ENV: test
+  ENV: staging
 
 jobs:
   tf-setup:
-    name: 'Provision test environemnt'
+    name: 'Provision test environment'
     runs-on: ubuntu-latest
-    environment: test
+    environment: staging
     env:
         ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
         ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
@@ -41,11 +41,11 @@ jobs:
 
 
   tf-destroy:
-    name: 'Destroy test environemnt'
+    name: 'Destroy test environment'
     if: ${{ always() }}
     needs: tf-setup
     runs-on: ubuntu-latest
-    environment: test
+    environment: staging
     env:
         ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
         ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
