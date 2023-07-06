@@ -63,7 +63,7 @@ jobs:
             tags: kafkaese/taro:pipeline
         - name: Check out the repo
           uses: actions/checkout@v2
-        - name: Run the build process with Docker
+        - name: Run the container
           uses: addnab/docker-run-action@v3
           with:
               image: kafkaese/taro:pipeline
