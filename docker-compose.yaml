@@ -4,7 +4,7 @@ services:
   taro-postgres:
     image: postgres
     env_file:
-      - '.env'
+      - '../.env'
     networks:
       - taro
     ports:
@@ -20,15 +20,29 @@ services:
       - taro
     ports:
       - ${API_PORT}:8000
+    env_file:
+      - ../.env
 
   taro-frontend:
     build:
-      context: ../taro_map
-      dockerfile: Dockerfile_dev
+      context: ../taro-map
+      dockerfile: ./Dockerfile_dev
     networks:
       - taro
     ports:
       - ${REACT_PORT}:3000
+
+  taro-pipeline:
+    build:
+      context: .
+      dockerfile: ./pipeline.Dockerfile
+    env_file:
+      - ../.env
+    networks:
+      - taro
+    depends_on:
+      taro-postgres:
+        condition: service_started
 
 volumes:
   data:
