@@ -116,7 +116,7 @@ def test_metadata_peace_index_request():
     
     assert response.json()['value'] == 1.333
     
-def test_metadata_peace_index_request_mssing():
+def test_metadata_peace_index_request_missing():
     ENDPOINT = "/metadata/peace_index"
     URL = f'http://{API_HOST}:{API_PORT}{ENDPOINT}'
     
@@ -164,7 +164,7 @@ def test_arms_exports_total_request():
     
     assert response.json()['value'] == 200_000_000
     
-def test_arms_exports_total_request_mssing():
+def test_arms_exports_total_request_missing():
     ENDPOINT = "/arms/exports/total"
     URL = f'http://{API_HOST}:{API_PORT}{ENDPOINT}'
     
@@ -211,7 +211,7 @@ def test_arms_exports_timeseries_request():
     assert type(response) == list
     assert list(response[0].keys()) == ['year', 'value']
     
-def test_arms_exports_timeseries_request_mssing():
+def test_arms_exports_timeseries_request_missing():
     ENDPOINT = "/arms/exports/timeseries"
     URL = f'http://{API_HOST}:{API_PORT}{ENDPOINT}'
     
@@ -222,3 +222,53 @@ def test_arms_exports_timeseries_request_mssing():
     response = requests.get(URL, params=PARAMS)
     
     assert response.json()['value'] == 'no data'
+    
+# tests for "/arms/exports/by_country" endpoint
+def test_arms_exports_by_ountry_endpoint_status_code():
+    ENDPOINT = "/arms/exports/by_country"
+    URL = f'http://{API_HOST}:{API_PORT}{ENDPOINT}'
+    
+    response = requests.get(URL)
+    
+    assert response.status_code == 422
+    
+def test_arms_exports_by_country_status_code():
+    ENDPOINT = "/arms/exports/by_country"
+    URL = f'http://{API_HOST}:{API_PORT}{ENDPOINT}'
+    
+    PARAMS = {
+        "country_code": "CA",
+        "year": 2020
+    }
+    
+    response = requests.get(URL, params=PARAMS)
+    
+    assert response.status_code == 200
+
+def test_arms_exports_by_country_request():
+    ENDPOINT = "/arms/exports/by_country"
+    URL = f'http://{API_HOST}:{API_PORT}{ENDPOINT}'
+    
+    PARAMS = {
+        "country_code": "FR",
+        "year": 2020
+    }
+    
+    response = requests.get(URL, params=PARAMS).json()
+    
+    assert type(response) == list
+    assert list(response[0].keys()) == ['name', 'value']
+    
+def test_arms_exports_by_country_request_missing():
+    ENDPOINT = "/arms/exports/by_country"
+    URL = f'http://{API_HOST}:{API_PORT}{ENDPOINT}'
+    
+    PARAMS = {
+        "country_code": "XX",
+        "year": 2020
+    }
+    
+    response = requests.get(URL, params=PARAMS)
+    
+    assert response.json()['value'] == 'no data'
+    
