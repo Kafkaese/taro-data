@@ -67,7 +67,20 @@ def test_metadata_democracy_index_request():
     response = requests.get(URL, params=PARAMS)
     
     assert response.json()['value'] == 9.24
+
+def test_metadata_democracy_index_request_missing():
+    ENDPOINT = "/metadata/democracy_index"
+    URL = f'http://{API_HOST}:{API_PORT}{ENDPOINT}'
     
+    PARAMS = {
+        "country_code": "CA", 
+        "year": 1778
+    }
+    
+    response = requests.get(URL, params=PARAMS)
+    
+    assert response.json()['value'] == 'no data'
+
 # test "/metadata/peace_index" endpoint
 def test_metadata_peace_index_endpoint_status_code():
     ENDPOINT = "/metadata/peace_index"
