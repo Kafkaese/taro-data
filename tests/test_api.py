@@ -33,3 +33,37 @@ def test_metadata_name_short_request_status_code():
     
     assert response.status_code == 501
     
+# tests for "/metadata/democracy_index"
+def test_metadata_democracy_index_endpoint_status_code():
+    ENDPOINT = "/metadata/democracy_index"
+    URL = f'http://{API_HOST}:{API_PORT}{ENDPOINT}'
+    
+    response = requests.get(URL)
+    
+    assert response.status_code == 422
+    
+def test_metadata_democracy_index_request_status_code():
+    ENDPOINT = "/metadata/democracy_index"
+    URL = f'http://{API_HOST}:{API_PORT}{ENDPOINT}'
+    
+    PARAMS = {
+        "country_code": "CA", 
+        "year": 2020
+    }
+    
+    response = requests.get(URL, params=PARAMS)
+    
+    assert response.status_code == 200
+
+def test_metadata_democracy_index_request():
+    ENDPOINT = "/metadata/democracy_index"
+    URL = f'http://{API_HOST}:{API_PORT}{ENDPOINT}'
+    
+    PARAMS = {
+        "country_code": "CA", 
+        "year": 2020
+    }
+    
+    response = requests.get(URL, params=PARAMS)
+    
+    assert response.json()['value'] == 9.24
