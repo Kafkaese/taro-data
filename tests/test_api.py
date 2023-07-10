@@ -102,3 +102,16 @@ def test_metadata_peace_index_request():
     response = requests.get(URL, params=PARAMS)
     
     assert response.json()['value'] == 1.333
+    
+def test_metadata_peace_index_request_mssing():
+    ENDPOINT = "/metadata/peace_index"
+    URL = f'http://{API_HOST}:{API_PORT}{ENDPOINT}'
+    
+    PARAMS = {
+        "country_code": "CA", 
+        "year": 1778
+    }
+    
+    response = requests.get(URL, params=PARAMS)
+    
+    assert response.json()['value'] == 'no data'
