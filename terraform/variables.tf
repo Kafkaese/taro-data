@@ -21,7 +21,3 @@ variable "postgres_password" {
 variable "postgres_database" {
   default = "taro-staging-db"
 }
-
-variable "postgres_server" {
-  default = "taro-staging-server"
-}
