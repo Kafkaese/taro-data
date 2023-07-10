@@ -58,10 +58,12 @@ async def root():
 
 # metadata path endpoints
 
-@app.get("/metadata/name/short")
+@app.get("/metadata/name/short", status_code=501)
 async def short_name(country_code):
     
     global conn
+    
+    return {}
     
     query = sql.text('''select short_name from country_names where "Alpha-2 code" = :c;''')
     
