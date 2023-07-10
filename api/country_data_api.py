@@ -322,8 +322,8 @@ async def exports_merchandise_year(country_code, year):
     
     try:
         result = cursor.fetchall()
-        
-        if result == []:
+  
+        if result[0] == (None,):
             return {'value': 'no data'}
         
         return {'value': result[0][0]}    
