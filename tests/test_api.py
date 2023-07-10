@@ -415,3 +415,51 @@ def test_arms_imports_by_country_request_missing():
     
     assert response.json()['value'] == 'no data'
     
+# tests for "/merchandise/exports/total" endpoint
+def test_merchandise_exports_total_endpoint_status_code():
+    ENDPOINT = "/merchandise/exports/total"
+    URL = f'http://{API_HOST}:{API_PORT}{ENDPOINT}'
+    
+    response = requests.get(URL)
+    
+    assert response.status_code == 422
+    
+def test_merchandise_exports_total_request_status_code():
+    ENDPOINT = "/merchandise/exports/total"
+    URL = f'http://{API_HOST}:{API_PORT}{ENDPOINT}'
+    
+    PARAMS = {
+        "country_code": "CA", 
+        "year": 2020
+    }
+    
+    response = requests.get(URL, params=PARAMS)
+    
+    assert response.status_code == 200
+
+def test_merchandise_exports_total_request():
+    ENDPOINT = "/merchandise/exports/total"
+    URL = f'http://{API_HOST}:{API_PORT}{ENDPOINT}'
+    
+    PARAMS = {
+        "country_code": "CA", 
+        "year": 2020
+    }
+    
+    response = requests.get(URL, params=PARAMS)
+    
+    assert response.json()['value'] == 390_762.62845
+    
+def test_merchandise_exports_total_request_missing():
+    ENDPOINT = "/merchandise/exports/total"
+    URL = f'http://{API_HOST}:{API_PORT}{ENDPOINT}'
+    
+    PARAMS = {
+        "country_code": "CA", 
+        "year": 1778
+    }
+    
+    response = requests.get(URL, params=PARAMS)
+    
+    assert response.json()['value'] == 'no data'
+    
