@@ -368,20 +368,25 @@ if __name__ == "__main__":
     # Connection string info
     
     host = os.environ['POSTGRES_HOST']
-    dbname = os.environ['POSTGRES_PORT']
-    user = os.environ['TF_VAR_postgres_user']
-    password = os.environ['TF_VAR_postgres_password']
+    dbname = os.environ['POSTGRES_DB']
+    
+    # Use tf vars if not local dev env
+    if os.environ['ENV'] == 'dev':
+        user = os.environ['POSTGRES_USER']
+        password = os.environ['POSTGRES_PASSWORD']
+    else:    
+        user = os.environ['TF_VAR_postgres_user']
+        password = os.environ['TF_VAR_postgres_password']
+    
     sslmode = "require"
     
-    print("{" + password + "}")
-
     # Construct connection string
     print(f"USING ENV: {os.environ['ENV']}")
-    if os.environ['ENV'] == 'dev':
-        conn_string = 'postgresql://postgres:password@localhost/postgres'
-    else:
-        conn_string = f"postgresql+psycopg2://{user}:{password}@{host}:{5432}/{dbname}"
+    conn_string = f"postgresql+psycopg2://{user}:{password}@{host}:{5432}/{dbname}"
     
+    print(conn_string)
+    
+    # Create connection
     db = create_engine(conn_string)
     conn = db.connect()
 
@@ -392,10 +397,12 @@ if __name__ == "__main__":
     
     export_data_pipeline(db_conn = conn, csv_path = '../data/exports.csv')
     
-    democracy_index_pipeline(source='scraper', dest='postgres', db_conn = conn)
+    democracy_index_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path='../data/democracy_index.csv')
     
     peace_index_pipe(source='csv', dest='postgres', csv_path=os.path.join(os.path.dirname(__file__),'../raw_data/GPI-2022-overall-scores-and-domains-2008-2022.csv'), db_conn=conn)
     
     merch_export_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path='../data/total_merchandise_exports.csv')
     
     arms_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path = '../data/arms.csv')
+    
+    country_name_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path = '../data/countries_info.csv')
