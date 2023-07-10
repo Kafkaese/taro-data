@@ -128,3 +128,51 @@ def test_metadata_peace_index_request_mssing():
     response = requests.get(URL, params=PARAMS)
     
     assert response.json()['value'] == 'no data'
+    
+# test "/arms/exports/total" endpoint
+def test_arms_exports_total_endpoint_status_code():
+    ENDPOINT = "/arms/exports/total"
+    URL = f'http://{API_HOST}:{API_PORT}{ENDPOINT}'
+    
+    response = requests.get(URL)
+    
+    assert response.status_code == 422
+    
+def test_arms_exports_total_request_status_code():
+    ENDPOINT = "/arms/exports/total"
+    URL = f'http://{API_HOST}:{API_PORT}{ENDPOINT}'
+    
+    PARAMS = {
+        "country_code": "CA", 
+        "year": 2020
+    }
+    
+    response = requests.get(URL, params=PARAMS)
+    
+    assert response.status_code == 200
+
+def test_arms_exports_total_request():
+    ENDPOINT = "/arms/exports/total"
+    URL = f'http://{API_HOST}:{API_PORT}{ENDPOINT}'
+    
+    PARAMS = {
+        "country_code": "CA", 
+        "year": 2020
+    }
+    
+    response = requests.get(URL, params=PARAMS)
+    
+    assert response.json()['value'] == 200_000_000
+    
+def test_arms_exports_total_request_mssing():
+    ENDPOINT = "/arms/exports/total"
+    URL = f'http://{API_HOST}:{API_PORT}{ENDPOINT}'
+    
+    PARAMS = {
+        "country_code": "CA", 
+        "year": 1778
+    }
+    
+    response = requests.get(URL, params=PARAMS)
+    
+    assert response.json()['value'] == 'no data'
