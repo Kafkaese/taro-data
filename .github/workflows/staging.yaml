@@ -40,10 +40,42 @@ jobs:
         run: terraform apply test.tfplan
 
 
+  pipeline:
+      name: Build and run the pipeline container
+      runs-on: ubuntu-latest
+      needs: tf-setup
+      environment: staging
+      steps:
+        - name: Set up QEMU
+          uses: docker/setup-qemu-action@v1
+        - name: Set up Docker Buildx
+          uses: docker/setup-buildx-action@v1
+        - name: Login to DockerHub
+          uses: docker/login-action@v1
+          with:
+            username: ${{ secrets.DOCKERHUB_USERNAME }}
+            password: ${{ secrets.DOCKERHUB_TOKEN }}
+        - name: Build and push
+          uses: docker/build-push-action@v2
+          with:
+            file: ./pipeline.Dockerfile
+            push: true
+            tags: kafkaese/taro:pipeline
+        - name: Check out the repo
+          uses: actions/checkout@v2
+        - name: Run the container
+          uses: addnab/docker-run-action@v3
+          with:
+            username: ${{ secrets.DOCKERHUB_USERNAME }}
+            password: ${{ secrets.DOCKERHUB_TOKEN }}
+            image: kafkaese/taro:pipeline
+    
+      
+      
   tf-destroy:
     name: 'Destroy test environment'
     if: ${{ always() }}
-    needs: tf-setup
+    needs: [tf-setup, pipeline]
     runs-on: ubuntu-latest
     environment: staging
     env:
