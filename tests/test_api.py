@@ -176,3 +176,49 @@ def test_arms_exports_total_request_mssing():
     response = requests.get(URL, params=PARAMS)
     
     assert response.json()['value'] == 'no data'
+    
+# tests for "/arms/exports/timeseries" endpoint
+def test_arms_exports_timeseries_endpoint_status_code():
+    ENDPOINT = "/arms/exports/timeseries"
+    URL = f'http://{API_HOST}:{API_PORT}{ENDPOINT}'
+    
+    response = requests.get(URL)
+    
+    assert response.status_code == 422
+    
+def test_arms_exports_total_timeseries_status_code():
+    ENDPOINT = "/arms/exports/timeseries"
+    URL = f'http://{API_HOST}:{API_PORT}{ENDPOINT}'
+    
+    PARAMS = {
+        "country_code": "CA"
+    }
+    
+    response = requests.get(URL, params=PARAMS)
+    
+    assert response.status_code == 200
+
+def test_arms_exports_timeseries_request():
+    ENDPOINT = "/arms/exports/timeseries"
+    URL = f'http://{API_HOST}:{API_PORT}{ENDPOINT}'
+    
+    PARAMS = {
+        "country_code": "CA"
+    }
+    
+    response = requests.get(URL, params=PARAMS).json()
+    
+    assert type(response) == list
+    assert list(response[0].keys()) == ['year', 'value']
+    
+def test_arms_exports_timeseries_request_mssing():
+    ENDPOINT = "/arms/exports/timeseries"
+    URL = f'http://{API_HOST}:{API_PORT}{ENDPOINT}'
+    
+    PARAMS = {
+        "country_code": "XX"
+    }
+    
+    response = requests.get(URL, params=PARAMS)
+    
+    assert response.json()['value'] == 'no data'
