@@ -31,7 +31,19 @@ def test_metadata_name_short_request_status_code():
     
     response = requests.get(URL, params=PARAMS)
     
-    assert response.status_code == 501
+    assert response.status_code == 200
+    
+def test_metadata_name_short_request():
+    ENDPOINT = '/metadata/name/short'
+    URL = f'http://{API_HOST}:{API_PORT}{ENDPOINT}'
+    
+    PARAMS = {
+        "country_code": "CA" 
+    }
+    
+    response = requests.get(URL, params=PARAMS)
+    
+    assert response.json()['value'] == "Canada"
     
 # tests for "/metadata/democracy_index"
 def test_metadata_democracy_index_endpoint_status_code():
