@@ -7,6 +7,7 @@ import pandas as pd
 
 app = FastAPI()
 
+## CORS settings
 
 origins = [
     "http://localhost",
@@ -21,25 +22,28 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# database connection
 
-host = "taro-server.postgres.database.azure.com"
-dbname = "taro-db"
-user = "postgres"
-password = os.environ['POSTGRES_PASSWORD']
+## database connection
+
+host = os.environ['POSTGRES_HOST']
+dbname = os.environ['POSTGRES_DB']
+
+# Use tf vars if not local dev env
+if os.environ['ENV'] == 'dev':
+    user = os.environ['POSTGRES_USER']
+    password = os.environ['POSTGRES_PASSWORD']
+else:    
+    user = os.environ['TF_VAR_postgres_user']
+    password = os.environ['TF_VAR_postgres_password']
+
 sslmode = "require"
-
+    
 # Construct connection string
 print(f"USING ENV: {os.environ['ENV']}")
-if os.environ['ENV'] == 'dev':
-    conn_string = 'postgresql://postgres:password@localhost/postgres'
-elif os.environ['ENV'] == 'test':
-    pass
-else:
-    conn_string = f"postgresql+psycopg2://{user}:{password}@{host}:{5432}/{dbname}"
+conn_string = f"postgresql+psycopg2://{user}:{password}@{host}:{5432}/{dbname}"
 
+# Cet up connecttion
 print(f"Connecting to: {conn_string}")
-
 db = create_engine(conn_string)
 conn = db.connect()
 
