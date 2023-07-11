@@ -31,3 +31,10 @@ resource "azurerm_postgresql_flexible_server_firewall_rule" "pg-server-open" {
   start_ip_address    = "0.0.0.0"
   end_ip_address      = "255.255.255.255"
 }
+
+resource "azurerm_container_registry" "taro-registry" {
+  name                = "taroContainerRegistry"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  sku                 = "Basic"
+}
