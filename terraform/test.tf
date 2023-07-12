@@ -56,3 +56,7 @@ resource "azuread_service_principal" "taro-registry-sp" {
   application_id = "${azuread_application.taro-registry-app.application_id}"
 }
 
+# Password for the service principal for container registry
+resource "azuread_service_principal_password" "taro-registry-sp-pass" {
+  service_principal_id = "${azuread_service_principal.taro-registry-sp.id}"
+}
