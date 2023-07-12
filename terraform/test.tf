@@ -60,3 +60,11 @@ resource "azuread_service_principal" "taro-registry-sp" {
 resource "azuread_service_principal_password" "taro-registry-sp-pass" {
   service_principal_id = "${azuread_service_principal.taro-registry-sp.id}"
 }
+
+# Role assignement service principal to container registry
+resource "azurerm_role_assignment" "taro-registry-assignment" {
+  scope                = "${azurerm_container_registry.taro-registry.id}"
+  role_definition_name = "Contributor"
+  principal_id         = "${azuread_service_principal_password.taro-registry-sp-pass.service_principal_id}"
+}
+
