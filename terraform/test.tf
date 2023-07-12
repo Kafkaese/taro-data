@@ -46,7 +46,13 @@ resource "azurerm_container_registry" "taro-registry" {
   sku                 = "Basic"
 }
 
-# Service principal for the container regsitry
-resource "azurerm_azuread_service_principal" "acr-sp" {
-  application_id = "${azurerm_azuread_application.taro-registry.application_id}"
+# Azuread application needed to assign service principal to container registry. What does this actullay do???
+resource "azuread_application" "taro-registry-app" {
+  display_name = "taro-registry-app"
 }
+
+# Service principal for the container regsitry
+resource "azuread_service_principal" "taro-registry-sp" {
+  application_id = "${azuread_application.taro-registry-app.application_id}"
+}
+
