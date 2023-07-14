@@ -4,7 +4,7 @@ variable "resource_group_location" {
 }
 
 variable "resource_group_name" {
-  default     = "taro-staging-env"
+  default     = "taro-test-env"
   description = "The resource group name."
 }
 
@@ -19,5 +19,5 @@ variable "postgres_password" {
 }
 
 variable "postgres_database" {
-  default = "taro-staging-db"
+  default = "taro-test-db"
 }
