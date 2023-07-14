@@ -86,7 +86,7 @@ jobs:
         ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
     steps:
       - name: Login to Azure with service principal
-        uses: azure/login@v1
+        uses: azure/actions/login@v1
         with:
           creds: ${{ secrets.AZURE_SP_CREDNETIALS }}
       - name: Set up QEMU
