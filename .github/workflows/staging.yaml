@@ -7,7 +7,7 @@ on:
 permissions:
   id-token: write
   contents: read
-  
+
 env: 
   ENV: staging
 
@@ -88,10 +88,7 @@ jobs:
       - name: Login to Azure with service principal
         uses: azure/login@v1
         with:
-          client-id: ${{ secrets.ARM_CLIENT_ID }}
-          tenant-id: ${{ secrets.ARM_TENANT_ID }}
-          subscription-id: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-          client-secret: ${{ secrets.ARM_CLIENT_ID}} 
+          creds: ${{ secrets.AZURE_SP_CREDNETIALS }}
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
