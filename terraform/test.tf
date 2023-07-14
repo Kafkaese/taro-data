@@ -42,7 +42,7 @@ resource "azurerm_postgresql_flexible_server_firewall_rule" "pg-server-open" {
 
 # Container registry for the API 
 resource "azurerm_container_registry" "taro-staging-registry" {
-  name                = "taroStagingContainerRegistry"
+  name                = "taro-staging-container-registry"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   sku                 = "Basic"
