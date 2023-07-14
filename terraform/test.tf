@@ -4,6 +4,7 @@ resource "azurerm_resource_group" "rg" {
   name     = var.resource_group_name
 }
 
+/*
 # Random id for pg server
 resource "random_id" "pg-server-id" {
     byte_length = 8
@@ -37,6 +38,7 @@ resource "azurerm_postgresql_flexible_server_firewall_rule" "pg-server-open" {
   start_ip_address    = "0.0.0.0"
   end_ip_address      = "255.255.255.255"
 }
+*/ 
 
 # Container registry for the API 
 resource "azurerm_container_registry" "taro-registry" {
@@ -45,7 +47,7 @@ resource "azurerm_container_registry" "taro-registry" {
   location            = azurerm_resource_group.rg.location
   sku                 = "Basic"
 }
-
+/*
 # Azuread application needed to assign service principal to container registry. What does this actullay do???
 resource "azuread_application" "taro-registry-app" {
   display_name = "taro-registry-app"
@@ -64,6 +66,13 @@ resource "azuread_service_principal_password" "taro-registry-sp-pass" {
 # Role assignement service principal to container registry
 resource "azurerm_role_assignment" "taro-registry-assignment" {
   scope                = "${azurerm_container_registry.taro-registry.id}"
-  role_definition_name = "Contributor"
+  role_definition_name = "Administrator"
   principal_id         = "${azuread_service_principal_password.taro-registry-sp-pass.service_principal_id}"
 }
+
+# login?
+output "docker" {
+  value = "docker login ${azurerm_container_registry.taro-registry.login_server} -u ${azuread_service_principal.taro-registry-sp.application_id} -p ${azuread_service_principal_password.taro-registry-sp-pass.value}"
+  sensitive = true
+}
+*/
