@@ -45,7 +45,7 @@ jobs:
 
 
   pipeline:
-      name: Build and run the pipeline container
+      name: 'Build and run pipeline container'
       runs-on: ubuntu-latest
       needs: tf-setup
       environment: staging
@@ -75,7 +75,7 @@ jobs:
             image: kafkaese/taro:pipeline
   
   build-api:
-    name: 'Deploy API'
+    name: 'Build API'
     needs: tf-setup
     runs-on: ubuntu-latest
     environment: staging
