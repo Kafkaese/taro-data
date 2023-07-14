@@ -100,7 +100,7 @@ jobs:
         with:
           file: ./api.Dockerfile
           push: true
-          tags: taroStagingContainerRegistry.azurecr.io/taro:api
+          tags: tarostagingcontainerregistry.azurecr.io/taro:api
   
   tf-destroy:
     name: 'Destroy test environment'
