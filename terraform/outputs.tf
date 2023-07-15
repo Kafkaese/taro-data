@@ -13,3 +13,7 @@ output "acr_service_principal_password" {
 #output "server_name" {
 #  value = azurerm_postgresql_flexible_server.pg-server.name
 #}
+
+output "postgres_server" {
+  value = azurerm_postgresql_flexible_server.pg-server.name
+}
