@@ -54,8 +54,13 @@ resource "azurerm_container_group" "taro-test-api-instance" {
   location            = var.resource_group_location
   resource_group_name = var.resource_group_name
   ip_address_type     = "Public"
-  dns_name_label      = "aci-label"
   os_type             = "Linux"
+
+  image_registry_credential {
+    username = var.image_registry_credential_user
+    password = var.image_registry_credential_password
+    server   = "tarotestcontainerregistry.azurecr.io"
+  }
 
   container {
     name   = "taro-test-api"
@@ -64,7 +69,7 @@ resource "azurerm_container_group" "taro-test-api-instance" {
     memory = "1.5"
 
     ports {
-      port     = 443
+      port     = 8080
       protocol = "TCP"
     }
   }
