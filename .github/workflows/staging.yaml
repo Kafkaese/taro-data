@@ -47,7 +47,7 @@ jobs:
       - name: Save outputs
         id: terraform
         run: |
-          POSTGRES_SERVER=$(terraform outputs -raw postgres_server)
+          POSTGRES_SERVER=$(terraform output -raw postgres_server)
           echo "::set-output name=postgres_server::$POSTGRES_SERVER"
 
 
