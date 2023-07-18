@@ -145,6 +145,26 @@ jobs:
         run: terraform apply test-deploy.tfplan
 
 
+  api-tests:
+    name: 'API integration tests'
+    needs: [deploy-api, pipeline]
+    runs-on: ubuntu-latest
+    environment: staging
+    env:
+      API_HOST: '?' 
+      API_PORT: '?'
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: update pip
+        run: pip install --upgrade pip
+      - name: Install request package
+        run: requests==2.31.0
+      - name: Run tests
+        run: pytest tests/test_api.py
+
+
   tf-destroy:
     name: 'Destroy test environment'
     if: ${{ always() }}
