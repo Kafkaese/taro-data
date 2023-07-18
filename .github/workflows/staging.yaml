@@ -8,6 +8,8 @@ permissions:
   id-token: write
   contents: read
 
+concurrency: test_environment
+
 env: 
   ENV: staging
 
