@@ -123,7 +123,7 @@ jobs:
         TF_VAR_postgres_password: ${{ secrets.TF_VAR_postgres_password }}
         POSTGRES_HOST: ${{ needs.terraform.outputs.postgres_server}}
         POSTGRES_USER: ${{ secrets.TF_VAR_postgres_user }}
-        POSTRES_PASSWORD: ${{ secrets.TF_VAR_postgres_password }}
+        POSTGRES_PASSWORD: ${{ secrets.TF_VAR_postgres_password }}
 
     steps:
       - name: Debug context
