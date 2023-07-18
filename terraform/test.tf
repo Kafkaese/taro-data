@@ -20,6 +20,7 @@ resource "azurerm_postgresql_flexible_server" "pg-server" {
   version = 11
   administrator_login = var.postgres_user
   administrator_password = var.postgres_password
+  zone = 2
 }
 
 # Database on postgres server
