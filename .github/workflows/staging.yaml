@@ -17,8 +17,6 @@ jobs:
   tf-setup:
     name: 'Provision test environment'
     runs-on: ubuntu-latest
-    outputs:
-      server-name: ${{ steps.terraform.outputs}}
     environment: staging
     env:
         ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
@@ -130,7 +128,6 @@ jobs:
         run: |
           echo POSTGRES_HOST
           echo ${{ needs.terraform.outputs.postgres_server }}
-          echo ${{ needs.terraform.outputs.server-name }}
       - name: Checkout
         uses: actions/checkout@v3
       - name: 'Terraform Setup'
