@@ -15,6 +15,8 @@ jobs:
   tf-setup:
     name: 'Provision test environment'
     runs-on: ubuntu-latest
+    outputs:
+      server-name: ${{ steps.terraform.outputs}}
     environment: staging
     env:
         ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
@@ -42,6 +44,11 @@ jobs:
       - name: 'Apply plan'
         working-directory: ./terraform
         run: terraform apply test.tfplan
+      - name: Save outputs
+        id: terraform
+        run: |
+          POSTGRES_SERVER=$(terraform outputs -raw postgres_server)
+          echo "::set-output name=postgres_server::$POSTGRES_SERVER"
 
 
   pipeline:
@@ -114,9 +121,14 @@ jobs:
         ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
         TF_VAR_postgres_user: ${{ secrets.TF_VAR_postgres_user }}
         TF_VAR_postgres_password: ${{ secrets.TF_VAR_postgres_password }}
-    
+        POSTGRES_HOST: ${{ needs.terraform.outputs.postgres_server}}
 
     steps:
+      - name: Debug context
+        run: |
+          echo POSTGRES_HOST
+          echo ${{ needs.terraform.outputs.postgres_server }}
+          echo ${{ needs.terraform.outputs.server-name }}
       - name: Checkout
         uses: actions/checkout@v3
       - name: 'Terraform Setup'
