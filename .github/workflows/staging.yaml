@@ -140,7 +140,7 @@ jobs:
         run: terraform plan -refresh-only
       - name: 'Make plan'
         working-directory: ./terraform/deploy
-        run: terraform plan -out test-deploy.tfplan
+        run: tf plan -var "image_registry_credential_user=$ARM_CLIENT_ID" -var "image_registry_credential_password=$ARM_CLIENT_SECRET" -var "postgres_host=$POSTGRES_HOST" -var "postgres_user=$POSTGRES_USER" -var "postgres_password=$POSTGRES_PASSWORD" -out 'test-deploy.tfplan'
       - name: 'Apply plan'
         working-directory: ./terraform/deploy
         run: terraform apply test-deploy.tfplan

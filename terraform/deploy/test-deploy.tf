@@ -20,6 +20,7 @@ resource "azurerm_postgresql_flexible_server" "pg-server" {
   version = 11
   administrator_login = var.postgres_user
   administrator_password = var.postgres_password
+  zone = 2
 }
 
 # Database on postgres server
@@ -66,6 +67,13 @@ resource "azurerm_container_group" "taro-test-api-instance" {
     image  = "tarotestcontainerregistry.azurecr.io/taro:api"
     cpu    = "0.5"
     memory = "1.5"
+    environment_variables = {
+      ENV="test"
+      POSTGRES_PORT=var.postgres_port
+      POSTGRES_DB=var.postgres_database
+      POSTGRES_USER=var.postgres_user
+      POSTGRES_PASSWORD=var.postgres_password
+    }
 
     ports {
       port     = 8080

@@ -15,3 +15,24 @@ variable "image_registry_credential_user" {
 variable "image_registry_credential_password" {
   default = "secret"
 }
+
+variable "postgres_host" {
+}
+
+variable "postgres_port" {
+  default = "5432"
+}
+
+variable "postgres_user" {
+  default = "postgres"
+  sensitive = true
+}
+
+variable "postgres_password" {
+  default = "secret"
+  sensitive = true
+}
+
+variable "postgres_database" {
+  default = "taro-test-db"
+}
