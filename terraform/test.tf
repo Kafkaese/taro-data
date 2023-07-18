@@ -4,7 +4,6 @@ resource "azurerm_resource_group" "rg" {
   name     = var.resource_group_name
 }
 
-
 # Random id for pg server
 resource "random_id" "pg-server-id" {
     byte_length = 8
