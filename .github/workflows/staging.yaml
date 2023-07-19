@@ -50,7 +50,7 @@ jobs:
         id: terraform
         run: |
           POSTGRES_SERVER=$(terraform output -raw postgres_server)
-          recho "postgres_server=$POSTGRES_SERVER" >> $GITHUB_OUTPUT
+          echo "postgres_server=$POSTGRES_SERVER" >> $GITHUB_OUTPUT
 
   pipeline:
       name: 'Build and run pipeline container'
