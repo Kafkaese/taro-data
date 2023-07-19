@@ -18,7 +18,7 @@ jobs:
     name: 'Provision test environment'
     runs-on: ubuntu-latest
     outputs:
-      sql-server: ${{ steps.terraform.outputs.postgres_server }}
+      sql-server-encrypted: ${{ steps.terraform.outputs.postgres_server }}
     environment: staging
     env:
         ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
@@ -27,6 +27,7 @@ jobs:
         ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
         TF_VAR_postgres_user: ${{ secrets.TF_VAR_postgres_user }}
         TF_VAR_postgres_password: ${{ secrets.TF_VAR_postgres_password }}
+        SECRET: ${{ secrets.PGP_SECRET_SIGNING_PASSPHRASE }}
     
     steps:
       - name: Checkout
@@ -52,8 +53,8 @@ jobs:
         working-directory: ./terraform
         run: |
           POSTGRES_SERVER=$(terraform output -raw postgres_server)
-          echo $POSTGRES_SERVER
-          echo "postgres_server=$POSTGRES_SERVER" >> $GITHUB_OUTPUT
+          postgres_server_encrypted=$(gpg --symmetric --batch --passphrase "$SECRET" --output - <(echo "$POSTGRES_SERVER") | base64 -w0)
+          echo "sql-server-encrypted=$postgres_server_encrypted" >> $GITHUB_OUTPUT
 
   pipeline:
       name: 'Build and run pipeline container'
@@ -127,14 +128,14 @@ jobs:
         ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
         TF_VAR_postgres_user: ${{ secrets.TF_VAR_postgres_user }}
         TF_VAR_postgres_password: ${{ secrets.TF_VAR_postgres_password }}
-        POSTGRES_HOST: ${{ needs.tf-setup.outputs.sql-server }}
         POSTGRES_USER: ${{ secrets.TF_VAR_postgres_user }}
         POSTGRES_PASSWORD: ${{ secrets.TF_VAR_postgres_password }}
+        SECRET: ${{ secrets.PGP_SECRET_SIGNING_PASSPHRASE }}
 
     steps:
-      - name: Debug context
+      - name: Decrypt postgres host
         run: |
-          echo $(${{ needs.tf-setup.outputs.postgres-server }})
+          export POSTGRES_HOST=$(gpg --decrypt --quiet --batch --passphrase "$SECRET" --output - <(echo "${{ needs.tf-setup.outputs.sql-server-encrypted }}" | base64 --decode))
           echo $POSTGRES_HOST
       - name: Checkout
         uses: actions/checkout@v3
