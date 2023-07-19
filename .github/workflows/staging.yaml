@@ -54,8 +54,6 @@ jobs:
         run: |
           POSTGRES_SERVER=$(terraform output -raw postgres_server)
           echo "postgres_server=$POSTGRES_SERVER" >> $GITHUB_OUTPUT
-          echo $POSTGRES_SERVER
-
 
   pipeline:
       name: 'Build and run pipeline container'
@@ -158,11 +156,7 @@ jobs:
         id: api
         run: |
           API_HOST=$(terraform output -raw api-public-ip)
-          echo "api_host=$API_HOST" >> $GITHUB_OUTPUT
-          echo "api_host=$API_HOST"
-          echo $GITHUB_OUTPUT
-
-        
+          echo "api_host=$API_HOST" >> $GITHUB_OUTPUT   
 
   api-tests:
     name: 'API integration tests'
