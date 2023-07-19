@@ -17,6 +17,8 @@ jobs:
   tf-setup:
     name: 'Provision test environment'
     runs-on: ubuntu-latest
+    outputs:
+      postgres-server: ${{ steps.terraform.outputs.postgres_server }}
     environment: staging
     env:
         ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
@@ -116,6 +118,8 @@ jobs:
   deploy-api:
     name: 'Deploy API'
     runs-on: ubuntu-latest
+    outputs:
+      api-host: ${{ steps.api.outputs.api_host }}
     needs: [build-api]
     environment: staging
     env:
@@ -125,7 +129,7 @@ jobs:
         ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
         TF_VAR_postgres_user: ${{ secrets.TF_VAR_postgres_user }}
         TF_VAR_postgres_password: ${{ secrets.TF_VAR_postgres_password }}
-        POSTGRES_HOST: ${{ needs.terraform.outputs.postgres_server}}
+        POSTGRES_HOST: ${{ needs.tf-setup.outputs.postgres-server}}
         POSTGRES_USER: ${{ secrets.TF_VAR_postgres_user }}
         POSTGRES_PASSWORD: ${{ secrets.TF_VAR_postgres_password }}
 
@@ -166,8 +170,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: staging
     env:
-      TEST: ${{ needs.api.outputs.test }}
-      API_HOST: ${{ needs.api.outputs.api_host }}
+      API_HOST: ${{ needs.deploy-api.outputs.api-host }}
       API_PORT: 8080
     
     steps:
