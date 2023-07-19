@@ -173,7 +173,7 @@ jobs:
   tf-destroy:
     name: 'Destroy test environment'
     if: ${{ always() }}
-    needs: [tf-setup, pipeline, build-api, deploy-api]
+    needs: [tf-setup, pipeline, build-api, deploy-api, api-tests]
     runs-on: ubuntu-latest
     environment: staging
     env:
