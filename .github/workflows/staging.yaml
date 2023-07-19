@@ -54,6 +54,7 @@ jobs:
           echo "postgres_server=$POSTGRES_SERVER" >> $GITHUB_OUTPUT
           echo $POSTGRES_SERVER
 
+
   pipeline:
       name: 'Build and run pipeline container'
       runs-on: ubuntu-latest
@@ -154,6 +155,11 @@ jobs:
         run: |
           API_HOST=$(terraform output -raw api-public-ip)
           echo "api_host=$API_HOST" >> $GITHUB_OUTPUT
+          echo "api_host=$API_HOST"
+          echo $API_HOST
+          TEST='yes'
+          echo "test=$TEST" >> $GITHUB_OUTPUT
+        
 
   api-tests:
     name: 'API integration tests'
@@ -161,6 +167,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: staging
     env:
+      TEST: ${{ needs.api.outputs.test }}
       API_HOST: ${{ needs.api.outputs.api_host }}
       API_PORT: 8080
     
