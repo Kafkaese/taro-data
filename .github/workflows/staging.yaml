@@ -144,6 +144,7 @@ jobs:
         working-directory: ./terraform/deploy
         run: terraform apply test-deploy.tfplan
       - name: 'Save public ip'
+        working-directory: ./terraform/deploy
         id: api
         run: |
           API_HOST=$(terraform output -raw api-public-ip)
