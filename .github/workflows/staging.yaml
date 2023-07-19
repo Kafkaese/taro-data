@@ -28,7 +28,6 @@ jobs:
         TF_VAR_postgres_user: ${{ secrets.TF_VAR_postgres_user }}
         TF_VAR_postgres_password: ${{ secrets.TF_VAR_postgres_password }}
     
-
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -53,6 +52,7 @@ jobs:
         working-directory: ./terraform
         run: |
           POSTGRES_SERVER=$(terraform output -raw postgres_server)
+          echo $POSTGRES_SERVER
           echo "postgres_server=$POSTGRES_SERVER" >> $GITHUB_OUTPUT
 
   pipeline:
@@ -127,7 +127,7 @@ jobs:
         ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
         TF_VAR_postgres_user: ${{ secrets.TF_VAR_postgres_user }}
         TF_VAR_postgres_password: ${{ secrets.TF_VAR_postgres_password }}
-        POSTGRES_HOST: ${{ needs.tf-setup.outputs.postgres-server}}
+        POSTGRES_HOST: ${{ needs.tf-setup.outputs.postgres-server }}
         POSTGRES_USER: ${{ secrets.TF_VAR_postgres_user }}
         POSTGRES_PASSWORD: ${{ secrets.TF_VAR_postgres_password }}
 
@@ -135,7 +135,6 @@ jobs:
       - name: Debug context
         run: |
           echo $POSTGRES_HOST
-          echo ${{ needs.terraform.outputs.postgres_server }}
       - name: Checkout
         uses: actions/checkout@v3
       - name: 'Terraform Setup'
