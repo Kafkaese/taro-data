@@ -134,6 +134,7 @@ jobs:
     steps:
       - name: Debug context
         run: |
+          echo $(${{ needs.tf-setup.outputs.postgres-server }})
           echo $POSTGRES_HOST
       - name: Checkout
         uses: actions/checkout@v3
@@ -170,7 +171,7 @@ jobs:
       - name: 'Debug'
         run: |
           echo $GITHUB_OUTPUT
-          echo $(${{ needs.api.outputs.api_host }})
+          echo $(${{ needs.deploy-api.outputs.api-host }})
           echo $API_HOST
       - name: Checkout
         uses: actions/checkout@v3
