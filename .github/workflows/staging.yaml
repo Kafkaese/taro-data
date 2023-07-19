@@ -18,7 +18,7 @@ jobs:
     name: 'Provision test environment'
     runs-on: ubuntu-latest
     outputs:
-      sql-server-encrypted: ${{ steps.terraform.outputs.postgres_server }}
+      sql-server-encrypted: ${{ steps.terraform.outputs.sql_server_encrypted }}
     environment: staging
     env:
         ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
@@ -54,7 +54,7 @@ jobs:
         run: |
           POSTGRES_SERVER=$(terraform output -raw postgres_server)
           postgres_server_encrypted=$(gpg --symmetric --batch --passphrase "$SECRET" --output - <(echo "$POSTGRES_SERVER") | base64 -w0)
-          echo "sql-server-encrypted=$postgres_server_encrypted" >> $GITHUB_OUTPUT
+          echo "sql_server_encrypted=$postgres_server_encrypted" >> $GITHUB_OUTPUT
 
   pipeline:
       name: 'Build and run pipeline container'
