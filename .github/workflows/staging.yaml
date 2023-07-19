@@ -156,9 +156,8 @@ jobs:
           API_HOST=$(terraform output -raw api-public-ip)
           echo "api_host=$API_HOST" >> $GITHUB_OUTPUT
           echo "api_host=$API_HOST"
-          echo $API_HOST
-          TEST='yes'
-          echo "test=$TEST" >> $GITHUB_OUTPUT
+          echo $GITHUB_OUTPUT
+
         
 
   api-tests:
@@ -174,6 +173,7 @@ jobs:
     steps:
       - name: 'Debug'
         run: |
+          echo $GITHUB_OUTPUT
           echo $(${{ needs.api.outputs.api_host }})
           echo $API_HOST
       - name: Checkout
