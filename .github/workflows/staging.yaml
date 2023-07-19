@@ -48,9 +48,11 @@ jobs:
         run: terraform apply test.tfplan
       - name: Save outputs
         id: terraform
+        working-directory: ./terraform
         run: |
           POSTGRES_SERVER=$(terraform output -raw postgres_server)
           echo "postgres_server=$POSTGRES_SERVER" >> $GITHUB_OUTPUT
+          echo $POSTGRES_SERVER
 
   pipeline:
       name: 'Build and run pipeline container'
