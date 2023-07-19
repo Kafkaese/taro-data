@@ -118,7 +118,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       api-host: ${{ steps.api.outputs.api_host }}
-    needs: [build-api]
+    needs: [tf-setup, build-api]
     environment: staging
     env:
         ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
