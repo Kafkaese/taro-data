@@ -147,8 +147,7 @@ jobs:
         id: api
         run: |
           API_HOST=$(terraform output -raw api-public-ip)
-          echo "::set-output name=api-host::$API_HOST"
-
+          echo "::set-output name=api_host::$API_HOST"
 
   api-tests:
     name: 'API integration tests'
@@ -156,7 +155,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: staging
     env:
-      API_HOST: ${{ needs.api.outputs.api-host}}
+      API_HOST: ${{ needs.api.outputs.api_host}}
       API_PORT: 8080
     
     steps:
