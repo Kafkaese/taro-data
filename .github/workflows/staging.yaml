@@ -157,13 +157,13 @@ jobs:
     runs-on: ubuntu-latest
     environment: staging
     env:
-      API_HOST: ${{ needs.api.outputs.api_host}}
+      API_HOST: ${{ needs.api.outputs.api_host }}
       API_PORT: 8080
     
     steps:
       - name: 'Debug'
         run: |
-          echo $(${{ needs.api.outputs.api_host}})
+          echo $(${{ needs.api.outputs.api_host }})
           echo $API_HOST
       - name: Checkout
         uses: actions/checkout@v3
