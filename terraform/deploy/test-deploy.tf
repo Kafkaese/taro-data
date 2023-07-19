@@ -69,6 +69,7 @@ resource "azurerm_container_group" "taro-test-api-instance" {
     memory = "1.5"
     environment_variables = {
       ENV="test"
+      POSTGRES_HOST=var.postgres_host
       POSTGRES_PORT=var.postgres_port
       POSTGRES_DB=var.postgres_database
       POSTGRES_USER=var.postgres_user
