@@ -149,6 +149,7 @@ jobs:
         run: |
           API_HOST=$(terraform output -raw api-public-ip)
           echo "::set-output name=api_host::$API_HOST"
+          echo $API_HOST
 
   api-tests:
     name: 'API integration tests'
@@ -160,6 +161,10 @@ jobs:
       API_PORT: 8080
     
     steps:
+      - name: 'Debug'
+        run: |
+          echo $(${{ needs.api.outputs.api_host}})
+          echo $API_HOST
       - name: Checkout
         uses: actions/checkout@v3
       - name: update pip
