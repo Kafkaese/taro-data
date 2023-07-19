@@ -164,8 +164,10 @@ jobs:
         uses: actions/checkout@v3
       - name: update pip
         run: pip install --upgrade pip
-      - name: Install request package
-        run: requests==2.31.0
+      - name: Install request and pytest packages
+        run: |
+          pip install requests==2.31.0
+          pip install pytest==7.3.1
       - name: Run tests
         run: pytest tests/test_api.py
 
