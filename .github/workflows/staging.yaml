@@ -148,7 +148,7 @@ jobs:
         run: terraform init
       - name: 'Make plan'
         working-directory: ./terraform/deploy
-        run: terraform plan -var "image_registry_credential_user=$ARM_CLIENT_ID" -var "image_registry_credential_password=$ARM_CLIENT_SECRET" -var "postgres_host=$POSTGRES_HOST" -var "postgres_user=$POSTGRES_USER" -var "postgres_password=$POSTGRES_PASSWORD" -out 'test-deploy.tfplan'
+        run: terraform plan -var "image_registry_credential_user=$ARM_CLIENT_ID" -var "image_registry_credential_password=$ARM_CLIENT_SECRET" -var "postgres_host=$(gpg --decrypt --quiet --batch --passphrase "$SECRET" --output - <(echo "${{ needs.tf-setup.outputs.sql-server-encrypted }}" | base64 --decode))" -var "postgres_user=$POSTGRES_USER" -var "postgres_password=$POSTGRES_PASSWORD" -out 'test-deploy.tfplan'
       - name: 'Apply plan'
         working-directory: ./terraform/deploy
         run: terraform apply test-deploy.tfplan
