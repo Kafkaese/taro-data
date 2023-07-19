@@ -50,8 +50,7 @@ jobs:
         id: terraform
         run: |
           POSTGRES_SERVER=$(terraform output -raw postgres_server)
-          echo "::set-output name=postgres_server::$POSTGRES_SERVER"
-
+          recho "postgres_server=$POSTGRES_SERVER" >> $GITHUB_OUTPUT
 
   pipeline:
       name: 'Build and run pipeline container'
@@ -152,8 +151,7 @@ jobs:
         id: api
         run: |
           API_HOST=$(terraform output -raw api-public-ip)
-          echo "::set-output name=api_host::$API_HOST"
-          echo $API_HOST
+          echo "api_host=$API_HOST" >> $GITHUB_OUTPUT
 
   api-tests:
     name: 'API integration tests'
