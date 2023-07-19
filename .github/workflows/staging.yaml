@@ -18,7 +18,7 @@ jobs:
     name: 'Provision test environment'
     runs-on: ubuntu-latest
     outputs:
-      postgres-server: ${{ steps.terraform.outputs.postgres_server }}
+      sql-server: ${{ steps.terraform.outputs.postgres_server }}
     environment: staging
     env:
         ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
@@ -127,7 +127,7 @@ jobs:
         ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
         TF_VAR_postgres_user: ${{ secrets.TF_VAR_postgres_user }}
         TF_VAR_postgres_password: ${{ secrets.TF_VAR_postgres_password }}
-        POSTGRES_HOST: ${{ needs.tf-setup.outputs.postgres-server }}
+        POSTGRES_HOST: ${{ needs.tf-setup.outputs.sql-server }}
         POSTGRES_USER: ${{ secrets.TF_VAR_postgres_user }}
         POSTGRES_PASSWORD: ${{ secrets.TF_VAR_postgres_password }}
 
