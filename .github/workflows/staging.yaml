@@ -32,6 +32,8 @@ jobs:
         uses: actions/checkout@v3
       - name: 'Terraform Setup'
         uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_wrapper: false
       - name: 'Initialize Terraform'
         working-directory: ./terraform
         run: terraform init
@@ -134,6 +136,8 @@ jobs:
         uses: actions/checkout@v3
       - name: 'Terraform Setup'
         uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_wrapper: false
       - name: 'Initialize Terraform'
         working-directory: ./terraform/deploy
         run: terraform init
