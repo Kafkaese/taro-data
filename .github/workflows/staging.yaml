@@ -62,6 +62,7 @@ jobs:
       needs: tf-setup
       environment: staging
       env:
+        SECRET: ${{ secrets.PGP_SECRET_SIGNING_PASSPHRASE }}
         POSTGRES_USER: ${{ secrets.TF_VAR_postgres_user }}
         POSTGRES_PASSWORD: ${{ secrets.TF_VAR_postgres_password }}
         POSTGRES_PORT: 5432
