@@ -61,7 +61,16 @@ jobs:
       runs-on: ubuntu-latest
       needs: tf-setup
       environment: staging
+      env:
+        POSTGRES_USER: ${{ secrets.TF_VAR_postgres_user }}
+        POSTGRES_PASSWORD: ${{ secrets.TF_VAR_postgres_password }}
+        POSTGRES_PORT: 5432
+        POSTGRES_DB: 'taro-test-db'
       steps:
+        - name: Decrypt postgres host
+          run: |
+            export POSTGRES_HOST=$(gpg --decrypt --quiet --batch --passphrase "$SECRET" --output - <(echo "${{ needs.tf-setup.outputs.sql-server-encrypted }}" | base64 --decode))
+            echo $POSTGRES_HOST
         - name: Set up QEMU
           uses: docker/setup-qemu-action@v1
         - name: Set up Docker Buildx
