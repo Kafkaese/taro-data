@@ -176,7 +176,7 @@ jobs:
     environment: staging
     env:
       API_HOST: ${{ needs.deploy-api.outputs.api-host }}
-      API_PORT: 8080
+      API_PORT: 8000
     
     steps:
       - name: 'Debug'
