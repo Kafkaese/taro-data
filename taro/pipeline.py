@@ -371,17 +371,13 @@ if __name__ == "__main__":
     dbname = os.environ['POSTGRES_DB']
     
     # Use tf vars if not local dev env
-    if os.environ['ENV'] == 'dev':
-        user = os.environ['POSTGRES_USER']
-        password = os.environ['POSTGRES_PASSWORD']
-    else:    
-        user = os.environ['TF_VAR_postgres_user']
-        password = os.environ['TF_VAR_postgres_password']
+    user = os.environ['POSTGRES_USER']
+    password = os.environ['POSTGRES_PASSWORD']
+
     
     sslmode = "require"
     
     # Construct connection string
-    print(f"USING ENV: {os.environ['ENV']}")
     conn_string = f"postgresql+psycopg2://{user}:{password}@{host}:{5432}/{dbname}"
     
     print(conn_string)
