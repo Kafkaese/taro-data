@@ -77,7 +77,7 @@ resource "azurerm_container_group" "taro-test-api-instance" {
     }
 
     ports {
-      port     = 8080
+      port     = 8000
       protocol = "TCP"
     }
   }
