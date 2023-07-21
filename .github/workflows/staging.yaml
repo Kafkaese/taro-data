@@ -67,13 +67,12 @@ jobs:
         POSTGRES_PASSWORD: ${{ secrets.TF_VAR_postgres_password }}
         POSTGRES_PORT: 5432
         POSTGRES_DB: 'taro-test-db'
-        POSTGRES_HOST: $(gpg --decrypt --quiet --batch --passphrase "$SECRET" --output - <(echo "${{ needs.tf-setup.outputs.sql-server-encrypted }}" | base64 --decode))
+        
       steps:
         - name: Decrypt postgres host
           run: |
-            echo $POSTGRES_HOST
-            export POSTGRES_HOST=$(gpg --decrypt --quiet --batch --passphrase "$SECRET" --output - <(echo "${{ needs.tf-setup.outputs.sql-server-encrypted }}" | base64 --decode))
-            echo $POSTGRES_HOST
+            echo "{POSTGRES_HOST}={$(gpg --decrypt --quiet --batch --passphrase "$SECRET" --output - <(echo "${{ needs.tf-setup.outputs.sql-server-encrypted }}" | base64 --decode))}"
+            echo "${{ env.POSTGRES_HOST }}
         - name: Set up QEMU
           uses: docker/setup-qemu-action@v1
         - name: Set up Docker Buildx
@@ -93,7 +92,7 @@ jobs:
           uses: actions/checkout@v2
         - name: Debug
           run: |
-            echo $POSTGRES_HOST
+            echo "${{ env.POSTGRES_HOST }}"
             echo $POSTGRES_USER
             echo $POSTGRES_PASSWORD
             echo $POSTGRES_DB
@@ -103,7 +102,7 @@ jobs:
             username: ${{ secrets.DOCKERHUB_USERNAME }}
             password: ${{ secrets.DOCKERHUB_TOKEN }}
             image: kafkaese/taro:pipeline
-            options: -e POSTGRES_HOST=$(gpg --decrypt --quiet --batch --passphrase "$SECRET" --output - <(echo "${{ needs.tf-setup.outputs.sql-server-encrypted }}" | base64 --decode)) -e POSTGRES_DB=$POSTGRES_DB -e POSTGRES_USER=$POSTGRES_USER -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD -e ENV=test
+            options: -e POSTGRES_HOST=${{ env.POSTGRES_HOST }} | base64 --decode)) -e POSTGRES_DB=$POSTGRES_DB -e POSTGRES_USER=$POSTGRES_USER -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD -e ENV=test
   
   build-api:
     name: 'Build API'
