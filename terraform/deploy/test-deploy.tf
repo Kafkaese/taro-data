@@ -7,7 +7,7 @@ resource "azurerm_resource_group" "rg" {
 # Random id for pg server
 resource "random_id" "pg-server-id" {
     byte_length = 8
-    prefix = "taro-staging-server"
+    prefix = "taro-test-server"
 } 
 
 # Postgres server
