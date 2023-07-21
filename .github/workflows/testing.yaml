@@ -1,0 +1,234 @@
+name: Testing
+
+on: 
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency: test_environment
+
+env: 
+  ENV: test
+
+jobs:
+  tf-setup:
+    name: 'Provision test environment'
+    runs-on: ubuntu-latest
+    outputs:
+      sql-server-encrypted: ${{ steps.terraform.outputs.sql_server_encrypted }}
+    environment: testing
+    env:
+        ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+        TF_VAR_postgres_user: ${{ secrets.TF_VAR_postgres_user }}
+        TF_VAR_postgres_password: ${{ secrets.TF_VAR_postgres_password }}
+        SECRET: ${{ secrets.PGP_SECRET_SIGNING_PASSPHRASE }}
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: 'Terraform Setup'
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_wrapper: false
+      - name: 'Initialize Terraform'
+        working-directory: ./terraform
+        run: terraform init
+      - name: 'Get state'
+        working-directory: ./terraform
+        run: terraform plan -refresh-only
+      - name: 'Make plan'
+        working-directory: ./terraform
+        run: terraform plan -out test.tfplan
+      - name: 'Apply plan'
+        working-directory: ./terraform
+        run: terraform apply test.tfplan
+      - name: Save outputs
+        id: terraform
+        working-directory: ./terraform
+        run: |
+          POSTGRES_SERVER=$(terraform output -raw postgres_server)
+          postgres_server_encrypted=$(gpg --symmetric --batch --passphrase "$SECRET" --output - <(echo "$POSTGRES_SERVER") | base64 -w0)
+          echo "sql_server_encrypted=$postgres_server_encrypted" >> $GITHUB_OUTPUT
+
+  pipeline:
+      name: 'Build and run pipeline container'
+      runs-on: ubuntu-latest
+      needs: tf-setup
+      environment: testing
+      env:
+        SECRET: ${{ secrets.PGP_SECRET_SIGNING_PASSPHRASE }}
+        POSTGRES_USER: ${{ secrets.TF_VAR_postgres_user }}
+        POSTGRES_PASSWORD: ${{ secrets.TF_VAR_postgres_password }}
+        POSTGRES_PORT: 5432
+        POSTGRES_DB: 'taro-test-db'
+        
+      steps:
+        - name: Decrypt postgres host
+          run: |
+            export POSTGRES_HOST=$(gpg --decrypt --quiet --batch --passphrase "$SECRET" --output - <(echo "${{ needs.tf-setup.outputs.sql-server-encrypted }}" | base64 --decode))
+            echo $POSTGRES_HOST
+            echo $GITHUB_ENV
+            echo "POSTGRES_HOST=$POSTGRES_HOST" >> "$GITHUB_ENV"
+            echo "${{ env.POSTGRES_HOST }}"
+        - name: Set up QEMU
+          uses: docker/setup-qemu-action@v1
+        - name: Set up Docker Buildx
+          uses: docker/setup-buildx-action@v1
+        - name: Login to DockerHub
+          uses: docker/login-action@v1
+          with:
+            username: ${{ secrets.DOCKERHUB_USERNAME }}
+            password: ${{ secrets.DOCKERHUB_TOKEN }}
+        - name: Build and push
+          uses: docker/build-push-action@v2
+          with:
+            file: ./pipeline.Dockerfile
+            push: true
+            tags: kafkaese/taro:pipeline
+        - name: Check out the repo
+          uses: actions/checkout@v2
+        - name: Debug
+          run: |
+            echo $POSTGRES_HOST
+            echo $POSTGRES_USER
+            echo $POSTGRES_PASSWORD
+            echo $POSTGRES_DB
+        - name: Run the container
+          run: docker run --rm -e POSTGRES_HOST=$POSTGRES_HOST -e POSTGRES_DB=$POSTGRES_DB -e POSTGRES_USER=$POSTGRES_USER -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD -e ENV=test kafkaese/taro:pipeline
+
+  build-api:
+    name: 'Build API'
+    needs: tf-setup
+    runs-on: ubuntu-latest
+    environment: testing
+    env:
+        ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+    steps:
+      - name: Login to Azure with service principal
+        uses: azure/login@v1.4.3
+        with:
+          creds: ${{ secrets.AZURE_SP_CREDNETIALS }}
+      - name: 'Loggin to Azure Container Registry'
+        run: az acr login --name tarotestcontainerregistry.azurecr.io
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          file: ./api.Dockerfile
+          push: true
+          tags: tarotestcontainerregistry.azurecr.io/taro:api
+
+  deploy-api:
+    name: 'Deploy API'
+    runs-on: ubuntu-latest
+    outputs:
+      api-host: ${{ steps.api.outputs.api_host }}
+    needs: [tf-setup, build-api]
+    environment: testing
+    env:
+        ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+        TF_VAR_postgres_user: ${{ secrets.TF_VAR_postgres_user }}
+        TF_VAR_postgres_password: ${{ secrets.TF_VAR_postgres_password }}
+        POSTGRES_USER: ${{ secrets.TF_VAR_postgres_user }}
+        POSTGRES_PASSWORD: ${{ secrets.TF_VAR_postgres_password }}
+        SECRET: ${{ secrets.PGP_SECRET_SIGNING_PASSPHRASE }}
+
+    steps:
+      - name: Decrypt postgres host
+        run: |
+          export POSTGRES_HOST=$(gpg --decrypt --quiet --batch --passphrase "$SECRET" --output - <(echo "${{ needs.tf-setup.outputs.sql-server-encrypted }}" | base64 --decode))
+          echo $POSTGRES_HOST
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: 'Terraform Setup'
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_wrapper: false
+      - name: 'Initialize Terraform'
+        working-directory: ./terraform/deploy
+        run: terraform init
+      - name: 'Make plan'
+        working-directory: ./terraform/deploy
+        run: terraform plan -var "image_registry_credential_user=$ARM_CLIENT_ID" -var "image_registry_credential_password=$ARM_CLIENT_SECRET" -var "postgres_host=$(gpg --decrypt --quiet --batch --passphrase "$SECRET" --output - <(echo "${{ needs.tf-setup.outputs.sql-server-encrypted }}" | base64 --decode))" -var "postgres_user=$POSTGRES_USER" -var "postgres_password=$POSTGRES_PASSWORD" -out 'test-deploy.tfplan'
+      - name: 'Apply plan'
+        working-directory: ./terraform/deploy
+        run: terraform apply test-deploy.tfplan
+      - name: 'Save public ip'
+        working-directory: ./terraform/deploy
+        id: api
+        run: |
+          API_HOST=$(terraform output -raw api-public-ip)
+          echo "api_host=$API_HOST" >> $GITHUB_OUTPUT   
+
+  api-tests:
+    name: 'API integration tests'
+    if: 
+    needs: [deploy-api, pipeline]
+    runs-on: ubuntu-latest
+    environment: testing
+    env:
+      API_HOST: ${{ needs.deploy-api.outputs.api-host }}
+      API_PORT: 8000
+    
+    steps:
+      - name: 'Debug'
+        run: |
+          echo $GITHUB_OUTPUT
+          echo $(${{ needs.deploy-api.outputs.api-host }})
+          echo $API_HOST
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: update pip
+        run: pip install --upgrade pip
+      - name: Install request and pytest packages
+        run: |
+          pip install requests==2.31.0
+          pip install pytest==7.3.1
+      - name: Run tests
+        run: pytest tests/test_api.py
+
+  tf-destroy:
+    name: 'Destroy test environment'
+    if: ${{ always() }}
+    needs: [tf-setup, pipeline, build-api, deploy-api, api-tests]
+    runs-on: ubuntu-latest
+    environment: testing
+    env:
+        ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: 'Terraform Setup'
+        uses: hashicorp/setup-terraform@v1
+      - name: 'Initialize Terraform'
+        working-directory: ./terraform
+        run: terraform init
+      - name: 'Get state'
+        working-directory: ./terraform
+        run: terraform plan -refresh-only
+      - name: 'Make plan'
+        working-directory: ./terraform
+        run: terraform plan -destroy -out test.tfplan
+      - name: 'Apply plan'
+        working-directory: ./terraform
+        run: terraform apply test.tfplan
+  

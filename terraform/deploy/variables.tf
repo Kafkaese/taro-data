@@ -8,6 +8,21 @@ variable "resource_group_name" {
   description = "The resource group name."
 }
 
+variable "image_registry_credential_user" {
+  default = "user"
+}
+
+variable "image_registry_credential_password" {
+  default = "secret"
+}
+
+variable "postgres_host" {
+}
+
+variable "postgres_port" {
+  default = "5432"
+}
+
 variable "postgres_user" {
   default = "postgres"
   sensitive = true

@@ -8,6 +8,7 @@ build/
 .env
 
 # terraform
-*/.terraform.lock.hcl
+**/.terraform.lock.hcl
 .terraform
 *.tfplan
+*.tfstate
