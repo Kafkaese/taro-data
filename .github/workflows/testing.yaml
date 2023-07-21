@@ -1,4 +1,4 @@
-name: Staging 
+name: Testing
 
 on: 
   pull_request:
@@ -11,7 +11,7 @@ permissions:
 concurrency: test_environment
 
 env: 
-  ENV: staging
+  ENV: test
 
 jobs:
   tf-setup:
@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       sql-server-encrypted: ${{ steps.terraform.outputs.sql_server_encrypted }}
-    environment: staging
+    environment: testing
     env:
         ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
         ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
@@ -60,7 +60,7 @@ jobs:
       name: 'Build and run pipeline container'
       runs-on: ubuntu-latest
       needs: tf-setup
-      environment: staging
+      environment: testing
       env:
         SECRET: ${{ secrets.PGP_SECRET_SIGNING_PASSPHRASE }}
         POSTGRES_USER: ${{ secrets.TF_VAR_postgres_user }}
@@ -106,7 +106,7 @@ jobs:
     name: 'Build API'
     needs: tf-setup
     runs-on: ubuntu-latest
-    environment: staging
+    environment: testing
     env:
         ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
         ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
@@ -136,7 +136,7 @@ jobs:
     outputs:
       api-host: ${{ steps.api.outputs.api_host }}
     needs: [tf-setup, build-api]
-    environment: staging
+    environment: testing
     env:
         ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
         ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
@@ -180,7 +180,7 @@ jobs:
     if: 
     needs: [deploy-api, pipeline]
     runs-on: ubuntu-latest
-    environment: staging
+    environment: testing
     env:
       API_HOST: ${{ needs.deploy-api.outputs.api-host }}
       API_PORT: 8000
@@ -207,7 +207,7 @@ jobs:
     if: ${{ always() }}
     needs: [tf-setup, pipeline, build-api, deploy-api, api-tests]
     runs-on: ubuntu-latest
-    environment: staging
+    environment: testing
     env:
         ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
         ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
