@@ -89,6 +89,12 @@ jobs:
             tags: kafkaese/taro:pipeline
         - name: Check out the repo
           uses: actions/checkout@v2
+        - name: Debug
+          run: |
+            echo $POSTGRES_HOST
+            echo $POSTGRES_USER
+            echo $POSTGRES_PASSWORD
+            echo $POSTGRES_DB
         - name: Run the container
           uses: addnab/docker-run-action@v3
           with:
