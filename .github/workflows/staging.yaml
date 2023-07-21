@@ -73,8 +73,9 @@ jobs:
           run: |
             export POSTGRES_HOST=$(gpg --decrypt --quiet --batch --passphrase "$SECRET" --output - <(echo "${{ needs.tf-setup.outputs.sql-server-encrypted }}" | base64 --decode))
             echo $POSTGRES_HOST
-            echo "POSTGRES_HOST=$POSTGRES_HOST" >> "$GITUB_ENV"
-            echo "${{ env.POSTGRES_HOST }}
+            echo $GITHUB_ENV
+            echo "POSTGRES_HOST=$POSTGRES_HOST" >> "$GITHUB_ENV"
+            echo "${{ env.POSTGRES_HOST }}"
         - name: Set up QEMU
           uses: docker/setup-qemu-action@v1
         - name: Set up Docker Buildx
