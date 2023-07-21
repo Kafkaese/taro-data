@@ -71,7 +71,7 @@ jobs:
       steps:
         - name: Decrypt postgres host
           run: |
-            echo "{POSTGRES_HOST}={$(gpg --decrypt --quiet --batch --passphrase "$SECRET" --output - <(echo "${{ needs.tf-setup.outputs.sql-server-encrypted }}" | base64 --decode))}"
+            echo "{POSTGRES_HOST}={$(gpg --decrypt --quiet --batch --passphrase $SECRET --output - <(echo ${{ needs.tf-setup.outputs.sql-server-encrypted }} | base64 --decode))}" >> "GITHUB_ENV"
             echo "${{ env.POSTGRES_HOST }}
         - name: Set up QEMU
           uses: docker/setup-qemu-action@v1
