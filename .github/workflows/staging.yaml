@@ -95,7 +95,7 @@ jobs:
           uses: actions/checkout@v2
         - name: Debug
           run: |
-            echo "${{ env.POSTGRES_HOST }}"
+            echo $POSTGRES_HOST
             echo $POSTGRES_USER
             echo $POSTGRES_PASSWORD
             echo $POSTGRES_DB
@@ -105,7 +105,7 @@ jobs:
             username: ${{ secrets.DOCKERHUB_USERNAME }}
             password: ${{ secrets.DOCKERHUB_TOKEN }}
             image: kafkaese/taro:pipeline
-            options: -e POSTGRES_HOST=${{ env.POSTGRES_HOST }} | base64 --decode)) -e POSTGRES_DB=$POSTGRES_DB -e POSTGRES_USER=$POSTGRES_USER -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD -e ENV=test
+            options: -e POSTGRES_HOST=$POSTGRES_HOST | base64 --decode)) -e POSTGRES_DB=$POSTGRES_DB -e POSTGRES_USER=$POSTGRES_USER -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD -e ENV=test
   
   build-api:
     name: 'Build API'
