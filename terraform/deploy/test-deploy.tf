@@ -59,7 +59,7 @@ resource "azurerm_container_group" "taro-test-api-instance" {
   image_registry_credential {
     username = var.image_registry_credential_user
     password = var.image_registry_credential_password
-    server   = "tarotestcontainerregistry.azurecr.io"
+    server   = azurerm_container_registry.login_server
   }
 
   container {
