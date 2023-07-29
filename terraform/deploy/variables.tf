@@ -28,6 +28,10 @@ variable "image_registry_credential_password" {
   default = "secret"
 }
 
+variable "postgres_prefix" {
+  default = "taro"
+}
+
 variable "postgres_host" {
 }
 

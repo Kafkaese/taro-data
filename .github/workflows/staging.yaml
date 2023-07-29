@@ -75,7 +75,7 @@ jobs:
               run: terraform init
             - name: 'Make plan'
               working-directory: ./terraform/deploy
-              run: terraform plan -var "instance_name=staging-frontend" -var "environment=staging" -var "resource_group_name=taro-staging" -var "acr_name=tarostagingregistry" -var "image_registry_credential_user=$ARM_CLIENT_ID" -var "image_registry_credential_password=$ARM_CLIENT_SECRET" -out 'deploy.tfplan'
+              run: terraform plan -var "postgres_prefix=staging-postgres-server" -var "instance_name=staging-frontend" -var "environment=staging" -var "resource_group_name=taro-staging" -var "acr_name=tarostagingregistry" -var "image_registry_credential_user=$ARM_CLIENT_ID" -var "image_registry_credential_password=$ARM_CLIENT_SECRET" -out 'deploy.tfplan'
             - name: 'Apply plan'
               working-directory: ./terraform/deploy
               run: terraform apply deploy.tfplan

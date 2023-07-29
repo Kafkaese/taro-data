@@ -4,11 +4,11 @@ resource "azurerm_resource_group" "rg" {
   name     = var.resource_group_name
 }
 
-/*
+
 # Random id for pg server
 resource "random_id" "pg-server-id" {
     byte_length = 8
-    prefix = "taro-test-server"
+    prefix = var.postgres_prefix
 } 
 
 # Postgres server
@@ -39,7 +39,7 @@ resource "azurerm_postgresql_flexible_server_firewall_rule" "pg-server-open" {
   start_ip_address    = "0.0.0.0"
   end_ip_address      = "255.255.255.255"
 }
-*/
+
 
 # Container registry for the API 
 resource "azurerm_container_registry" "container-registry" {
@@ -50,7 +50,7 @@ resource "azurerm_container_registry" "container-registry" {
 }
 
 # Container Instance for the API
-resource "azurerm_container_group" "taro-test-api-instance" {
+resource "azurerm_container_group" "api-instance" {
   name                = var.instance_name
   location            = var.resource_group_location
   resource_group_name = var.resource_group_name
@@ -65,7 +65,7 @@ resource "azurerm_container_group" "taro-test-api-instance" {
 
   container {
     name   = "taro-api"
-    image  = "${azurerm_container_registry.container-registry.login_server}/taro:frontend"
+    image  = "${azurerm_container_registry.container-registry.login_server}/taro:api"
     cpu    = "0.5"
     memory = "1.5"
     environment_variables = {
