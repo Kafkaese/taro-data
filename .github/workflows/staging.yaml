@@ -34,7 +34,6 @@ jobs:
           POSTGRES_PASSWORD: ${{ secrets.TF_VAR_postgres_password }}
           POSTGRES_PORT: 5432
           POSTGRES_DB: 'taro-db'
-          POSTGRES_HOST: ${{ github.event.inputs.POSTGRES_HOST }}
           
         steps:
           - name: echo distinct ID ${{ github.event.inputs.distinct_id }}
@@ -56,6 +55,12 @@ jobs:
               tags: kafkaese/taro:pipeline
           - name: Check out the repo
             uses: actions/checkout@v2
+          - name: 'Decrypt postgres server'
+            run: |
+              export pg_host_decrypted=$(gpg --decrypt --quiet --batch --passphrase "$SECRET" --output - <(echo "${{ github.event.inputs.POSTGRES_HOST }}" | base64 --decode))
+              echo "POSTGRES_HOST=\"$pg_host_decrypted\"" >> "$GITHUB_ENV"
+              cat $GITHUB_ENV
+              echo "${{ env.POSTGRES_HOST }}"
           - name: Debug
             run: |
               echo $POSTGRES_HOST
