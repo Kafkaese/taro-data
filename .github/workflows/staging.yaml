@@ -33,7 +33,7 @@ jobs:
           POSTGRES_USER: ${{ secrets.TF_VAR_PG_PASSWORD }}
           POSTGRES_PASSWORD: ${{ secrets.TF_VAR_PG_PASSWORD }}
           POSTGRES_PORT: 5432
-          POSTGRES_DB: 'taro-db'
+          POSTGRES_DB: 'taro-staging-db'
           
         steps:
           - name: echo distinct ID ${{ github.event.inputs.distinct_id }}
