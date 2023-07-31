@@ -1,1 +1,2 @@
 container_name = "terraform-staging-env"
+key = "staging.tfstate"
