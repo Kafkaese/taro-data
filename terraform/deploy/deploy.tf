@@ -70,7 +70,7 @@ resource "azurerm_container_group" "api-instance" {
     memory = "1.5"
     environment_variables = {
       ENV=var.environment
-      POSTGRES_HOST=var.postgres_host
+      POSTGRES_HOST=azurerm_postgresql_flexible_server.pg-server.login_server
       POSTGRES_PORT=var.postgres_port
       POSTGRES_DB=var.postgres_database
       POSTGRES_USER=var.postgres_user
