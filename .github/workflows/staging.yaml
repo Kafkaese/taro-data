@@ -111,6 +111,8 @@ jobs:
             ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
             ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
             ACR_TAG: ${{ github.event.client_payload.acr-login }}/taro:api
+            POSTGRES_USER: ${{ secrets.TF_VAR_PG_USER }}
+            POSTGRES_PASSWORD: ${{ secrets.TF_VAR_PG_PASSWORD }}
 
         steps:
             - name: Checkout
@@ -124,7 +126,7 @@ jobs:
               run: terraform init -backend-config='./config.staging.tfbackend'
             - name: 'Make plan'
               working-directory: ./terraform/deploy
-              run: terraform plan -var "postgres_prefix=staging-postgres-server" -var "instance_name=staging-frontend" -var "environment=staging" -var "resource_group_name=taro-staging" -var "acr_name=tarostagingregistry" -var "image_registry_credential_user=$ARM_CLIENT_ID" -var "image_registry_credential_password=$ARM_CLIENT_SECRET" -out 'deploy.tfplan'
+              run: terraform plan -var "postgres_user=$POSTGRES_USER" -var "postgres_password=$POSTGRES_PASSWORD" -var "postgres_database=taro-staging-db" -var "postgres_prefix=staging-postgres-server" -var "instance_name=staging-frontend" -var "environment=staging" -var "resource_group_name=taro-staging" -var "acr_name=tarostagingregistry" -var "image_registry_credential_user=$ARM_CLIENT_ID" -var "image_registry_credential_password=$ARM_CLIENT_SECRET" -out 'deploy.tfplan'
             - name: 'Apply plan'
               working-directory: ./terraform/deploy
               run: terraform apply deploy.tfplan
