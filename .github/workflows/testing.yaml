@@ -231,4 +231,3 @@ jobs:
       - name: 'Apply plan'
         working-directory: ./terraform/testing
         run: terraform apply test.tfplan
-  
