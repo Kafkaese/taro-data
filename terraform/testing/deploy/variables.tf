@@ -8,6 +8,18 @@ variable "resource_group_name" {
   description = "The resource group name."
 }
 
+variable "environment" {
+  
+}
+
+variable "acr_name" {
+  
+}
+
+variable "instance_name" {
+  
+}
+
 variable "image_registry_credential_user" {
   default = "user"
 }

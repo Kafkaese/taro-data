@@ -4,6 +4,7 @@ resource "azurerm_resource_group" "rg" {
   name     = var.resource_group_name
 }
 
+/*
 # Random id for pg server
 resource "random_id" "pg-server-id" {
     byte_length = 8
@@ -38,11 +39,11 @@ resource "azurerm_postgresql_flexible_server_firewall_rule" "pg-server-open" {
   start_ip_address    = "0.0.0.0"
   end_ip_address      = "255.255.255.255"
 }
-
+*/
 
 # Container registry for the API 
-resource "azurerm_container_registry" "taro-test-registry" {
-  name                = "taroTestContainerRegistry"
+resource "azurerm_container_registry" "container-registry" {
+  name                = var.acr_name
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   sku                 = "Basic"
@@ -50,7 +51,7 @@ resource "azurerm_container_registry" "taro-test-registry" {
 
 # Container Instance for the API
 resource "azurerm_container_group" "taro-test-api-instance" {
-  name                = "taroTestAPIInstance"
+  name                = var.instance_name
   location            = var.resource_group_location
   resource_group_name = var.resource_group_name
   ip_address_type     = "Public"
@@ -59,16 +60,16 @@ resource "azurerm_container_group" "taro-test-api-instance" {
   image_registry_credential {
     username = var.image_registry_credential_user
     password = var.image_registry_credential_password
-    server   = azurerm_container_registry.taro-test-registry.login_server
+    server   = azurerm_container_registry.container-registry.login_server
   }
 
   container {
-    name   = "taro-test-api"
-    image  = "tarotestcontainerregistry.azurecr.io/taro:api"
+    name   = "taro-api"
+    image  = "${azurerm_container_registry.container-registry.login_server}/taro:frontend"
     cpu    = "0.5"
     memory = "1.5"
     environment_variables = {
-      ENV="test"
+      ENV=var.environment
       POSTGRES_HOST=var.postgres_host
       POSTGRES_PORT=var.postgres_port
       POSTGRES_DB=var.postgres_database
@@ -83,6 +84,6 @@ resource "azurerm_container_group" "taro-test-api-instance" {
   }
 
   tags = {
-    environment = "testing"
+    environment = var.environment
   }
 }
