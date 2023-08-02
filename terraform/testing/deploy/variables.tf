@@ -9,11 +9,11 @@ variable "resource_group_name" {
 }
 
 variable "environment" {
-  
+  default = "testing"
 }
 
 variable "acr_name" {
-  
+  default = "taroTestContainerRegistry"
 }
 
 variable "instance_name" {
