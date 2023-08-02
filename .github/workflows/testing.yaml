@@ -220,15 +220,15 @@ jobs:
       - name: 'Terraform Setup'
         uses: hashicorp/setup-terraform@v1
       - name: 'Initialize Terraform'
-        working-directory: ./terraform
+        working-directory: ./terraform/testing
         run: terraform init
       - name: 'Get state'
-        working-directory: ./terraform
+        working-directory: ./terraform/testing
         run: terraform plan -refresh-only
       - name: 'Make plan'
-        working-directory: ./terraform
+        working-directory: ./terraform/testing
         run: terraform plan -destroy -out test.tfplan
       - name: 'Apply plan'
-        working-directory: ./terraform
+        working-directory: ./terraform/testing
         run: terraform apply test.tfplan
   
