@@ -60,12 +60,12 @@ resource "azurerm_container_group" "taro-test-api-instance" {
   image_registry_credential {
     username = var.image_registry_credential_user
     password = var.image_registry_credential_password
-    server   = azurerm_container_registry.container-registry.login_server
+    server   = azurerm_container_registry.taro-test-registry.login_server
   }
 
   container {
     name   = "taro-api"
-    image  = "${azurerm_container_registry.container-registry.login_server}/taro:frontend"
+    image  = "${azurerm_container_registry.taro-test-registry.login_server}/taro:frontend"
     cpu    = "0.5"
     memory = "1.5"
     environment_variables = {
