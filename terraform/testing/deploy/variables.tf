@@ -17,7 +17,7 @@ variable "acr_name" {
 }
 
 variable "instance_name" {
-  
+  default = "taro-staging-api-instance"
 }
 
 variable "image_registry_credential_user" {
