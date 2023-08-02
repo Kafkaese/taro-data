@@ -65,7 +65,7 @@ resource "azurerm_container_group" "taro-test-api-instance" {
 
   container {
     name   = "taro-api"
-    image  = "${azurerm_container_registry.taro-test-registry.login_server}/taro:frontend"
+    image  = "${azurerm_container_registry.taro-test-registry.login_server}/taro:api"
     cpu    = "0.5"
     memory = "1.5"
     environment_variables = {
