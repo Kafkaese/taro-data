@@ -9,7 +9,7 @@ variable "resource_group_name" {
 }
 
 variable "environment" {
-  default = "testing"
+  default = "test"
 }
 
 variable "acr_name" {
