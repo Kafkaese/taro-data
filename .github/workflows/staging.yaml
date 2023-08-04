@@ -55,12 +55,6 @@ jobs:
               tags: kafkaese/taro:pipeline
           - name: Check out the repo
             uses: actions/checkout@v2
-          - name: 'Decrypt postgres server'
-            run: |
-              pg_host_decrypted=$(echo -n "${{ github.event.inputs.POSTGRES_HOST }}" | base64 -d | gpg --decrypt --batch --passphrase "$SECRET" --output -)
-              echo "POSTGRES_HOST=$pg_host_decrypted" >> "$GITHUB_ENV"
-              cat $GITHUB_ENV
-              echo "${{ env.POSTGRES_HOST }}"
           - name: Debug
             run: |
               echo $POSTGRES_HOST
