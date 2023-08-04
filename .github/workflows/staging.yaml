@@ -33,6 +33,27 @@ jobs:
         POSTGRES_PASSWORD: ${{ secrets.TF_VAR_PG_PASSWORD }}
         POSTGRES_PORT: 5432
         POSTGRES_DB: 'taro-staging-db'
+      
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v3
+        - name: 'Terraform Setup'
+          uses: hashicorp/setup-terraform@v1
+          with:
+            terraform_wrapper: false
+        - name: 'Initialize Terraform'
+          working-directory: ./staging
+          run: terraform init
+        - name: 'Get state'
+          working-directory: ./staging
+          run: terraform plan -refresh-only
+        - name: 'Make plan'
+          working-directory: ./staging
+          run: terraform plan -out test.tfplan
+        - name: 'Apply plan'
+          working-directory: ./staging
+          run: terraform apply test.tfplan
+
 
     pipeline:
         name: 'Build and run pipeline container'
