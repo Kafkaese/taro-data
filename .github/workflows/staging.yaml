@@ -24,12 +24,21 @@ env:
   ENV: staging
 
 jobs:
+    tf-setup:
+      name: 'Setup terraform'
+      runs-on: ubuntu-latest
+      environment: staging
+      env:
+        POSTGRES_USER: ${{ secrets.TF_VAR_PG_USER }}
+        POSTGRES_PASSWORD: ${{ secrets.TF_VAR_PG_PASSWORD }}
+        POSTGRES_PORT: 5432
+        POSTGRES_DB: 'taro-staging-db'
+
     pipeline:
         name: 'Build and run pipeline container'
         runs-on: ubuntu-latest
         environment: staging
         env:
-          SECRET: ${{ secrets.PGP_PASSPHRASE }}
           POSTGRES_USER: ${{ secrets.TF_VAR_PG_USER }}
           POSTGRES_PASSWORD: ${{ secrets.TF_VAR_PG_PASSWORD }}
           POSTGRES_PORT: 5432
