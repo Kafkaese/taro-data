@@ -37,3 +37,21 @@ variable "instance_name_api" {
 variable "environment" {
   default = "staging"
 }
+
+variable "postgres_port" {
+  default = "5432"
+}
+
+variable "postgres_user" {
+  default = "postgres"
+  sensitive = true
+}
+
+variable "postgres_password" {
+  default = "secret"
+  sensitive = true
+}
+
+variable "postgres_database" {
+  default = "taro-staging-db"
+}
