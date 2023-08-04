@@ -47,7 +47,7 @@ resource "azurerm_container_group" "container-instance" {
   }
 }
 
-# Container Instance for the frontend
+# Container Instance for the api
 resource "azurerm_container_group" "container-instance-api" {
   name                = var.instance_name_api
   location            = var.resource_group_location
