@@ -12,7 +12,7 @@ resource "azurerm_container_registry" "container-registry" {
   location            = azurerm_resource_group.rg.location
   sku                 = "Basic"
 }
-
+/*
 # Container Instance for the frontend
 resource "azurerm_container_group" "container-instance" {
   name                = var.instance_name
@@ -46,7 +46,7 @@ resource "azurerm_container_group" "container-instance" {
     environment = var.environment
   }
 }
-
+*/
 # Container Instance for the api
 resource "azurerm_container_group" "container-instance-api" {
   name                = var.instance_name_api
