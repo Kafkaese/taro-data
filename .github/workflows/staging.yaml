@@ -83,7 +83,7 @@ jobs:
               run: terraform init
             - name: 'Make plan'
               working-directory: ./terraform/staging
-              run: terraform plan -var "postgres_user=$POSTGRES_USER" -var "postgres_password=$POSTGRES_PASSWORD" -var "postgres_database=taro-staging-db" -var "postgres_prefix=staging-postgres-server" -var "instance_name=staging-api" -var "environment=staging" -var "resource_group_name=taro-staging" -var "acr_name=tarostagingregistry" -var "image_registry_credential_user=$ARM_CLIENT_ID" -var "image_registry_credential_password=$ARM_CLIENT_SECRET" -out 'main.tfplan'
+              run: terraform plan -var "postgres_user=$POSTGRES_USER" -var "postgres_password=$POSTGRES_PASSWORD" -var "postgres_database=taro-staging-db" -var "postgres_prefix=staging-postgres-server" -var "instance_name=staging-api" -var "environment=staging" -var "resource_group_name=taro-staging" -var "container_registry_name=tarostagingregistry" -var "image_registry_credential_user=$ARM_CLIENT_ID" -var "image_registry_credential_password=$ARM_CLIENT_SECRET" -out 'main.tfplan'
             - name: 'Apply plan'
               working-directory: ./terraform/staging
               run: terraform apply main.tfplan
