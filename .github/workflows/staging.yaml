@@ -19,7 +19,6 @@ env:
   ENV: staging
 
 jobs:
-
     build-api:
         name: 'Build and push api container'
         runs-on: ubuntu-latest

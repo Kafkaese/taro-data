@@ -9,15 +9,15 @@ variable "resource_group_name" {
 }
 
 variable "environment" {
-  
+  default = "test"
 }
 
 variable "acr_name" {
-  
+  default = "taroTestContainerRegistry"
 }
 
 variable "instance_name" {
-  
+  default = "taro-test-api-instance"
 }
 
 variable "image_registry_credential_user" {

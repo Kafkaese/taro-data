@@ -37,20 +37,20 @@ jobs:
         with:
           terraform_wrapper: false
       - name: 'Initialize Terraform'
-        working-directory: ./terraform
+        working-directory: ./terraform/testing
         run: terraform init
       - name: 'Get state'
-        working-directory: ./terraform
+        working-directory: ./terraform/testing
         run: terraform plan -refresh-only
       - name: 'Make plan'
-        working-directory: ./terraform
+        working-directory: ./terraform/testing
         run: terraform plan -out test.tfplan
       - name: 'Apply plan'
-        working-directory: ./terraform
+        working-directory: ./terraform/testing
         run: terraform apply test.tfplan
       - name: Save outputs
         id: terraform
-        working-directory: ./terraform
+        working-directory: ./terraform/testing
         run: |
           POSTGRES_SERVER=$(terraform output -raw postgres_server)
           postgres_server_encrypted=$(gpg --symmetric --batch --passphrase "$SECRET" --output - <(echo "$POSTGRES_SERVER") | base64 -w0)
@@ -160,16 +160,16 @@ jobs:
         with:
           terraform_wrapper: false
       - name: 'Initialize Terraform'
-        working-directory: ./terraform/deploy
+        working-directory: ./terraform/testing/deploy
         run: terraform init
       - name: 'Make plan'
-        working-directory: ./terraform/deploy
+        working-directory: ./terraform/testing/deploy
         run: terraform plan -var "image_registry_credential_user=$ARM_CLIENT_ID" -var "image_registry_credential_password=$ARM_CLIENT_SECRET" -var "postgres_host=$(gpg --decrypt --quiet --batch --passphrase "$SECRET" --output - <(echo "${{ needs.tf-setup.outputs.sql-server-encrypted }}" | base64 --decode))" -var "postgres_user=$POSTGRES_USER" -var "postgres_password=$POSTGRES_PASSWORD" -out 'test-deploy.tfplan'
       - name: 'Apply plan'
-        working-directory: ./terraform/deploy
+        working-directory: ./terraform/testing/deploy
         run: terraform apply test-deploy.tfplan
       - name: 'Save public ip'
-        working-directory: ./terraform/deploy
+        working-directory: ./terraform/testing/deploy
         id: api
         run: |
           API_HOST=$(terraform output -raw api-public-ip)
@@ -220,15 +220,14 @@ jobs:
       - name: 'Terraform Setup'
         uses: hashicorp/setup-terraform@v1
       - name: 'Initialize Terraform'
-        working-directory: ./terraform
+        working-directory: ./terraform/testing
         run: terraform init
       - name: 'Get state'
-        working-directory: ./terraform
+        working-directory: ./terraform/testing
         run: terraform plan -refresh-only
       - name: 'Make plan'
-        working-directory: ./terraform
+        working-directory: ./terraform/testing
         run: terraform plan -destroy -out test.tfplan
       - name: 'Apply plan'
-        working-directory: ./terraform
+        working-directory: ./terraform/testing
         run: terraform apply test.tfplan
-  
