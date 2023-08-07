@@ -42,7 +42,7 @@ resource "azurerm_postgresql_flexible_server_firewall_rule" "pg-server-open" {
 
 
 # Container registry for the API 
-resource "azurerm_container_registry" "taro-test-registry" {
+resource "azurerm_container_registry" "container-registry" {
   name                = var.acr_name
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
@@ -50,7 +50,7 @@ resource "azurerm_container_registry" "taro-test-registry" {
 }
 
 # Container Instance for the API
-resource "azurerm_container_group" "taro-test-api-instance" {
+resource "azurerm_container_group" "api-instance" {
   name                = var.instance_name
   location            = var.resource_group_location
   resource_group_name = var.resource_group_name
@@ -65,12 +65,12 @@ resource "azurerm_container_group" "taro-test-api-instance" {
 
   container {
     name   = "taro-api"
-    image  = "${azurerm_container_registry.taro-test-registry.login_server}/taro:api"
+    image  = "${azurerm_container_registry.container-registry.login_server}/taro:api"
     cpu    = "0.5"
     memory = "1.5"
     environment_variables = {
       ENV=var.environment
-      POSTGRES_HOST=var.postgres_host
+      POSTGRES_HOST=azurerm_postgresql_flexible_server.pg-server.fqdn
       POSTGRES_PORT=var.postgres_port
       POSTGRES_DB=var.postgres_database
       POSTGRES_USER=var.postgres_user

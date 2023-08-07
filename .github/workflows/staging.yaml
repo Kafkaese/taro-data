@@ -56,12 +56,16 @@ jobs:
         runs-on: ubuntu-latest
         needs: [build-api]
         environment: staging
+        outputs:
+          postgres_host: ${{ steps.terraform.outputs.POSTGRES_HOST }}
         env:
             ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
             ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
             ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
             ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
             ACR_TAG: ${{ github.event.client_payload.acr-login }}/taro:api
+            POSTGRES_USER: ${{ secrets.TF_VAR_PG_USER }}
+            POSTGRES_PASSWORD: ${{ secrets.TF_VAR_PG_PASSWORD }}
 
         steps:
             - name: Checkout
@@ -71,11 +75,56 @@ jobs:
               with:
                 terraform_wrapper: false
             - name: 'Initialize Terraform'
-              working-directory: ./terraform/deploy
+              working-directory: ./terraform/staging
               run: terraform init
             - name: 'Make plan'
-              working-directory: ./terraform/deploy
-              run: terraform plan -var "instance_name=staging-frontend" -var "environment=staging" -var "resource_group_name=taro-staging" -var "acr_name=tarostagingregistry" -var "image_registry_credential_user=$ARM_CLIENT_ID" -var "image_registry_credential_password=$ARM_CLIENT_SECRET" -out 'deploy.tfplan'
+              working-directory: ./terraform/staging
+              run: terraform plan -var "postgres_user=$POSTGRES_USER" -var "postgres_password=$POSTGRES_PASSWORD" -var "postgres_database=taro-staging-db" -var "postgres_prefix=staging-postgres-server" -var "instance_name=staging-api" -var "environment=staging" -var "resource_group_name=taro-staging" -var "container_registry_name=tarostagingregistry" -var "image_registry_credential_user=$ARM_CLIENT_ID" -var "image_registry_credential_password=$ARM_CLIENT_SECRET" -out 'main.tfplan'
             - name: 'Apply plan'
-              working-directory: ./terraform/deploy
-              run: terraform apply deploy.tfplan
+              working-directory: ./terraform/staging
+              run: terraform apply main.tfplan
+            - name: 'Output postgres host to env'
+              id: terraform
+              working-directory: ./terraform/staging
+              run: |
+                echo "POSTGRES_HOST=$(terraform output -raw postgres_host)" >> "$GITHUB_OUTPUT"
+
+    pipeline:
+      name: 'Build and run pipeline container'
+      runs-on: ubuntu-latest
+      needs: deploy-api
+      environment: staging
+      env:
+        POSTGRES_USER: ${{ secrets.TF_VAR_PG_USER }}
+        POSTGRES_PASSWORD: ${{ secrets.TF_VAR_PG_PASSWORD }}
+        POSTGRES_PORT: 5432
+        POSTGRES_DB: 'taro-staging-db'
+        POSTGRES_HOST: ${{ needs.deploy-api.outputs.postgres_host }}
+        
+      steps:
+        - name: Set up QEMU
+          uses: docker/setup-qemu-action@v1
+        - name: Set up Docker Buildx
+          uses: docker/setup-buildx-action@v1
+        - name: Login to DockerHub
+          uses: docker/login-action@v1
+          with:
+            username: ${{ secrets.DOCKERHUB_USERNAME }}
+            password: ${{ secrets.DOCKERHUB_TOKEN }}
+        - name: Build and push
+          uses: docker/build-push-action@v2
+          with:
+            file: ./pipeline.Dockerfile
+            push: true
+            tags: kafkaese/taro:pipeline
+        - name: Check out the repo
+          uses: actions/checkout@v2
+        - name: Debug
+          run: |
+            echo $POSTGRES_USER
+            echo $POSTGRES_PASSWORD
+            echo $POSTGRES_DB
+            echo $POSTGRES_HOST
+        - name: Run the container
+          run: docker run --rm -e PYTHONUNBUFFERED=1 -e POSTGRES_HOST=$POSTGRES_HOST -e POSTGRES_DB=$POSTGRES_DB -e POSTGRES_USER=$POSTGRES_USER -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD -e ENV=staging kafkaese/taro:pipeline
+  
