@@ -161,7 +161,7 @@
 167,Namibia,The Republic of Namibia,UN member state,,NAM,516,ISO 3166-2:NA,.na
 168,Nauru,The Republic of Nauru,UN member state,NR,NRU,520,ISO 3166-2:NR,.nr
 169,Nepal,The Federal Democratic Republic of Nepal,UN member state,NP,NPL,524,ISO 3166-2:NP,.np
-170,"Netherlands, Kingdom of the",The Kingdom of the Netherlands,UN member state,NL,NLD,528,ISO 3166-2:NL,.nl
+170,Netherlands,The Kingdom of the Netherlands,UN member state,NL,NLD,528,ISO 3166-2:NL,.nl
 171,New Caledonia,New Caledonia,France,NC,NCL,540,ISO 3166-2:NC,.nc
 172,New Zealand,New Zealand,UN member state,NZ,NZL,554,ISO 3166-2:NZ,.nz
 173,Nicaragua,The Republic of Nicaragua,UN member state,NI,NIC,558,ISO 3166-2:NI,.ni
@@ -174,7 +174,7 @@
 181,Oman,The Sultanate of Oman,UN member state,OM,OMN,512,ISO 3166-2:OM,.om
 182,Pakistan,The Islamic Republic of Pakistan,UN member state,PK,PAK,586,ISO 3166-2:PK,.pk
 183,Palau,The Republic of Palau,UN member state,PW,PLW,585,ISO 3166-2:PW,.pw
-184,"Palestine, State of",The State of Palestine,UN observer state,PS,PSE,275,ISO 3166-2:PS,.ps
+184,Palestine,The State of Palestine,UN observer state,PS,PSE,275,ISO 3166-2:PS,.ps
 185,Panama,The Republic of Panamá,UN member state,PA,PAN,591,ISO 3166-2:PA,.pa
 186,Papua New Guinea,The Independent State of Papua New Guinea,UN member state,PG,PNG,598,ISO 3166-2:PG,.pg
 187,Paraguay,The Republic of Paraguay,UN member state,PY,PRY,600,ISO 3166-2:PY,.py
@@ -223,7 +223,7 @@
 238,Syrian Arab Republic ,The Syrian Arab Republic,UN member state,SY,SYR,760,ISO 3166-2:SY,.sy
 239,Taiwan ,The Republic of China,Disputed,TW,TWN,158,ISO 3166-2:TW,.tw
 240,Tajikistan,The Republic of Tajikistan,UN member state,TJ,TJK,762,ISO 3166-2:TJ,.tj
-241,"Tanzania, the United Republic of",The United Republic of Tanzania,UN member state,TZ,TZA,834,ISO 3166-2:TZ,.tz
+241,Tanzania,The United Republic of Tanzania,UN member state,TZ,TZA,834,ISO 3166-2:TZ,.tz
 242,Thailand,The Kingdom of Thailand,UN member state,TH,THA,764,ISO 3166-2:TH,.th
 243,Timor-Leste,The Democratic Republic of Timor-Leste,UN member state,TL,TLS,626,ISO 3166-2:TL,.tl
 244,Togo,The Togolese Republic,UN member state,TG,TGO,768,ISO 3166-2:TG,.tg
