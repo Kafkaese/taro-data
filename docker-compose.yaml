@@ -15,7 +15,7 @@ services:
   taro-api:
     build: 
       context: .
-      dockerfile: ./api.Dockerfile
+      dockerfile: ./DEV_api.Dockerfile
     networks:
       - taro
     ports:
