@@ -1,26 +1,17 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from flask import Flask, jsonify, request
+from flask_cors import CORS
 import psycopg2
 from sqlalchemy import create_engine, sql
 import os
 import pandas as pd
 
-app = FastAPI()
+## APP
+app = Flask(__name__)
+
 
 ## CORS settings
 
-origins = [
-    "http://localhost",
-    "http://localhost:3000",
-]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["GET"],
-    allow_headers=["*"],
-)
+CORS(app)
 
 
 ## database connection
@@ -49,8 +40,7 @@ conn = db.connect()
 
 
 # root endpoint
-
-@app.get("/")
+@app.route("/", methods=["GET"])
 async def root():
     
     return {'status': 200}
@@ -58,7 +48,7 @@ async def root():
 
 # metadata path endpoints
 
-@app.get("/metadata/name/short")
+@app.route("/metadata/name/short", methods=["GET"])
 async def short_name(country_code):
     
     global conn
@@ -81,7 +71,7 @@ async def short_name(country_code):
         conn = db.connect()
         return {'value': 'no data'}
     
-@app.get("/metadata/democracy_index")
+@app.route("/metadata/democracy_index", methods=["GET"])
 async def democracy_index(country_code, year):
 
     global conn
@@ -105,7 +95,7 @@ async def democracy_index(country_code, year):
         conn = db.connect()
         return {'value': 'no data'}
     
-@app.get("/metadata/peace_index")
+@app.route("/metadata/peace_index", methods=["GET"])
 async def peace_index(country_code, year):
 
     global conn
@@ -135,7 +125,7 @@ async def peace_index(country_code, year):
 
 # arms/export
 
-@app.get("/arms/exports/total")
+@app.route("/arms/exports/total", methods=["GET"])
 async def arms_exports_total(country_code, year):
    
     global conn
@@ -168,7 +158,7 @@ async def arms_exports_total(country_code, year):
 
 
 
-@app.get("/arms/exports/timeseries")
+@app.route("/arms/exports/timeseries", methods=["GET"])
 async def arms_exports_timeseries(country_code):
     global conn
     
@@ -203,7 +193,7 @@ async def arms_exports_timeseries(country_code):
         return {'value': 'no data'}
 
 # Gets export data for a country on a given year, listing values for source counries seperately
-@app.get("/arms/exports/by_country")
+@app.route("/arms/exports/by_country", methods=["GET"])
 async def arms_exports_by_country(country_code, year, limit=300):
     '''
     Gets export data for a country on a given year, listing values for source countries seperately.
@@ -242,7 +232,7 @@ async def arms_exports_by_country(country_code, year, limit=300):
     
 # arms/import path endpoints
 
-@app.get("/arms/imports/total")
+@app.route("/arms/imports/total", methods=["GET"])
 async def arms_imports_total(country_code, year):
     
     global conn
@@ -264,7 +254,7 @@ async def arms_imports_total(country_code, year):
         return {'value': 'no data'}
     
 
-@app.get("/arms/imports/by_country")
+@app.route("/arms/imports/by_country", methods=["GET"])
 async def arms_imports_by_country(country_code, year, limit=300):
     '''
     Gets import data for a country on a given year, listing values for source countries seperately.
@@ -302,7 +292,7 @@ async def arms_imports_by_country(country_code, year, limit=300):
         return {'value': 'no data'}
     
 # Gets time series of total import values per year for a given country
-@app.get("/arms/imports/timeseries")
+@app.route("/arms/imports/timeseries", methods=["GET"])
 async def arms_imports_timeseries(country_code):
     global conn
     
@@ -339,7 +329,7 @@ async def arms_imports_timeseries(country_code):
     
 # merchandise path endpoints
 
-@app.get("/merchandise/exports/total")
+@app.route("/merchandise/exports/total", methods=["GET"])
 async def exports_merchandise_year(country_code, year):
 
     global conn
