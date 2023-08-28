@@ -49,7 +49,9 @@ async def root():
 # metadata path endpoints
 
 @app.route("/metadata/name/short", methods=["GET"])
-async def short_name(country_code):
+async def short_name():
+    
+    country_code = request.args.get("country_code")
     
     global conn
         
@@ -72,7 +74,10 @@ async def short_name(country_code):
         return jsonify({'value': 'no data'})
     
 @app.route("/metadata/democracy_index", methods=["GET"])
-async def democracy_index(country_code, year):
+async def democracy_index():
+
+    country_code = request.args.get("country_code")
+    year = request.args.get("year")
 
     global conn
     
@@ -96,8 +101,11 @@ async def democracy_index(country_code, year):
         return jsonify({'value': 'no data'})
     
 @app.route("/metadata/peace_index", methods=["GET"])
-async def peace_index(country_code, year):
+async def peace_index():
 
+    country_code = request.args.get("country_code")
+    year = request.args.get("year")
+    
     global conn
 
     # columns cannot be passed as parameters
@@ -126,8 +134,11 @@ async def peace_index(country_code, year):
 # arms/export
 
 @app.route("/arms/exports/total", methods=["GET"])
-async def arms_exports_total(country_code, year):
+async def arms_exports_total():
    
+    country_code = request.args.get("country_code")
+    year = request.args.get("year")
+    
     global conn
    
     print('HERE')
@@ -159,7 +170,10 @@ async def arms_exports_total(country_code, year):
 
 
 @app.route("/arms/exports/timeseries", methods=["GET"])
-async def arms_exports_timeseries(country_code):
+async def arms_exports_timeseries():
+    
+    country_code = request.args.get("country_code")
+    
     global conn
     
     query = sql.text('''select coalesce (arms."Year", exports."Year"), coalesce (arms.sum, exports.sum) from 
@@ -194,7 +208,7 @@ async def arms_exports_timeseries(country_code):
 
 # Gets export data for a country on a given year, listing values for source counries seperately
 @app.route("/arms/exports/by_country", methods=["GET"])
-async def arms_exports_by_country(country_code, year, limit=300):
+async def arms_exports_by_country():
     '''
     Gets export data for a country on a given year, listing values for source countries seperately.
     
@@ -209,6 +223,10 @@ async def arms_exports_by_country(country_code, year, limit=300):
              Individual country information in dictionary with: {name, value, full_name}
              Single dictionary with {'value': 'no data'} in case of missing data.
     '''
+    
+    country_code = request.args.get("country_code")
+    year = request.args.get("year")
+    limit = request.args.get("year", default=300)
     
     global conn
     
@@ -233,7 +251,10 @@ async def arms_exports_by_country(country_code, year, limit=300):
 # arms/import path endpoints
 
 @app.route("/arms/imports/total", methods=["GET"])
-async def arms_imports_total(country_code, year):
+async def arms_imports_total():
+        
+    country_code = request.args.get("country_code")
+    year = request.args.get("year")
     
     global conn
     
@@ -255,7 +276,7 @@ async def arms_imports_total(country_code, year):
     
 
 @app.route("/arms/imports/by_country", methods=["GET"])
-async def arms_imports_by_country(country_code, year, limit=300):
+async def arms_imports_by_country():
     '''
     Gets import data for a country on a given year, listing values for source countries seperately.
     
@@ -270,6 +291,10 @@ async def arms_imports_by_country(country_code, year, limit=300):
              Individual country information in dictionary with: {name, value, full_name}
              Single dictionary with {'value': 'no data'} in case of missing data.
     '''
+    
+    country_code = request.args.get("country_code")
+    year = request.args.get("year")
+    limit = request.args.get("year", default=300)
     
     global conn
     
@@ -293,7 +318,11 @@ async def arms_imports_by_country(country_code, year, limit=300):
     
 # Gets time series of total import values per year for a given country
 @app.route("/arms/imports/timeseries", methods=["GET"])
-async def arms_imports_timeseries(country_code):
+async def arms_imports_timeseries():
+    
+        
+    country_code = request.args.get("country_code")
+    
     global conn
     
     query = sql.text('''select coalesce (arms."Year", imports."Year"), coalesce (arms.sum, imports.sum) from 
@@ -330,7 +359,11 @@ async def arms_imports_timeseries(country_code):
 # merchandise path endpoints
 
 @app.route("/merchandise/exports/total", methods=["GET"])
-async def exports_merchandise_year(country_code, year):
+async def exports_merchandise_year():
+    
+        
+    country_code = request.args.get("country_code")
+    year = request.args.get("year")
 
     global conn
     
