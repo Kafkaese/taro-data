@@ -6,4 +6,4 @@ RUN pip install -r requirements.txt
 
 COPY api/ api
 
-CMD ["uvicorn", "--host", "0.0.0.0", "api.country_data_api:app"]
+CMD ["python", "api/country_data_api.py"]
