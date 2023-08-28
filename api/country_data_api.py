@@ -351,3 +351,6 @@ async def exports_merchandise_year(country_code, year):
         conn.close()
         conn = db.connect()
         return {'value': 'no data'}
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8080)
