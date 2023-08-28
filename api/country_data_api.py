@@ -43,7 +43,7 @@ conn = db.connect()
 @app.route("/", methods=["GET"])
 async def root():
     
-    return {'status': 200}
+    return jsonify({'status': 200})
 
 
 # metadata path endpoints
@@ -61,15 +61,15 @@ async def short_name(country_code):
         result = cursor.fetchall()
     
         if result == []:
-            return {'value': 'no data'}
+            return jsonify({'value': 'no data'})
         
-        return {'value': result[0][0]} 
+        return jsonify({'value': result[0][0]} )
     
     # if year < 2008 throws error because columns does not exist
     except:
         conn.close()
         conn = db.connect()
-        return {'value': 'no data'}
+        return jsonify({'value': 'no data'})
     
 @app.route("/metadata/democracy_index", methods=["GET"])
 async def democracy_index(country_code, year):
@@ -85,15 +85,15 @@ async def democracy_index(country_code, year):
         result = cursor.fetchall()
     
         if result == []:
-            return {'value': 'no data'}
+            return jsonify({'value': 'no data'})
         
-        return {'value': result[0][0]} 
+        return jsonify({'value': result[0][0]}) 
     
     # if year < 2008 throws error because columns does not exist
     except:
         conn.close()
         conn = db.connect()
-        return {'value': 'no data'}
+        return jsonify({'value': 'no data'})
     
 @app.route("/metadata/peace_index", methods=["GET"])
 async def peace_index(country_code, year):
@@ -109,15 +109,15 @@ async def peace_index(country_code, year):
         result = cursor.fetchall()
     
         if result == []:
-            return {'value': 'no data'}
+            return jsonify({'value': 'no data'})
         
-        return {'value': result[0][0]} 
+        return jsonify({'value': result[0][0]} )
     
     # if year < 2008 throws error because columns does not exist
     except:
         conn.close()
         conn = db.connect()
-        return {'value': 'no data'}
+        return jsonify({'value': 'no data'})
     
     
 
@@ -148,13 +148,13 @@ async def arms_exports_total(country_code, year):
             
             # Still nothing? -> no data
             if result == []:
-                return {'value': 'no data'}
+                return jsonify({'value': 'no data'})
         
-        return {'value': result[0][0]}    
+        return jsonify({'value': result[0][0]} )   
     except:
         conn.close()
         conn = db.connect()
-        return {'value': 'no data'}
+        return jsonify({'value': 'no data'})
 
 
 
@@ -183,14 +183,14 @@ async def arms_exports_timeseries(country_code):
         result = cursor.fetchall()
         
         if result == []:
-            return {'value': 'no data'}
+            return jsonify({'value': 'no data'})
       
-        return [{'year': year[0], 'value': int(year[1])} for year in result]
+        return jsonify([{'year': year[0], 'value': int(year[1])} for year in result])
     
     except:
         conn.close()
         conn = db.connect()
-        return {'value': 'no data'}
+        return jsonify({'value': 'no data'})
 
 # Gets export data for a country on a given year, listing values for source counries seperately
 @app.route("/arms/exports/by_country", methods=["GET"])
@@ -222,13 +222,13 @@ async def arms_exports_by_country(country_code, year, limit=300):
         result = cursor.fetchall()
         
         if result == []:
-            return {'value': 'no data'}
+            return jsonify({'value': 'no data'})
         
-        return [{'name': country[0], 'value': country[1], 'full_name': country[2]} for country in result]
+        return jsonify([{'name': country[0], 'value': country[1], 'full_name': country[2]} for country in result])
     except:
         conn.close()
         conn = db.connect()
-        return {'value': 'no data'}
+        return jsonify({'value': 'no data'})
     
 # arms/import path endpoints
 
@@ -245,13 +245,13 @@ async def arms_imports_total(country_code, year):
          # If aggregate function is used, result will not be empty, but NULL
         if result[0] == (None,):
             
-            return {'value': 'no data'}
+            return jsonify({'value': 'no data'})
         
         return {'value': result[0][0]}
     except:
         conn.close()
         conn = db.connect()
-        return {'value': 'no data'}
+        return jsonify({'value': 'no data'})
     
 
 @app.route("/arms/imports/by_country", methods=["GET"])
@@ -283,13 +283,13 @@ async def arms_imports_by_country(country_code, year, limit=300):
         result = cursor.fetchall()
         
         if result == []:
-            return {'value': 'no data'}
+            return jsonify({'value': 'no data'})
         
-        return [{'name': country[0], 'value': country[1], 'full_name': country[2]} for country in result]
+        return jsonify([{'name': country[0], 'value': country[1], 'full_name': country[2]} for country in result])
     except:
         conn.close()
         conn = db.connect()
-        return {'value': 'no data'}
+        return jsonify({'value': 'no data'})
     
 # Gets time series of total import values per year for a given country
 @app.route("/arms/imports/timeseries", methods=["GET"])
@@ -317,14 +317,14 @@ async def arms_imports_timeseries(country_code):
         result = cursor.fetchall()
         
         if result == []:
-            return {'value': 'no data'}
+            return jsonify({'value': 'no data'})
       
-        return [{'year': year[0], 'value': int(year[1])} for year in result]
+        return jsonify([{'year': year[0], 'value': int(year[1])} for year in result])
     
     except:
         conn.close()
         conn = db.connect()
-        return {'value': 'no data'}
+        return jsonify({'value': 'no data'})
     
     
 # merchandise path endpoints
@@ -344,13 +344,13 @@ async def exports_merchandise_year(country_code, year):
         result = cursor.fetchall()
   
         if result[0] == (None,):
-            return {'value': 'no data'}
+            return jsonify({'value': 'no data'})
         
-        return {'value': result[0][0]}    
+        return jsonify({'value': result[0][0]} )   
     except:
         conn.close()
         conn = db.connect()
-        return {'value': 'no data'}
+        return jsonify({'value': 'no data'})
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
