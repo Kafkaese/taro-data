@@ -19,20 +19,11 @@ services:
     networks:
       - taro
     ports:
-      - ${API_PORT}:8000
+      - ${API_PORT}:8080
     env_file:
       - ../.env
 
-  taro-frontend:
-    build:
-      context: ../taro-map
-      dockerfile: ./Dockerfile_dev
-    env_file:
-      - '../.env'
-    networks:
-      - taro
-    ports:
-      - ${REACT_PORT}:3000
+
 
   taro-pipeline:
     build:
