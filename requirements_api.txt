@@ -1,5 +1,5 @@
 pandas
-fastapi
-uvicorn
+Flask
+Flask-Cors
 psycopg2
 sqlalchemy
