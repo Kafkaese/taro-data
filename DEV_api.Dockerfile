@@ -1,6 +1,6 @@
 FROM python:latest
 
-COPY requirements_api.txt requirements.txt
+COPY DEV_requirements_api.txt requirements.txt
 
 RUN pip install -r requirements.txt
 
