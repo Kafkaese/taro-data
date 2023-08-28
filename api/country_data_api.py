@@ -205,9 +205,25 @@ async def arms_exports_timeseries(country_code):
 # Gets export data for a country on a given year, listing values for source counries seperately
 @app.get("/arms/exports/by_country")
 async def arms_exports_by_country(country_code, year, limit=300):
+    '''
+    Gets export data for a country on a given year, listing values for source countries seperately.
+    
+    Paramaters:
+        country_code (string): Alpha-2 country code
+        year (string): Year of the data
+    
+        limit (int): Number of source countries to return. Returns top n by export value for the given year.
+
+    Returns:
+        Dictionary or List of Dictionaries: 
+             Individual country information in dictionary with: {name, value, full_name}
+             Single dictionary with {'value': 'no data'} in case of missing data.
+    '''
+    
     global conn
     
-    query = sql.text('''select "Destination country", "Value" from arms
+    query = sql.text('''select "Destination country", "Value", "short_name" from arms
+        join country_names on "Destination country"="Alpha-2 code"
         where "Source country" = :c and "Year" = :y
         order by "Value" desc limit :l;''')
     
@@ -218,7 +234,7 @@ async def arms_exports_by_country(country_code, year, limit=300):
         if result == []:
             return {'value': 'no data'}
         
-        return [{'name': country[0], 'value': country[1]} for country in result]
+        return [{'name': country[0], 'value': country[1], 'full_name': country[2]} for country in result]
     except:
         conn.close()
         conn = db.connect()
@@ -251,7 +267,7 @@ async def arms_imports_total(country_code, year):
 @app.get("/arms/imports/by_country")
 async def arms_imports_by_country(country_code, year, limit=300):
     '''
-    Gets import data for a country on a given year, listing values for source counries seperately.
+    Gets import data for a country on a given year, listing values for source countries seperately.
     
     Paramaters:
         country_code (string): Alpha-2 country code
@@ -264,6 +280,7 @@ async def arms_imports_by_country(country_code, year, limit=300):
              Individual country information in dictionary with: {name, value, full_name}
              Single dictionary with {'value': 'no data'} in case of missing data.
     '''
+    
     global conn
     
     query = sql.text('''select "Source country", "Value", "short_name" from arms
