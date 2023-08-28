@@ -385,5 +385,6 @@ async def exports_merchandise_year():
         conn = db.connect()
         return jsonify({'value': 'no data'})
 
+# Dev only
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
