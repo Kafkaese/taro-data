@@ -1,5 +1,5 @@
-from flask import Flask, jsonify, request
-from flask_cors import CORS
+from flask import Flask, jsonify, request, logging
+from flask_cors import CORS, cross_origin
 import psycopg2
 from sqlalchemy import create_engine, sql
 import os
@@ -10,7 +10,7 @@ app = Flask(__name__)
 
 
 ## CORS settings
-
+#logging.getLogger('flask_cors').level = logging.DEBUG
 CORS(app)
 
 
@@ -40,8 +40,9 @@ conn = db.connect()
 
 
 # root endpoint
+
 @app.route("/", methods=["GET"])
-async def root():
+def root():
     
     return jsonify({'status': 200})
 
@@ -49,7 +50,8 @@ async def root():
 # metadata path endpoints
 
 @app.route("/metadata/name/short", methods=["GET"])
-async def short_name():
+@cross_origin()
+def short_name():
     
     country_code = request.args.get("country_code")
     
@@ -74,7 +76,7 @@ async def short_name():
         return jsonify({'value': 'no data'})
     
 @app.route("/metadata/democracy_index", methods=["GET"])
-async def democracy_index():
+def democracy_index():
 
     country_code = request.args.get("country_code")
     year = request.args.get("year")
@@ -101,7 +103,7 @@ async def democracy_index():
         return jsonify({'value': 'no data'})
     
 @app.route("/metadata/peace_index", methods=["GET"])
-async def peace_index():
+def peace_index():
 
     country_code = request.args.get("country_code")
     year = request.args.get("year")
@@ -134,7 +136,7 @@ async def peace_index():
 # arms/export
 
 @app.route("/arms/exports/total", methods=["GET"])
-async def arms_exports_total():
+def arms_exports_total():
    
     country_code = request.args.get("country_code")
     year = request.args.get("year")
@@ -170,7 +172,7 @@ async def arms_exports_total():
 
 
 @app.route("/arms/exports/timeseries", methods=["GET"])
-async def arms_exports_timeseries():
+def arms_exports_timeseries():
     
     country_code = request.args.get("country_code")
     
@@ -208,7 +210,7 @@ async def arms_exports_timeseries():
 
 # Gets export data for a country on a given year, listing values for source counries seperately
 @app.route("/arms/exports/by_country", methods=["GET"])
-async def arms_exports_by_country():
+def arms_exports_by_country():
     '''
     Gets export data for a country on a given year, listing values for source countries seperately.
     
@@ -251,7 +253,7 @@ async def arms_exports_by_country():
 # arms/import path endpoints
 
 @app.route("/arms/imports/total", methods=["GET"])
-async def arms_imports_total():
+def arms_imports_total():
         
     country_code = request.args.get("country_code")
     year = request.args.get("year")
@@ -276,7 +278,7 @@ async def arms_imports_total():
     
 
 @app.route("/arms/imports/by_country", methods=["GET"])
-async def arms_imports_by_country():
+def arms_imports_by_country():
     '''
     Gets import data for a country on a given year, listing values for source countries seperately.
     
@@ -318,7 +320,7 @@ async def arms_imports_by_country():
     
 # Gets time series of total import values per year for a given country
 @app.route("/arms/imports/timeseries", methods=["GET"])
-async def arms_imports_timeseries():
+def arms_imports_timeseries():
     
         
     country_code = request.args.get("country_code")
@@ -359,7 +361,7 @@ async def arms_imports_timeseries():
 # merchandise path endpoints
 
 @app.route("/merchandise/exports/total", methods=["GET"])
-async def exports_merchandise_year():
+def exports_merchandise_year():
     
         
     country_code = request.args.get("country_code")
