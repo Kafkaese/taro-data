@@ -1,5 +1,5 @@
 pandas
-Flask
+Flask[async]
 Flask-Cors
 psycopg2
 sqlalchemy
