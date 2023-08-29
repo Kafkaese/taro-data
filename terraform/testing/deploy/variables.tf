@@ -32,6 +32,9 @@ variable "postgres_prefix" {
   default = "taro"
 }
 
+variable "postgres_host" {
+}
+
 variable "postgres_port" {
   default = "5432"
 }
