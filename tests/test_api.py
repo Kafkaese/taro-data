@@ -1,6 +1,6 @@
 import requests
 import os
-from time import time
+import time
 
 API_HOST = os.environ['API_HOST']
 API_PORT = os.environ['API_PORT']
