@@ -1,5 +1,6 @@
 import requests
 import os
+from time import time
 
 API_HOST = os.environ['API_HOST']
 API_PORT = os.environ['API_PORT']
@@ -7,6 +8,8 @@ API_PORT = os.environ['API_PORT']
 # test for root endpoint 
 def test_root_endpoint_status_code():
     URL = f'http://{API_HOST}:{API_PORT}/'
+    
+    time.sleep(0.45)
     
     response = requests.get(URL)
 
