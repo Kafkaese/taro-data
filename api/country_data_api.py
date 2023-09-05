@@ -270,7 +270,7 @@ def arms_imports_total():
             
             return jsonify({'value': 'no data'})
         
-        return {'value': result[0][0]}
+        return {'value': int(result[0][0])}
     except:
         conn.close()
         conn = db.connect()
