@@ -1,3 +1,4 @@
+requests[security]
 pandas
 Flask[async]
 Flask-Cors
