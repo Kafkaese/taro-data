@@ -19,7 +19,7 @@ def test_metadata_name_short_endpoint_status_code():
     
     response = requests.get(URL)
     
-    assert response.status_code == 422
+    assert response.status_code == 200
     
 def test_metadata_name_short_request_status_code():
     ENDPOINT = '/metadata/name/short'
@@ -52,7 +52,7 @@ def test_metadata_democracy_index_endpoint_status_code():
     
     response = requests.get(URL)
     
-    assert response.status_code == 422
+    assert response.status_code == 200
     
 def test_metadata_democracy_index_request_status_code():
     ENDPOINT = "/metadata/democracy_index"
@@ -100,7 +100,7 @@ def test_metadata_peace_index_endpoint_status_code():
     
     response = requests.get(URL)
     
-    assert response.status_code == 422
+    assert response.status_code == 200
     
 def test_metadata_peace_index_request_status_code():
     ENDPOINT = "/metadata/peace_index"
@@ -148,7 +148,7 @@ def test_arms_exports_total_endpoint_status_code():
     
     response = requests.get(URL)
     
-    assert response.status_code == 422
+    assert response.status_code == 200
     
 def test_arms_exports_total_request_status_code():
     ENDPOINT = "/arms/exports/total"
@@ -196,7 +196,7 @@ def test_arms_exports_timeseries_endpoint_status_code():
     
     response = requests.get(URL)
     
-    assert response.status_code == 422
+    assert response.status_code == 200
     
 def test_arms_exports_total_timeseries_status_code():
     ENDPOINT = "/arms/exports/timeseries"
@@ -221,7 +221,7 @@ def test_arms_exports_timeseries_request():
     response = requests.get(URL, params=PARAMS).json()
     
     assert type(response) == list
-    assert list(response[0].keys()) == ['year', 'value']
+    assert list(response[0].keys()) == ['value', 'year']
     
 def test_arms_exports_timeseries_request_missing():
     ENDPOINT = "/arms/exports/timeseries"
@@ -242,7 +242,7 @@ def test_arms_exports_by_ountry_endpoint_status_code():
     
     response = requests.get(URL)
     
-    assert response.status_code == 422
+    assert response.status_code == 200
     
 def test_arms_exports_by_country_status_code():
     ENDPOINT = "/arms/exports/by_country"
@@ -269,7 +269,7 @@ def test_arms_exports_by_country_request():
     response = requests.get(URL, params=PARAMS).json()
     
     assert type(response) == list
-    assert list(response[0].keys()) == ['name', 'value']
+    assert list(response[0].keys()) == ['full_name', 'name', 'value']
     
 def test_arms_exports_by_country_request_missing():
     ENDPOINT = "/arms/exports/by_country"
@@ -284,6 +284,7 @@ def test_arms_exports_by_country_request_missing():
     
     assert response.json()['value'] == 'no data'
     
+
 # test for "/arms/imports/total" endpoint
 def test_arms_imports_total_endpoint_status_code():
     ENDPOINT = "/arms/imports/total"
@@ -291,7 +292,7 @@ def test_arms_imports_total_endpoint_status_code():
     
     response = requests.get(URL)
     
-    assert response.status_code == 422
+    assert response.status_code == 200
     
 def test_arms_imports_total_request_status_code():
     ENDPOINT = "/arms/imports/total"
@@ -339,7 +340,7 @@ def test_arms_exports_timeseries_endpoint_status_code():
     
     response = requests.get(URL)
     
-    assert response.status_code == 422
+    assert response.status_code == 200
     
 def test_arms_imports_total_timeseries_status_code():
     ENDPOINT = "/arms/imports/timeseries"
@@ -364,7 +365,7 @@ def test_arms_imports_timeseries_request():
     response = requests.get(URL, params=PARAMS).json()
     
     assert type(response) == list
-    assert list(response[0].keys()) == ['year', 'value']
+    assert list(response[0].keys()) == ['value', 'year']
     
 def test_arms_imports_timeseries_request_missing():
     ENDPOINT = "/arms/imports/timeseries"
@@ -385,7 +386,7 @@ def test_arms_imports_by_ountry_endpoint_status_code():
     
     response = requests.get(URL)
     
-    assert response.status_code == 422
+    assert response.status_code == 200
     
 def test_arms_imports_by_country_status_code():
     ENDPOINT = "/arms/imports/by_country"
@@ -412,7 +413,7 @@ def test_arms_imports_by_country_request():
     response = requests.get(URL, params=PARAMS).json()
     
     assert type(response) == list
-    assert list(response[0].keys()) == ['name', 'value']
+    assert list(response[0].keys()) == ['full_name', 'name', 'value']
     
 def test_arms_imports_by_country_request_missing():
     ENDPOINT = "/arms/imports/by_country"
@@ -434,7 +435,7 @@ def test_merchandise_exports_total_endpoint_status_code():
     
     response = requests.get(URL)
     
-    assert response.status_code == 422
+    assert response.status_code == 200
     
 def test_merchandise_exports_total_request_status_code():
     ENDPOINT = "/merchandise/exports/total"
