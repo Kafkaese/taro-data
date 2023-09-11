@@ -181,7 +181,7 @@ jobs:
     needs: [deploy-api, pipeline]
     runs-on: ubuntu-latest
     environment: testing
-    timeout-minutes: 5
+    timeout-minutes: 15
     env:
       API_HOST: ${{ needs.deploy-api.outputs.api-host }}
       API_PORT: 8000
