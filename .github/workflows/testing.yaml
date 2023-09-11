@@ -190,7 +190,7 @@ jobs:
       - name: 'Debug'
         run: |
           echo $GITHUB_OUTPUT
-          echo $(${{ needs.deploy-api.outputs.api-host }})
+          echo ${{ needs.deploy-api.outputs.api-host }}
           echo $API_HOST
       - name: Checkout
         uses: actions/checkout@v3
