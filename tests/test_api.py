@@ -269,7 +269,7 @@ def test_arms_exports_by_country_request():
     response = requests.get(URL, params=PARAMS).json()
     
     assert type(response) == list
-    assert list(response[0].keys()) == ['name', 'value']
+    assert list(response[0].keys()) == ['name', 'value', 'full_name']
     
 def test_arms_exports_by_country_request_missing():
     ENDPOINT = "/arms/exports/by_country"
@@ -412,7 +412,7 @@ def test_arms_imports_by_country_request():
     response = requests.get(URL, params=PARAMS).json()
     
     assert type(response) == list
-    assert list(response[0].keys()) == ['name', 'value']
+    assert list(response[0].keys()) == ['name', 'value', 'full_name']
     
 def test_arms_imports_by_country_request_missing():
     ENDPOINT = "/arms/imports/by_country"
