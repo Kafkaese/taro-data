@@ -27,14 +27,9 @@ app.add_middleware(
 
 host = os.environ['POSTGRES_HOST']
 dbname = os.environ['POSTGRES_DB']
+user = os.environ['POSTGRES_USER']
+password = os.environ['POSTGRES_PASSWORD']
 
-# Use tf vars if not local dev env
-if os.environ['ENV'] == 'dev' or os.environ['ENV'] == 'test':
-    user = os.environ['POSTGRES_USER']
-    password = os.environ['POSTGRES_PASSWORD']
-else:    
-    user = os.environ['TF_VAR_postgres_user']
-    password = os.environ['TF_VAR_postgres_password']
 
 sslmode = "require"
     
