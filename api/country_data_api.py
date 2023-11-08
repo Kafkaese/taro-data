@@ -9,10 +9,17 @@ app = FastAPI()
 
 ## CORS settings
 
-origins = [
-    "http://localhost",
-    "http://localhost:3000",
-]
+env = os.environ['ENV']
+frontend_host = os.environ['REACT_HOST']
+
+if env == 'production':
+    origins = [f"http://{frontend_host}"]
+
+else:
+        origins = [
+        "http://localhost",
+        "http://localhost:3000",
+    ]
 
 app.add_middleware(
     CORSMiddleware,
