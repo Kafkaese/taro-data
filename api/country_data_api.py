@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 import psycopg2
 from sqlalchemy import create_engine, sql
@@ -14,7 +15,8 @@ frontend_host = os.environ['REACT_HOST']
 
 if env == 'production':
     origins = [f"http://{frontend_host}",
-               "https://www.arms-tracker.app"]
+               "https://www.arms-tracker.app",
+               "https://arms-tracker.app"]
 
 else:
         origins = [
@@ -57,6 +59,12 @@ conn = db.connect()
 async def root():
     
     return {'status': 200}
+
+# Favicon
+
+@app.get('/favicon.ico', include_in_schema=False)
+async def favicon():
+    return FileResponse('favicon.png')
 
 
 # metadata path endpoints
