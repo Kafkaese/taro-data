@@ -1,18 +1,23 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import psycopg2
 from sqlalchemy import create_engine, sql
 import os
-import pandas as pd
 
 app = FastAPI()
 
 ## CORS settings
 
-origins = [
-    "http://localhost",
-    "http://localhost:3000",
-]
+env = os.environ['ENV']
+
+if env == 'production':
+    origins = ["https://www.arms-tracker.app",
+               "https://arms-tracker.app"]
+
+else:
+        origins = [
+        "http://localhost",
+        "http://localhost:3000",
+    ]
 
 app.add_middleware(
     CORSMiddleware,
@@ -49,7 +54,6 @@ conn = db.connect()
 async def root():
     
     return {'status': 200}
-
 
 # metadata path endpoints
 
