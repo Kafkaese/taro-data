@@ -11,11 +11,9 @@ app = FastAPI()
 ## CORS settings
 
 env = os.environ['ENV']
-frontend_host = os.environ['REACT_HOST']
 
 if env == 'production':
-    origins = [f"http://{frontend_host}",
-               "https://www.arms-tracker.app",
+    origins = ["https://www.arms-tracker.app",
                "https://arms-tracker.app"]
 
 else:
