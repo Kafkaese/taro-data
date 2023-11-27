@@ -49,6 +49,8 @@ print(f"Connecting to: {conn_string}")
 db = create_engine(conn_string)
 conn = db.connect()
 
+# valid currencies
+VALID_CURRENCIES = ['EUR', 'USD']
 
 # root endpoint
 
@@ -141,12 +143,17 @@ async def arms_exports_total(country_code, year, currency):
    
     global conn
    
-    print('HERE')
-    query = sql.text('''select SUM(:v) from arms where "Source country" = :c and "Year" = :y;''')
-    backup_query = sql.text('''select :v from exports where "Source country" = :c and "Year" = :y;''')
-
+    print('HERE', flush=True)
+    if currency in VALID_CURRENCIES :
+        query = sql.text(f'''select SUM("{currency}") from arms where "Source country" = :c and "Year" = :y;''')
+        backup_query = sql.text(f'''select "{currency}" from exports where "Source country" = :c and "Year" = :y;''')
+    else:
+        return {'value': 'no data'}
+        
+    print(query)
+    
     try:
-        cursor = conn.execute(query, parameters = {'v': currency, 'c': country_code, 'y': year})
+        cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
         
         result = cursor.fetchall()
         
@@ -173,24 +180,27 @@ async def arms_exports_total(country_code, year, currency):
 async def arms_exports_timeseries(country_code, currency):
     global conn
     
-    query = sql.text('''select coalesce (arms."Year", exports."Year"), coalesce (arms.sum, exports.sum) from 
-        (
-        select "Year", SUM(:v) from arms
-                        where "Source country" = :c
-                        group by "Year"
-                        order by "Year" asc
-        ) as arms
-        full outer join
-        (
-        select "Year", SUM(:v) from exports
-        where "Source country" = :c
-        group by "Year"
-        order by "Year" asc 
-        ) as exports
-        on arms."Year" = exports."Year" ;''')
+    if currency in VALID_CURRENCIES:
+        query = sql.text(f'''select coalesce (arms."Year", exports."Year"), coalesce (arms.sum, exports.sum) from 
+            (
+            select "Year", SUM("{currency}") from arms
+                            where "Source country" = :c
+                            group by "Year"
+                            order by "Year" asc
+            ) as arms
+            full outer join
+            (
+            select "Year", SUM("{currency}") from exports
+            where "Source country" = :c
+            group by "Year"
+            order by "Year" asc 
+            ) as exports
+            on arms."Year" = exports."Year" ;''')
+    else:
+        return {'value': 'no data'}
     
     try:
-        cursor = conn.execute(query, parameters = {'v': currency, 'c': country_code})
+        cursor = conn.execute(query, parameters = {'c': country_code})
         result = cursor.fetchall()
         
         if result == []:
@@ -223,13 +233,16 @@ async def arms_exports_by_country(country_code, year, currency, limit=300):
     
     global conn
     
-    query = sql.text('''select "Destination country", :v, "short_name" from arms
-        join country_names on "Destination country"="Alpha-2 code"
-        where "Source country" = :c and "Year" = :y
-        order by :v desc limit :l;''')
+    if currency in VALID_CURRENCIES:
+        query = sql.text(f'''select "Destination country", "{currency}", "short_name" from arms
+            join country_names on "Destination country"="Alpha-2 code"
+            where "Source country" = :c and "Year" = :y
+            order by "{currency}" desc limit :l;''')
+    else:
+        return {'value': 'no data'}
     
     try:
-        cursor = conn.execute(query, parameters = {'v': currency, 'c': country_code, 'y': year, 'l': limit})
+        cursor = conn.execute(query, parameters = {'c': country_code, 'y': year, 'l': limit})
         result = cursor.fetchall()
         
         if result == []:
@@ -247,10 +260,13 @@ async def arms_exports_by_country(country_code, year, currency, limit=300):
 async def arms_imports_total(country_code, currency, year):
     
     global conn
-    
-    query = sql.text('''select SUM(:v) from arms where "Destination country" = :c and "Year" = :y;''')
+    if currency in VALID_CURRENCIES:
+        query = sql.text(f'''select SUM("{currency}") from arms where "Destination country" = :c and "Year" = :y;''')
+    else:
+        return {'value': 'no data'}
+        
     try:
-        cursor = conn.execute(query, parameters = {'v': currency, 'c': country_code, 'y': year})
+        cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
         result = cursor.fetchall()
         
          # If aggregate function is used, result will not be empty, but NULL
@@ -284,11 +300,14 @@ async def arms_imports_by_country(country_code, year, currency, limit=300):
     
     global conn
     
-    query = sql.text('''select "Source country", :v, "short_name" from arms
+    if currency in VALID_CURRENCIES:
+        query = sql.text(f'''select "Source country", "{currency}", "short_name" from arms
         join country_names on "Source country"="Alpha-2 code"
         where "Destination country" = :c and "Year" = :y
-        order by :v desc limit :l;''')
-    
+        order by "{currency}" desc limit :l;''')
+    else:
+        return {'value': 'no data'}
+
     try:
         cursor = conn.execute(query, parameters = {'c': country_code, 'v': currency, 'y': year, 'l': limit})
         result = cursor.fetchall()
@@ -307,24 +326,29 @@ async def arms_imports_by_country(country_code, year, currency, limit=300):
 async def arms_imports_timeseries(country_code, currency):
     global conn
     
-    query = sql.text('''select coalesce (arms."Year", imports."Year"), coalesce (arms.sum, imports.sum) from 
-        (
-        select "Year", SUM(:v) from arms
-                        where "Destination country" = :c
-                        group by "Year"
-                        order by "Year" asc
-        ) as arms
-        full outer join
-        (
-        select "Year", SUM(:v) from imports
-        where "Destination country" = :c
-        group by "Year"
-        order by "Year" asc 
-        ) as imports
-        on arms."Year" = imports."Year" ;''')
-    
+    if currency in VALID_CURRENCIES:
+
+        query = sql.text(f'''select coalesce (arms."Year", imports."Year"), coalesce (arms.sum, imports.sum) from 
+            (
+            select "Year", SUM("{currency}") from arms
+                            where "Destination country" = :c
+                            group by "Year"
+                            order by "Year" asc
+            ) as arms
+            full outer join
+            (
+            select "Year", SUM("{currency}") from imports
+            where "Destination country" = :c
+            group by "Year"
+            order by "Year" asc 
+            ) as imports
+            on arms."Year" = imports."Year" ;''')
+    else:
+        return {'value': 'no data'}
+
+            
     try:
-        cursor = conn.execute(query, parameters = {'c': country_code, 'v': currency})
+        cursor = conn.execute(query, parameters = {'c': country_code})
         result = cursor.fetchall()
         
         if result == []:
