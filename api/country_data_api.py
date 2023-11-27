@@ -15,8 +15,10 @@ if env == 'production':
 
 else:
         origins = [
-        "http://localhost",
-        "http://localhost:3000",
+        "https://localhost",
+        "https://localhost:3000",
+        "localhost",
+        "localhost:3000"
     ]
 
 app.add_middleware(
