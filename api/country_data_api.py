@@ -137,16 +137,16 @@ async def peace_index(country_code, year):
 # arms/export
 
 @app.get("/arms/exports/total")
-async def arms_exports_total(country_code, year):
+async def arms_exports_total(country_code, year, currency):
    
     global conn
    
     print('HERE')
-    query = sql.text('''select SUM("Value") from arms where "Source country" = :c and "Year" = :y;''')
-    backup_query = sql.text('''select "Value" from exports where "Source country" = :c and "Year" = :y;''')
+    query = sql.text('''select SUM(:v) from arms where "Source country" = :c and "Year" = :y;''')
+    backup_query = sql.text('''select :v from exports where "Source country" = :c and "Year" = :y;''')
 
     try:
-        cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
+        cursor = conn.execute(query, parameters = {'v': currency, 'c': country_code, 'y': year})
         
         result = cursor.fetchall()
         
@@ -170,19 +170,19 @@ async def arms_exports_total(country_code, year):
 
 
 @app.get("/arms/exports/timeseries")
-async def arms_exports_timeseries(country_code):
+async def arms_exports_timeseries(country_code, currency):
     global conn
     
     query = sql.text('''select coalesce (arms."Year", exports."Year"), coalesce (arms.sum, exports.sum) from 
         (
-        select "Year", SUM("Value") from arms
+        select "Year", SUM(:v) from arms
                         where "Source country" = :c
                         group by "Year"
                         order by "Year" asc
         ) as arms
         full outer join
         (
-        select "Year", SUM("Value") from exports
+        select "Year", SUM(:v) from exports
         where "Source country" = :c
         group by "Year"
         order by "Year" asc 
@@ -190,7 +190,7 @@ async def arms_exports_timeseries(country_code):
         on arms."Year" = exports."Year" ;''')
     
     try:
-        cursor = conn.execute(query, parameters = {'c': country_code})
+        cursor = conn.execute(query, parameters = {'v': currency, 'c': country_code})
         result = cursor.fetchall()
         
         if result == []:
@@ -205,7 +205,7 @@ async def arms_exports_timeseries(country_code):
 
 # Gets export data for a country on a given year, listing values for source counries seperately
 @app.get("/arms/exports/by_country")
-async def arms_exports_by_country(country_code, year, limit=300):
+async def arms_exports_by_country(country_code, year, currency, limit=300):
     '''
     Gets export data for a country on a given year, listing values for source countries seperately.
     
@@ -223,13 +223,13 @@ async def arms_exports_by_country(country_code, year, limit=300):
     
     global conn
     
-    query = sql.text('''select "Destination country", "Value", "short_name" from arms
+    query = sql.text('''select "Destination country", :v, "short_name" from arms
         join country_names on "Destination country"="Alpha-2 code"
         where "Source country" = :c and "Year" = :y
-        order by "Value" desc limit :l;''')
+        order by :v desc limit :l;''')
     
     try:
-        cursor = conn.execute(query, parameters = {'c': country_code, 'y': year, 'l': limit})
+        cursor = conn.execute(query, parameters = {'v': currency, 'c': country_code, 'y': year, 'l': limit})
         result = cursor.fetchall()
         
         if result == []:
@@ -244,13 +244,13 @@ async def arms_exports_by_country(country_code, year, limit=300):
 # arms/import path endpoints
 
 @app.get("/arms/imports/total")
-async def arms_imports_total(country_code, year):
+async def arms_imports_total(country_code, currency, year):
     
     global conn
     
-    query = sql.text('''select SUM("Value") from arms where "Destination country" = :c and "Year" = :y;''')
+    query = sql.text('''select SUM(:v) from arms where "Destination country" = :c and "Year" = :y;''')
     try:
-        cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
+        cursor = conn.execute(query, parameters = {'v': currency, 'c': country_code, 'y': year})
         result = cursor.fetchall()
         
          # If aggregate function is used, result will not be empty, but NULL
@@ -266,7 +266,7 @@ async def arms_imports_total(country_code, year):
     
 
 @app.get("/arms/imports/by_country")
-async def arms_imports_by_country(country_code, year, limit=300):
+async def arms_imports_by_country(country_code, year, currency, limit=300):
     '''
     Gets import data for a country on a given year, listing values for source countries seperately.
     
@@ -284,13 +284,13 @@ async def arms_imports_by_country(country_code, year, limit=300):
     
     global conn
     
-    query = sql.text('''select "Source country", "Value", "short_name" from arms
+    query = sql.text('''select "Source country", :v, "short_name" from arms
         join country_names on "Source country"="Alpha-2 code"
         where "Destination country" = :c and "Year" = :y
-        order by "Value" desc limit :l;''')
+        order by :v desc limit :l;''')
     
     try:
-        cursor = conn.execute(query, parameters = {'c': country_code, 'y': year, 'l': limit})
+        cursor = conn.execute(query, parameters = {'c': country_code, 'v': currency, 'y': year, 'l': limit})
         result = cursor.fetchall()
         
         if result == []:
@@ -304,19 +304,19 @@ async def arms_imports_by_country(country_code, year, limit=300):
     
 # Gets time series of total import values per year for a given country
 @app.get("/arms/imports/timeseries")
-async def arms_imports_timeseries(country_code):
+async def arms_imports_timeseries(country_code, currency):
     global conn
     
     query = sql.text('''select coalesce (arms."Year", imports."Year"), coalesce (arms.sum, imports.sum) from 
         (
-        select "Year", SUM("Value") from arms
+        select "Year", SUM(:v) from arms
                         where "Destination country" = :c
                         group by "Year"
                         order by "Year" asc
         ) as arms
         full outer join
         (
-        select "Year", SUM("Value") from imports
+        select "Year", SUM(:v) from imports
         where "Destination country" = :c
         group by "Year"
         order by "Year" asc 
@@ -324,7 +324,7 @@ async def arms_imports_timeseries(country_code):
         on arms."Year" = imports."Year" ;''')
     
     try:
-        cursor = conn.execute(query, parameters = {'c': country_code})
+        cursor = conn.execute(query, parameters = {'c': country_code, 'v': currency})
         result = cursor.fetchall()
         
         if result == []:
@@ -339,7 +339,7 @@ async def arms_imports_timeseries(country_code):
     
     
 # merchandise path endpoints
-
+# NOT IN USE CURRENTLY. Needs to be updatedd for USD values if reactivated
 @app.get("/merchandise/exports/total")
 async def exports_merchandise_year(country_code, year):
 
