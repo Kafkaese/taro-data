@@ -206,7 +206,8 @@ def test_arms_exports_total_timeseries_status_code():
     URL = f'https://{API_HOST}:{API_PORT}{ENDPOINT}'
     
     PARAMS = {
-        "country_code": "CA"
+        "country_code": "CZ",
+        "currency": "EUR"
     }
     
     response = requests.get(URL, params=PARAMS, verify=False)
