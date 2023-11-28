@@ -6,8 +6,8 @@ RUN pip install -r requirements.txt
 
 COPY api/ api
 
-COPY example.com+5-key.pem ./key.pem
-COPY example.com+5.pem ./cert.pem
+COPY ssl/test-key.pem ./key.pem
+COPY ssl/test.pem ./cert.pem
 
 # ENVs needed to be provided on run-time:
 # POSTGRES_HOST

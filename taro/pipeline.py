@@ -386,12 +386,14 @@ if __name__ == "__main__":
     db = create_engine(conn_string)
     conn = db.connect()
 
- 
+    
     # Run all pipelines
     
-    import_data_pipeline(db_conn = conn, csv_path = '../data/imports.csv')
-    
-    export_data_pipeline(db_conn = conn, csv_path = '../data/exports.csv')
+    # These two pipelines normally source from the SIPRI dataset. Since currently the data can not be used
+    # due to unresolved licensing, it just writes the CAAT data into these two tables as well,
+    # which will result in no added behaviour, but keeps the code ready for the SIPRI data
+    import_data_pipeline(db_conn = conn, csv_path = '../data/arms.csv')
+    export_data_pipeline(db_conn = conn, csv_path = '../data/arms.csv')
     
     democracy_index_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path='../data/democracy_index.csv')
     
