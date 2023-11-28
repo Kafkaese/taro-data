@@ -169,14 +169,14 @@ def test_arms_exports_total_request():
     URL = f'https://{API_HOST}:{API_PORT}{ENDPOINT}'
     
     PARAMS = {
-        "country_code": "CA", 
+        "country_code": "CZ", 
         "year": 2020,
         "currency": "EUR"
     }
     
     response = requests.get(URL, params=PARAMS, verify=False)
     
-    assert response.json()['value'] == 200_000_000
+    assert response.json()['value'] == 673_493_771
     
 def test_arms_exports_total_request_missing():
     ENDPOINT = "/arms/exports/total"
