@@ -156,7 +156,8 @@ def test_arms_exports_total_request_status_code():
     
     PARAMS = {
         "country_code": "CA", 
-        "year": 2020
+        "year": 2020,
+        "currency": "EUR"
     }
     
     response = requests.get(URL, params=PARAMS)
@@ -169,7 +170,8 @@ def test_arms_exports_total_request():
     
     PARAMS = {
         "country_code": "CA", 
-        "year": 2020
+        "year": 2020,
+        "currency": "EUR"
     }
     
     response = requests.get(URL, params=PARAMS)
@@ -182,7 +184,8 @@ def test_arms_exports_total_request_missing():
     
     PARAMS = {
         "country_code": "CA", 
-        "year": 1778
+        "year": 1778,
+        "currency": "EUR"
     }
     
     response = requests.get(URL, params=PARAMS)
@@ -250,7 +253,8 @@ def test_arms_exports_by_country_status_code():
     
     PARAMS = {
         "country_code": "CA",
-        "year": 2020
+        "year": 2020,
+        "currency": "EUR"
     }
     
     response = requests.get(URL, params=PARAMS)
@@ -263,7 +267,8 @@ def test_arms_exports_by_country_request():
     
     PARAMS = {
         "country_code": "FR",
-        "year": 2020
+        "year": 2020,
+        "currency": "EUR"
     }
     
     response = requests.get(URL, params=PARAMS).json()
@@ -277,7 +282,8 @@ def test_arms_exports_by_country_request_missing():
     
     PARAMS = {
         "country_code": "XX",
-        "year": 2020
+        "year": 2020,
+        "currency": "EUR"
     }
     
     response = requests.get(URL, params=PARAMS)
@@ -299,7 +305,8 @@ def test_arms_imports_total_request_status_code():
     
     PARAMS = {
         "country_code": "CA", 
-        "year": 2020
+        "year": 2020,
+        "currency": "EUR"
     }
     
     response = requests.get(URL, params=PARAMS)
@@ -312,7 +319,8 @@ def test_arms_imports_total_request():
     
     PARAMS = {
         "country_code": "CA", 
-        "year": 2020
+        "year": 2020,
+        "currency": "EUR"
     }
     
     response = requests.get(URL, params=PARAMS)
@@ -325,7 +333,8 @@ def test_arms_imports_total_request_missing():
     
     PARAMS = {
         "country_code": "CA", 
-        "year": 1778
+        "year": 1778,
+        "currency": "EUR"
     }
     
     response = requests.get(URL, params=PARAMS)
@@ -346,7 +355,8 @@ def test_arms_imports_total_timeseries_status_code():
     URL = f'http://{API_HOST}:{API_PORT}{ENDPOINT}'
     
     PARAMS = {
-        "country_code": "CA"
+        "country_code": "CA",
+        "currency": "EUR"
     }
     
     response = requests.get(URL, params=PARAMS)
@@ -358,7 +368,8 @@ def test_arms_imports_timeseries_request():
     URL = f'http://{API_HOST}:{API_PORT}{ENDPOINT}'
     
     PARAMS = {
-        "country_code": "CA"
+        "country_code": "CA",
+        "currency": "EUR"
     }
     
     response = requests.get(URL, params=PARAMS).json()
@@ -371,7 +382,8 @@ def test_arms_imports_timeseries_request_missing():
     URL = f'http://{API_HOST}:{API_PORT}{ENDPOINT}'
     
     PARAMS = {
-        "country_code": "XX"
+        "country_code": "XX",
+        "currency": "EUR"
     }
     
     response = requests.get(URL, params=PARAMS)
@@ -393,7 +405,8 @@ def test_arms_imports_by_country_status_code():
     
     PARAMS = {
         "country_code": "CA",
-        "year": 2020
+        "year": 2020,
+        "currency": "EUR"
     }
     
     response = requests.get(URL, params=PARAMS)
@@ -406,7 +419,8 @@ def test_arms_imports_by_country_request():
     
     PARAMS = {
         "country_code": "CA",
-        "year": 2020
+        "year": 2020,
+        "currency": "EUR"
     }
     
     response = requests.get(URL, params=PARAMS).json()
@@ -420,7 +434,8 @@ def test_arms_imports_by_country_request_missing():
     
     PARAMS = {
         "country_code": "XX",
-        "year": 2020
+        "year": 2020,
+        "currency": "EUR"
     }
     
     response = requests.get(URL, params=PARAMS)
