@@ -219,7 +219,8 @@ def test_arms_exports_timeseries_request():
     URL = f'https://{API_HOST}:{API_PORT}{ENDPOINT}'
     
     PARAMS = {
-        "country_code": "CA"
+        "country_code": "CZ",
+        "currency": "EUR"
     }
     
     response = requests.get(URL, params=PARAMS, verify=False).json()
@@ -232,7 +233,8 @@ def test_arms_exports_timeseries_request_missing():
     URL = f'https://{API_HOST}:{API_PORT}{ENDPOINT}'
     
     PARAMS = {
-        "country_code": "XX"
+        "country_code": "XX",
+        "currency": "EUR"
     }
     
     response = requests.get(URL, params=PARAMS, verify=False)
