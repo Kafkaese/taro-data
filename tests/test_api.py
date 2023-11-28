@@ -8,7 +8,7 @@ API_PORT = os.environ['API_PORT']
 def test_root_endpoint_status_code():
     URL = f'https://{API_HOST}:{API_PORT}/'
     
-    response = requests.get(URL)
+    response = requests.get(URL, verify=False)
 
     assert response.status_code == 200
 
@@ -17,7 +17,7 @@ def test_metadata_name_short_endpoint_status_code():
     ENDPOINT = '/metadata/name/short'
     URL = f'https://{API_HOST}:{API_PORT}{ENDPOINT}'
     
-    response = requests.get(URL)
+    response = requests.get(URL, verify=False)
     
     assert response.status_code == 422
     
@@ -29,7 +29,7 @@ def test_metadata_name_short_request_status_code():
         "country_code": "CA" 
     }
     
-    response = requests.get(URL, params=PARAMS)
+    response = requests.get(URL, params=PARAMS, verify=False)
     
     assert response.status_code == 200
     
@@ -41,7 +41,7 @@ def test_metadata_name_short_request():
         "country_code": "CA" 
     }
     
-    response = requests.get(URL, params=PARAMS)
+    response = requests.get(URL, params=PARAMS, verify=False)
     
     assert response.json()['value'] == "Canada"
     
@@ -50,7 +50,7 @@ def test_metadata_democracy_index_endpoint_status_code():
     ENDPOINT = "/metadata/democracy_index"
     URL = f'https://{API_HOST}:{API_PORT}{ENDPOINT}'
     
-    response = requests.get(URL)
+    response = requests.get(URL, verify=False)
     
     assert response.status_code == 422
     
@@ -63,7 +63,7 @@ def test_metadata_democracy_index_request_status_code():
         "year": 2020
     }
     
-    response = requests.get(URL, params=PARAMS)
+    response = requests.get(URL, params=PARAMS, verify=False)
     
     assert response.status_code == 200
 
@@ -76,7 +76,7 @@ def test_metadata_democracy_index_request():
         "year": 2020
     }
     
-    response = requests.get(URL, params=PARAMS)
+    response = requests.get(URL, params=PARAMS, verify=False)
     
     assert response.json()['value'] == 9.24
 
@@ -89,7 +89,7 @@ def test_metadata_democracy_index_request_missing():
         "year": 1778
     }
     
-    response = requests.get(URL, params=PARAMS)
+    response = requests.get(URL, params=PARAMS, verify=False)
     
     assert response.json()['value'] == 'no data'
 
@@ -98,7 +98,7 @@ def test_metadata_peace_index_endpoint_status_code():
     ENDPOINT = "/metadata/peace_index"
     URL = f'https://{API_HOST}:{API_PORT}{ENDPOINT}'
     
-    response = requests.get(URL)
+    response = requests.get(URL, verify=False)
     
     assert response.status_code == 422
     
@@ -111,7 +111,7 @@ def test_metadata_peace_index_request_status_code():
         "year": 2020
     }
     
-    response = requests.get(URL, params=PARAMS)
+    response = requests.get(URL, params=PARAMS, verify=False)
     
     assert response.status_code == 200
 
@@ -124,7 +124,7 @@ def test_metadata_peace_index_request():
         "year": 2020
     }
     
-    response = requests.get(URL, params=PARAMS)
+    response = requests.get(URL, params=PARAMS, verify=False)
     
     assert response.json()['value'] == 1.333
     
@@ -137,7 +137,7 @@ def test_metadata_peace_index_request_missing():
         "year": 1778
     }
     
-    response = requests.get(URL, params=PARAMS)
+    response = requests.get(URL, params=PARAMS, verify=False)
     
     assert response.json()['value'] == 'no data'
     
@@ -146,7 +146,7 @@ def test_arms_exports_total_endpoint_status_code():
     ENDPOINT = "/arms/exports/total"
     URL = f'https://{API_HOST}:{API_PORT}{ENDPOINT}'
     
-    response = requests.get(URL)
+    response = requests.get(URL, verify=False)
     
     assert response.status_code == 422
     
@@ -160,7 +160,7 @@ def test_arms_exports_total_request_status_code():
         "currency": "EUR"
     }
     
-    response = requests.get(URL, params=PARAMS)
+    response = requests.get(URL, params=PARAMS, verify=False)
     
     assert response.status_code == 200
 
@@ -174,7 +174,7 @@ def test_arms_exports_total_request():
         "currency": "EUR"
     }
     
-    response = requests.get(URL, params=PARAMS)
+    response = requests.get(URL, params=PARAMS, verify=False)
     
     assert response.json()['value'] == 200_000_000
     
@@ -188,7 +188,7 @@ def test_arms_exports_total_request_missing():
         "currency": "EUR"
     }
     
-    response = requests.get(URL, params=PARAMS)
+    response = requests.get(URL, params=PARAMS, verify=False)
     
     assert response.json()['value'] == 'no data'
     
@@ -197,7 +197,7 @@ def test_arms_exports_timeseries_endpoint_status_code():
     ENDPOINT = "/arms/exports/timeseries"
     URL = f'https://{API_HOST}:{API_PORT}{ENDPOINT}'
     
-    response = requests.get(URL)
+    response = requests.get(URL, verify=False)
     
     assert response.status_code == 422
     
@@ -209,7 +209,7 @@ def test_arms_exports_total_timeseries_status_code():
         "country_code": "CA"
     }
     
-    response = requests.get(URL, params=PARAMS)
+    response = requests.get(URL, params=PARAMS, verify=False)
     
     assert response.status_code == 200
 
@@ -221,7 +221,7 @@ def test_arms_exports_timeseries_request():
         "country_code": "CA"
     }
     
-    response = requests.get(URL, params=PARAMS).json()
+    response = requests.get(URL, params=PARAMS, verify=False).json()
     
     assert type(response) == list
     assert list(response[0].keys()) == ['year', 'value']
@@ -234,7 +234,7 @@ def test_arms_exports_timeseries_request_missing():
         "country_code": "XX"
     }
     
-    response = requests.get(URL, params=PARAMS)
+    response = requests.get(URL, params=PARAMS, verify=False)
     
     assert response.json()['value'] == 'no data'
     
@@ -243,7 +243,7 @@ def test_arms_exports_by_ountry_endpoint_status_code():
     ENDPOINT = "/arms/exports/by_country"
     URL = f'https://{API_HOST}:{API_PORT}{ENDPOINT}'
     
-    response = requests.get(URL)
+    response = requests.get(URL, verify=False)
     
     assert response.status_code == 422
     
@@ -257,7 +257,7 @@ def test_arms_exports_by_country_status_code():
         "currency": "EUR"
     }
     
-    response = requests.get(URL, params=PARAMS)
+    response = requests.get(URL, params=PARAMS, verify=False)
     
     assert response.status_code == 200
 
@@ -271,7 +271,7 @@ def test_arms_exports_by_country_request():
         "currency": "EUR"
     }
     
-    response = requests.get(URL, params=PARAMS).json()
+    response = requests.get(URL, params=PARAMS, verify=False).json()
     
     assert type(response) == list
     assert list(response[0].keys()) == ['name', 'value', 'full_name']
@@ -286,7 +286,7 @@ def test_arms_exports_by_country_request_missing():
         "currency": "EUR"
     }
     
-    response = requests.get(URL, params=PARAMS)
+    response = requests.get(URL, params=PARAMS, verify=False)
     
     assert response.json()['value'] == 'no data'
     
@@ -295,7 +295,7 @@ def test_arms_imports_total_endpoint_status_code():
     ENDPOINT = "/arms/imports/total"
     URL = f'https://{API_HOST}:{API_PORT}{ENDPOINT}'
     
-    response = requests.get(URL)
+    response = requests.get(URL, verify=False)
     
     assert response.status_code == 422
     
@@ -309,7 +309,7 @@ def test_arms_imports_total_request_status_code():
         "currency": "EUR"
     }
     
-    response = requests.get(URL, params=PARAMS)
+    response = requests.get(URL, params=PARAMS, verify=False)
     
     assert response.status_code == 200
 
@@ -323,7 +323,7 @@ def test_arms_imports_total_request():
         "currency": "EUR"
     }
     
-    response = requests.get(URL, params=PARAMS)
+    response = requests.get(URL, params=PARAMS, verify=False)
     
     assert response.json()['value'] == 112_625_579
     
@@ -337,7 +337,7 @@ def test_arms_imports_total_request_missing():
         "currency": "EUR"
     }
     
-    response = requests.get(URL, params=PARAMS)
+    response = requests.get(URL, params=PARAMS, verify=False)
     
     assert response.json()['value'] == 'no data'
     
@@ -346,7 +346,7 @@ def test_arms_exports_timeseries_endpoint_status_code():
     ENDPOINT = "/arms/imports/timeseries"
     URL = f'https://{API_HOST}:{API_PORT}{ENDPOINT}'
     
-    response = requests.get(URL)
+    response = requests.get(URL, verify=False)
     
     assert response.status_code == 422
     
@@ -359,7 +359,7 @@ def test_arms_imports_total_timeseries_status_code():
         "currency": "EUR"
     }
     
-    response = requests.get(URL, params=PARAMS)
+    response = requests.get(URL, params=PARAMS, verify=False)
     
     assert response.status_code == 200
 
@@ -372,7 +372,7 @@ def test_arms_imports_timeseries_request():
         "currency": "EUR"
     }
     
-    response = requests.get(URL, params=PARAMS).json()
+    response = requests.get(URL, params=PARAMS, verify=False).json()
     
     assert type(response) == list
     assert list(response[0].keys()) == ['year', 'value']
@@ -386,7 +386,7 @@ def test_arms_imports_timeseries_request_missing():
         "currency": "EUR"
     }
     
-    response = requests.get(URL, params=PARAMS)
+    response = requests.get(URL, params=PARAMS, verify=False)
     
     assert response.json()['value'] == 'no data'
     
@@ -395,7 +395,7 @@ def test_arms_imports_by_ountry_endpoint_status_code():
     ENDPOINT = "/arms/imports/by_country"
     URL = f'https://{API_HOST}:{API_PORT}{ENDPOINT}'
     
-    response = requests.get(URL)
+    response = requests.get(URL, verify=False)
     
     assert response.status_code == 422
     
@@ -409,7 +409,7 @@ def test_arms_imports_by_country_status_code():
         "currency": "EUR"
     }
     
-    response = requests.get(URL, params=PARAMS)
+    response = requests.get(URL, params=PARAMS, verify=False)
     
     assert response.status_code == 200
 
@@ -423,7 +423,7 @@ def test_arms_imports_by_country_request():
         "currency": "EUR"
     }
     
-    response = requests.get(URL, params=PARAMS).json()
+    response = requests.get(URL, params=PARAMS, verify=False).json()
     
     assert type(response) == list
     assert list(response[0].keys()) == ['name', 'value', 'full_name']
@@ -438,7 +438,7 @@ def test_arms_imports_by_country_request_missing():
         "currency": "EUR"
     }
     
-    response = requests.get(URL, params=PARAMS)
+    response = requests.get(URL, params=PARAMS, verify=False)
     
     assert response.json()['value'] == 'no data'
     
@@ -447,7 +447,7 @@ def test_merchandise_exports_total_endpoint_status_code():
     ENDPOINT = "/merchandise/exports/total"
     URL = f'https://{API_HOST}:{API_PORT}{ENDPOINT}'
     
-    response = requests.get(URL)
+    response = requests.get(URL, verify=False)
     
     assert response.status_code == 422
     
@@ -460,7 +460,7 @@ def test_merchandise_exports_total_request_status_code():
         "year": 2020
     }
     
-    response = requests.get(URL, params=PARAMS)
+    response = requests.get(URL, params=PARAMS, verify=False)
     
     assert response.status_code == 200
 
@@ -473,7 +473,7 @@ def test_merchandise_exports_total_request():
         "year": 2020
     }
     
-    response = requests.get(URL, params=PARAMS)
+    response = requests.get(URL, params=PARAMS, verify=False)
     
     assert response.json()['value'] == 390_762.62845
     
@@ -486,7 +486,7 @@ def test_merchandise_exports_total_request_missing():
         "year": 1778
     }
     
-    response = requests.get(URL, params=PARAMS)
+    response = requests.get(URL, params=PARAMS, verify=False)
     
     assert response.json()['value'] == 'no data'
     
