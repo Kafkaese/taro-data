@@ -47,7 +47,7 @@
 50,Chile,The Republic of Chile,UN member state,CL,CHL,152,ISO 3166-2:CL,.cl
 51,China,The People's Republic of China,UN member state,CN,CHN,156,ISO 3166-2:CN,.cn
 53,Christmas Island,The Territory of Christmas Island,Australia,CX,CXR,162,ISO 3166-2:CX,.cx
-54,Cocos  Islands ,The Territory of Cocos  Islands,Australia,CC,CCK,166,ISO 3166-2:CC,.cc
+54,Cocos Islands ,The Territory of Cocos  Islands,Australia,CC,CCK,166,ISO 3166-2:CC,.cc
 55,Colombia,The Republic of Colombia,UN member state,CO,COL,170,ISO 3166-2:CO,.co
 56,Comoros ,The Union of the Comoros,UN member state,KM,COM,174,ISO 3166-2:KM,.km
 57,Congo ,The Democratic Republic of the Congo,UN member state,CD,COD,180,ISO 3166-2:CD,.cd
@@ -98,7 +98,7 @@
 106,Guyana,The Co-operative Republic of Guyana,UN member state,GY,GUY,328,ISO 3166-2:GY,.gy
 107,Haiti,The Republic of Haiti,UN member state,HT,HTI,332,ISO 3166-2:HT,.ht
 108,Heard Island and McDonald Islands,The Territory of Heard Island and McDonald Islands,Australia,HM,HMD,334,ISO 3166-2:HM,.hm
-109,Holy See ,The Holy See,UN observer state,VA,VAT,336,ISO 3166-2:VA,.va
+109,Vatican ,The Holy See,UN observer state,VA,VAT,336,ISO 3166-2:VA,.va
 110,Honduras,The Republic of Honduras,UN member state,HN,HND,340,ISO 3166-2:HN,.hn
 111,Hong Kong,The Hong Kong Special Administrative Region of China,China,HK,HKG,344,ISO 3166-2:HK,.hk
 112,Hungary,Hungary,UN member state,HU,HUN,348,ISO 3166-2:HU,.hu
@@ -118,11 +118,11 @@
 128,Kazakhstan,The Republic of Kazakhstan,UN member state,KZ,KAZ,398,ISO 3166-2:KZ,.kz
 129,Kenya,The Republic of Kenya,UN member state,KE,KEN,404,ISO 3166-2:KE,.ke
 130,Kiribati,The Republic of Kiribati,UN member state,KI,KIR,296,ISO 3166-2:KI,.ki
-131,Korea ,The Democratic People's Republic of Korea,UN member state,KP,PRK,408,ISO 3166-2:KP,.kp
-132,Korea ,The Republic of Korea,UN member state,KR,KOR,410,ISO 3166-2:KR,.kr
+131,North Korea ,The Democratic People's Republic of Korea,UN member state,KP,PRK,408,ISO 3166-2:KP,.kp
+132,South Korea ,The Republic of Korea,UN member state,KR,KOR,410,ISO 3166-2:KR,.kr
 133,Kuwait,The State of Kuwait,UN member state,KW,KWT,414,ISO 3166-2:KW,.kw
 134,Kyrgyzstan,The Kyrgyz Republic,UN member state,KG,KGZ,417,ISO 3166-2:KG,.kg
-135,Lao People's Democratic Republic ,The Lao People's Democratic Republic,UN member state,LA,LAO,418,ISO 3166-2:LA,.la
+135,Laos ,The Lao People's Democratic Republic,UN member state,LA,LAO,418,ISO 3166-2:LA,.la
 136,Latvia,The Republic of Latvia,UN member state,LV,LVA,428,ISO 3166-2:LV,.lv
 137,Lebanon,The Lebanese Republic,UN member state,LB,LBN,422,ISO 3166-2:LB,.lb
 138,Lesotho,The Kingdom of Lesotho,UN member state,LS,LSO,426,ISO 3166-2:LS,.ls
@@ -183,7 +183,7 @@
 195,Qatar,The State of Qatar,UN member state,QA,QAT,634,ISO 3166-2:QA,.qa
 199,Réunion,Réunion,France,RE,REU,638,ISO 3166-2:RE,.re
 200,Romania,Romania,UN member state,RO,ROU,642,ISO 3166-2:RO,.ro
-201,Russian Federation ,The Russian Federation,UN member state,RU,RUS,643,ISO 3166-2:RU,.ru
+201,Russia ,The Russian Federation,UN member state,RU,RUS,643,ISO 3166-2:RU,.ru
 202,Rwanda,The Republic of Rwanda,UN member state,RW,RWA,646,ISO 3166-2:RW,.rw
 205,Saint Barthélemy,The Collectivity of Saint-Barthélemy,France,BL,BLM,652,ISO 3166-2:BL,.bl
 206,Saint Helena Ascension Island Tristan da Cunha,"Saint Helena, Ascension and Tristan da Cunha",United Kingdom,SH,SHN,654,ISO 3166-2:SH,.sh
@@ -216,7 +216,7 @@
 235,Svalbard Jan Mayen,Svalbard and Jan Mayen,Norway,SJ,SJM,744,ISO 3166-2:SJ,
 236,Sweden,The Kingdom of Sweden,UN member state,SE,SWE,752,ISO 3166-2:SE,.se
 237,Switzerland,The Swiss Confederation,UN member state,CH,CHE,756,ISO 3166-2:CH,.ch
-238,Syrian Arab Republic ,The Syrian Arab Republic,UN member state,SY,SYR,760,ISO 3166-2:SY,.sy
+238,Syria ,The Syrian Arab Republic,UN member state,SY,SYR,760,ISO 3166-2:SY,.sy
 239,Taiwan ,The Republic of China,Disputed,TW,TWN,158,ISO 3166-2:TW,.tw
 240,Tajikistan,The Republic of Tajikistan,UN member state,TJ,TJK,762,ISO 3166-2:TJ,.tj
 241,Tanzania,The United Republic of Tanzania,UN member state,TZ,TZA,834,ISO 3166-2:TZ,.tz
