@@ -1,12 +1,17 @@
-import requests
+from curl_cffi import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import csv
 
 def democracy_index_scraper(out: str):
     url = 'https://en.wikipedia.org/w/index.php?title=The_Economist_Democracy_Index&oldid=1157018749'
-    
-    response = requests.get(url)
+
+    # Plain `reques ts` gets a 403 here even with a descriptive User-Agent -
+    # Wikimedia's anti-bot layer fingerprints the TLS/HTTP handshake itself,
+    # and requests' (urllib3's) handshake is a well-known bot signature
+    # regardless of headers. curl_cffi makes the request with a real
+    # browser's TLS fingerprint instead, while keeping a requests-like API.
+    response = requests.get(url, impersonate="chrome")
     
     soup = BeautifulSoup(response.content, 'html.parser')
     
@@ -37,14 +42,14 @@ def democracy_index_scraper(out: str):
 
         #info.append(tds[0].text.strip('\n'))
         
-        # Country name
+        # Country namet
         info.append(tds[2].find('a').text)
         
         # Regime type
-        info.append(tds[3].text.strip('\n'))
+        info.append(tds[5].text.strip('\n'))
         
         # Values for years
-        for td in tds[4:19]:
+        for td in tds[6:]:
             info.append(float(td.text))
             
         for column, info in zip(columns, info):
