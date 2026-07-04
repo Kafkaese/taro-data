@@ -1,5 +1,0 @@
-pandas
-fastapi
-uvicorn
-psycopg2
-sqlalchemy
