@@ -33,16 +33,17 @@ app.add_middleware(
 ## database connection
 
 host = os.environ['POSTGRES_HOST']
+port = os.environ.get('POSTGRES_PORT', 5432)
 dbname = os.environ['POSTGRES_DB']
 user = os.environ['POSTGRES_USER']
 password = os.environ['POSTGRES_PASSWORD']
 
 
 sslmode = "require"
-    
+
 # Construct connection string
 print(f"USING ENV: {os.environ['ENV']}")
-conn_string = f"postgresql+psycopg://{user}:{password}@{host}:{5432}/{dbname}"
+conn_string = f"postgresql+psycopg://{user}:{password}@{host}:{port}/{dbname}"
 
 # Cet up connecttion
 print(f"Connecting to: {conn_string}")

@@ -12,11 +12,12 @@ elif os.environ['ENV'] == 'test':
     conn_string = 'postgresql://postgres:password@localhost/postgres'
 else:
     host = "taro-server.postgres.database.azure.com"
+    port = os.environ.get('POSTGRES_PORT', 5432)
     dbname = "taro-db"
     user = "postgres"
     password = os.environ['POSTGRES_PASSWORD']
     sslmode = "require"
-    conn_string = f"postgresql+psycopg://{user}:{password}@{host}:{5432}/{dbname}"
+    conn_string = f"postgresql+psycopg://{user}:{password}@{host}:{port}/{dbname}"
 
 
 db = create_engine(conn_string)

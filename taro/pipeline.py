@@ -368,17 +368,18 @@ if __name__ == "__main__":
     # Connection string info
     
     host = os.environ['POSTGRES_HOST']
+    port = os.environ.get('POSTGRES_PORT', 5432)
     dbname = os.environ['POSTGRES_DB']
-    
+
     # Use tf vars if not local dev env
     user = os.environ['POSTGRES_USER']
     password = os.environ['POSTGRES_PASSWORD']
 
-    
+
     sslmode = "require"
-    
+
     # Construct connection string
-    conn_string = f"postgresql+psycopg://{user}:{password}@{host}:{5432}/{dbname}"
+    conn_string = f"postgresql+psycopg://{user}:{password}@{host}:{port}/{dbname}"
     
     print(conn_string)
     
