@@ -28,6 +28,17 @@ services:
     depends_on:
       taro-postgres:
         condition: service_healthy
+    develop:
+      watch:
+        - path: ./api
+          target: /api
+          action: sync+restart
+        - path: ./pyproject.toml
+          action: rebuild
+        - path: ./uv.lock
+          action: rebuild
+        - path: ./ssl
+          action: rebuild
 
   taro-frontend:
     build:
@@ -39,6 +50,21 @@ services:
       - taro
     ports:
       - ${REACT_PORT}:3000
+    develop:
+      watch:
+        - path: ../taro-map/src
+          target: /build/src
+          action: sync
+        - path: ../taro-map/public
+          target: /build/public
+          action: sync
+        - path: ../taro-map/assets
+          target: /build/assets
+          action: sync
+        - path: ../taro-map/package.json
+          action: rebuild
+        - path: ../taro-map/package-lock.json
+          action: rebuild
 
   taro-pipeline:
     build:
@@ -51,6 +77,14 @@ services:
     depends_on:
       taro-postgres:
         condition: service_healthy
+    develop:
+      watch:
+        - path: ./taro
+          action: rebuild
+        - path: ./pyproject.toml
+          action: rebuild
+        - path: ./uv.lock
+          action: rebuild
 
 volumes:
   data:
