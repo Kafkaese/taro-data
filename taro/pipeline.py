@@ -1,4 +1,4 @@
-import psycopg2
+import psycopg
 from sqlalchemy import create_engine, types
 from taro.scraper import democracy_index_scraper
 import pandas as pd
@@ -378,7 +378,7 @@ if __name__ == "__main__":
     sslmode = "require"
     
     # Construct connection string
-    conn_string = f"postgresql+psycopg2://{user}:{password}@{host}:{5432}/{dbname}"
+    conn_string = f"postgresql+psycopg://{user}:{password}@{host}:{5432}/{dbname}"
     
     print(conn_string)
     
