@@ -5,7 +5,7 @@ description = "Data pipelines and API backend for the arms-tracker app"
 authors = [
     { name = "Frederik Laubisch", email = "kafkaese@gmail.com" },
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.14"
 dependencies = [
     "beautifulsoup4==4.12.2",
     "curl_cffi==0.7.1",
