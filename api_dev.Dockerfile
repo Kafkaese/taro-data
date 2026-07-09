@@ -1,8 +1,14 @@
-FROM python:latest
+FROM python:3.14-slim
 
-COPY requirements_api.txt requirements.txt
+COPY --from=ghcr.io/astral-sh/uv:0.11.26 /uv /uvx /bin/
 
-RUN pip install -r requirements.txt
+ENV UV_LINK_MODE=copy \
+    UV_COMPILE_BYTECODE=1 \
+    UV_PYTHON_DOWNLOADS=never \
+    PATH="/.venv/bin:$PATH"
+
+COPY pyproject.toml uv.lock ./
+RUN uv sync --locked --no-dev --no-install-project --extra api
 
 COPY api/ api
 
