@@ -2,7 +2,7 @@
 from taro.pipeline import democracy_index_pipeline, peace_index_pipe, country_code_pipeline, country_info_pipeline
 import pandas as pd
 from sqlalchemy import create_engine
-import psycopg2
+import psycopg
 import os
 
 print(f"USING ENV: {os.environ['ENV']}")
@@ -16,7 +16,7 @@ else:
     user = "postgres"
     password = os.environ['POSTGRES_PASSWORD']
     sslmode = "require"
-    conn_string = f"postgresql+psycopg2://{user}:{password}@{host}:{5432}/{dbname}"
+    conn_string = f"postgresql+psycopg://{user}:{password}@{host}:{5432}/{dbname}"
 
 
 db = create_engine(conn_string)

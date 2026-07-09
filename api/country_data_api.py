@@ -42,7 +42,7 @@ sslmode = "require"
     
 # Construct connection string
 print(f"USING ENV: {os.environ['ENV']}")
-conn_string = f"postgresql+psycopg2://{user}:{password}@{host}:{5432}/{dbname}"
+conn_string = f"postgresql+psycopg://{user}:{password}@{host}:{5432}/{dbname}"
 
 # Cet up connecttion
 print(f"Connecting to: {conn_string}")
