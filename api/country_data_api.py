@@ -17,8 +17,8 @@ else:
         origins = [
         "https://localhost",
         "https://localhost:3000",
-        "localhost",
-        "localhost:3000"
+        "http://localhost",
+        "http://localhost:3000",
     ]
 
 app.add_middleware(
@@ -58,7 +58,7 @@ VALID_CURRENCIES = ['EUR', 'USD']
 @app.get("/")
 async def root():
     
-    return {'status': 200}
+    return {'status': 200, 'watch_test': 'live'}
 
 # metadata path endpoints
 
