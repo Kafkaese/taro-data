@@ -58,7 +58,7 @@ VALID_CURRENCIES = ['EUR', 'USD']
 @app.get("/")
 async def root():
     
-    return {'status': 200, 'watch_test': 'live'}
+    return {'status': 200}
 
 # metadata path endpoints
 
