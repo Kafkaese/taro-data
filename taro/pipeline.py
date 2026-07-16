@@ -380,28 +380,37 @@ if __name__ == "__main__":
 
     # Construct connection string
     conn_string = f"postgresql+psycopg://{user}:{password}@{host}:{port}/{dbname}"
-    
+
     print(conn_string)
-    
+
     # Create connection
     db = create_engine(conn_string)
     conn = db.connect()
 
-    
+    # CSVs live in S3 now rather than being committed to git and baked into
+    # the image at build time - this bucket is the source of truth,
+    # versioned there instead of in git history. Credentials are resolved
+    # automatically via the instance's IAM role (see s3fs/boto3's default
+    # credential chain), nothing to configure here.
+    s3_bucket = os.environ['S3_DATA_BUCKET']
+
+    def s3_path(filename: str) -> str:
+        return f"s3://{s3_bucket}/{filename}"
+
     # Run all pipelines
-    
+
     # These two pipelines normally source from the SIPRI dataset. Since currently the data can not be used
     # due to unresolved licensing, it just writes the CAAT data into these two tables as well,
     # which will result in no added behaviour, but keeps the code ready for the SIPRI data
-    import_data_pipeline(db_conn = conn, csv_path = '../data/arms.csv')
-    export_data_pipeline(db_conn = conn, csv_path = '../data/arms.csv')
-    
-    democracy_index_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path='../data/democracy_index.csv')
-    
-    peace_index_pipe(source='csv', dest='postgres', csv_path=os.path.join(os.path.dirname(__file__),'../raw_data/GPI-2022-overall-scores-and-domains-2008-2022.csv'), db_conn=conn)
-    
-    merch_export_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path='../data/total_merchandise_exports.csv')
-    
-    arms_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path = '../data/arms.csv')
-    
-    country_name_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path = '../data/countries_info.csv')
+    import_data_pipeline(db_conn = conn, csv_path = s3_path('arms.csv'))
+    export_data_pipeline(db_conn = conn, csv_path = s3_path('arms.csv'))
+
+    democracy_index_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path=s3_path('democracy_index.csv'))
+
+    peace_index_pipe(source='csv', dest='postgres', csv_path=s3_path('GPI-2022-overall-scores-and-domains-2008-2022.csv'), db_conn=conn)
+
+    merch_export_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path=s3_path('total_merchandise_exports.csv'))
+
+    arms_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path = s3_path('arms.csv'))
+
+    country_name_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path = s3_path('countries_info.csv'))
