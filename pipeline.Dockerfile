@@ -12,9 +12,8 @@ COPY pyproject.toml uv.lock ./
 COPY taro/ taro
 RUN uv sync --locked --no-dev
 
-# Copy csv data
-COPY data/ data
-COPY raw_data/ raw_data
+# CSVs come from S3 at run time (see S3_DATA_BUCKET in pipeline.py) rather
+# than being baked into the image here.
 
 # Run pipelines
 CMD ["python", "/taro/pipeline.py"]
