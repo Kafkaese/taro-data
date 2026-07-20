@@ -21,6 +21,7 @@ dependencies = [
 [project.optional-dependencies]
 api = [
     "uvicorn>=0.51.0,<0.52",
+    "mangum",
 ]
 
 [dependency-groups]
