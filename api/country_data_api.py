@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import create_engine, sql
+from mangum import Mangum
 import os
 
 app = FastAPI()
@@ -45,10 +46,17 @@ sslmode = "require"
 print(f"USING ENV: {os.environ['ENV']}")
 conn_string = f"postgresql+psycopg://{user}:{password}@{host}:{port}/{dbname}"
 
-# Cet up connecttion
+# pool_pre_ping validates a pooled connection before handing it out and
+# transparently reconnects if it's gone stale. Matters specifically for
+# Lambda: an execution environment can sit frozen between invocations for
+# long enough that Postgres (or something in between) has already closed
+# the connection by the time it thaws, and without this the first request
+# after a freeze would silently fail. Connections are also now acquired
+# per-request (see each endpoint) instead of one held for the process's
+# entire lifetime, which used to mean every concurrent request shared a
+# single connection object.
 print(f"Connecting to: {conn_string}")
-db = create_engine(conn_string)
-conn = db.connect()
+db = create_engine(conn_string, pool_pre_ping=True)
 
 # valid currencies
 VALID_CURRENCIES = ['EUR', 'USD']
@@ -57,83 +65,71 @@ VALID_CURRENCIES = ['EUR', 'USD']
 
 @app.get("/")
 async def root():
-    
+
     return {'status': 200}
 
 # metadata path endpoints
 
 @app.get("/metadata/name/short")
 async def short_name(country_code):
-    
-    global conn
-        
+
     query = sql.text('''select short_name from country_names where "Alpha-2 code" = :c;''')
-    
+
     try:
-        cursor = conn.execute(query, parameters = {'c': country_code})
-        
-        result = cursor.fetchall()
-    
+        with db.connect() as conn:
+            cursor = conn.execute(query, parameters = {'c': country_code})
+            result = cursor.fetchall()
+
         if result == []:
             return {'value': 'no data'}
-        
-        return {'value': result[0][0]} 
-    
+
+        return {'value': result[0][0]}
+
     # if year < 2008 throws error because columns does not exist
     except:
-        conn.close()
-        conn = db.connect()
         return {'value': 'no data'}
-    
+
 @app.get("/metadata/democracy_index")
 async def democracy_index(country_code, year):
 
-    global conn
-    
     # columns cannot be passed as parameters
     query = sql.text(f'''select "{year}" from democracy_index where "Alpha-2 code" = :c;''')
-    
+
     try:
-        cursor = conn.execute(query, parameters = {'c': country_code})
-        
-        result = cursor.fetchall()
-    
+        with db.connect() as conn:
+            cursor = conn.execute(query, parameters = {'c': country_code})
+            result = cursor.fetchall()
+
         if result == []:
             return {'value': 'no data'}
-        
-        return {'value': result[0][0]} 
-    
+
+        return {'value': result[0][0]}
+
     # if year < 2008 throws error because columns does not exist
     except:
-        conn.close()
-        conn = db.connect()
         return {'value': 'no data'}
-    
+
 @app.get("/metadata/peace_index")
 async def peace_index(country_code, year):
 
-    global conn
-
     # columns cannot be passed as parameters
     query = sql.text(f'''select "{year}" from peace_index where "Alpha-2 code" = :c;''')
-    
+
     try:
-        cursor = conn.execute(query, parameters = {'c': country_code})
-        
-        result = cursor.fetchall()
-    
+        with db.connect() as conn:
+            cursor = conn.execute(query, parameters = {'c': country_code})
+            result = cursor.fetchall()
+
         if result == []:
             return {'value': 'no data'}
-        
-        return {'value': result[0][0]} 
-    
+
+        return {'value': result[0][0]}
+
     # if year < 2008 throws error because columns does not exist
     except:
-        conn.close()
-        conn = db.connect()
         return {'value': 'no data'}
-    
-    
+
+
 
 # arms path endpoints
 
@@ -141,48 +137,43 @@ async def peace_index(country_code, year):
 
 @app.get("/arms/exports/total")
 async def arms_exports_total(country_code, year, currency):
-   
-    global conn
-   
+
     print('HERE', flush=True)
     if currency in VALID_CURRENCIES :
         query = sql.text(f'''select SUM("{currency}") from arms where "Source country" = :c and "Year" = :y;''')
         backup_query = sql.text(f'''select "{currency}" from exports where "Source country" = :c and "Year" = :y;''')
     else:
         return {'value': 'no data'}
-        
+
     print(query)
-    
+
     try:
-        cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
-        
-        result = cursor.fetchall()
-        
-        # If aggregate function is used, result will not be empty, but NULL
-        if result[0] == (None,):
-            
-            # Query exports table if no data was found on arms table
-            cursor = conn.execute(backup_query, parameters = {'c': country_code, 'y': year})
+        with db.connect() as conn:
+            cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
             result = cursor.fetchall()
-            
-            # Still nothing? -> no data
-            if result == []:
-                return {'value': 'no data'}
-        
-        return {'value': result[0][0]}    
+
+            # If aggregate function is used, result will not be empty, but NULL
+            if result[0] == (None,):
+
+                # Query exports table if no data was found on arms table
+                cursor = conn.execute(backup_query, parameters = {'c': country_code, 'y': year})
+                result = cursor.fetchall()
+
+                # Still nothing? -> no data
+                if result == []:
+                    return {'value': 'no data'}
+
+        return {'value': result[0][0]}
     except:
-        conn.close()
-        conn = db.connect()
         return {'value': 'no data'}
 
 
 
 @app.get("/arms/exports/timeseries")
 async def arms_exports_timeseries(country_code, currency):
-    global conn
-    
+
     if currency in VALID_CURRENCIES:
-        query = sql.text(f'''select coalesce (arms."Year", exports."Year"), coalesce (arms.sum, exports.sum) from 
+        query = sql.text(f'''select coalesce (arms."Year", exports."Year"), coalesce (arms.sum, exports.sum) from
             (
             select "Year", SUM("{currency}") from arms
                             where "Source country" = :c
@@ -194,24 +185,23 @@ async def arms_exports_timeseries(country_code, currency):
             select "Year", SUM("{currency}") from exports
             where "Source country" = :c
             group by "Year"
-            order by "Year" asc 
+            order by "Year" asc
             ) as exports
             on arms."Year" = exports."Year" ;''')
     else:
         return {'value': 'no data'}
-    
+
     try:
-        cursor = conn.execute(query, parameters = {'c': country_code})
-        result = cursor.fetchall()
-        
+        with db.connect() as conn:
+            cursor = conn.execute(query, parameters = {'c': country_code})
+            result = cursor.fetchall()
+
         if result == []:
             return {'value': 'no data'}
-      
+
         return [{'year': year[0], 'value': int(year[1])} for year in result]
-    
+
     except:
-        conn.close()
-        conn = db.connect()
         return {'value': 'no data'}
 
 # Gets export data for a country on a given year, listing values for source counries seperately
@@ -219,21 +209,19 @@ async def arms_exports_timeseries(country_code, currency):
 async def arms_exports_by_country(country_code, year, currency, limit=300):
     '''
     Gets export data for a country on a given year, listing values for source countries seperately.
-    
+
     Paramaters:
         country_code (string): Alpha-2 country code
         year (string): Year of the data
-    
+
         limit (int): Number of source countries to return. Returns top n by export value for the given year.
 
     Returns:
-        Dictionary or List of Dictionaries: 
+        Dictionary or List of Dictionaries:
              Individual country information in dictionary with: {name, value, full_name}
              Single dictionary with {'value': 'no data'} in case of missing data.
     '''
-    
-    global conn
-    
+
     if currency in VALID_CURRENCIES:
         query = sql.text(f'''select "Destination country", "{currency}", "short_name" from arms
             join country_names on "Destination country"="Alpha-2 code"
@@ -241,66 +229,61 @@ async def arms_exports_by_country(country_code, year, currency, limit=300):
             order by "{currency}" desc limit :l;''')
     else:
         return {'value': 'no data'}
-    
+
     try:
-        cursor = conn.execute(query, parameters = {'c': country_code, 'y': year, 'l': limit})
-        result = cursor.fetchall()
-        
+        with db.connect() as conn:
+            cursor = conn.execute(query, parameters = {'c': country_code, 'y': year, 'l': limit})
+            result = cursor.fetchall()
+
         if result == []:
             return {'value': 'no data'}
-        
+
         return [{'name': country[0], 'value': country[1], 'full_name': country[2]} for country in result]
     except:
-        conn.close()
-        conn = db.connect()
         return {'value': 'no data'}
-    
+
 # arms/import path endpoints
 
 @app.get("/arms/imports/total")
 async def arms_imports_total(country_code, currency, year):
-    
-    global conn
+
     if currency in VALID_CURRENCIES:
         query = sql.text(f'''select SUM("{currency}") from arms where "Destination country" = :c and "Year" = :y;''')
     else:
         return {'value': 'no data'}
-        
+
     try:
-        cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
-        result = cursor.fetchall()
-        
-         # If aggregate function is used, result will not be empty, but NULL
-        if result[0] == (None,):
-            
-            return {'value': 'no data'}
-        
+        with db.connect() as conn:
+            cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
+            result = cursor.fetchall()
+
+            # If aggregate function is used, result will not be empty, but NULL
+            if result[0] == (None,):
+
+                return {'value': 'no data'}
+
         return {'value': result[0][0]}
     except:
-        conn.close()
-        conn = db.connect()
         return {'value': 'no data'}
-    
+
 
 @app.get("/arms/imports/by_country")
 async def arms_imports_by_country(country_code, year, currency, limit=300):
     '''
     Gets import data for a country on a given year, listing values for source countries seperately.
-    
+
     Paramaters:
         country_code (string): Alpha-2 country code
         year (string): Year of the data
-    
+
         limit (int): Number of source countries to return. Returns top n by import value for the given year.
 
     Returns:
-        Dictionary or List of Dictionaries: 
+        Dictionary or List of Dictionaries:
              Individual country information in dictionary with: {name, value, full_name}
              Single dictionary with {'value': 'no data'} in case of missing data.
     '''
-    
-    global conn
-    
+
     if currency in VALID_CURRENCIES:
         query = sql.text(f'''select "Source country", "{currency}", "short_name" from arms
         join country_names on "Source country"="Alpha-2 code"
@@ -310,26 +293,24 @@ async def arms_imports_by_country(country_code, year, currency, limit=300):
         return {'value': 'no data'}
 
     try:
-        cursor = conn.execute(query, parameters = {'c': country_code, 'v': currency, 'y': year, 'l': limit})
-        result = cursor.fetchall()
-        
+        with db.connect() as conn:
+            cursor = conn.execute(query, parameters = {'c': country_code, 'v': currency, 'y': year, 'l': limit})
+            result = cursor.fetchall()
+
         if result == []:
             return {'value': 'no data'}
-        
+
         return [{'name': country[0], 'value': country[1], 'full_name': country[2]} for country in result]
     except:
-        conn.close()
-        conn = db.connect()
         return {'value': 'no data'}
-    
+
 # Gets time series of total import values per year for a given country
 @app.get("/arms/imports/timeseries")
 async def arms_imports_timeseries(country_code, currency):
-    global conn
-    
+
     if currency in VALID_CURRENCIES:
 
-        query = sql.text(f'''select coalesce (arms."Year", imports."Year"), coalesce (arms.sum, imports.sum) from 
+        query = sql.text(f'''select coalesce (arms."Year", imports."Year"), coalesce (arms.sum, imports.sum) from
             (
             select "Year", SUM("{currency}") from arms
                             where "Destination country" = :c
@@ -341,49 +322,50 @@ async def arms_imports_timeseries(country_code, currency):
             select "Year", SUM("{currency}") from imports
             where "Destination country" = :c
             group by "Year"
-            order by "Year" asc 
+            order by "Year" asc
             ) as imports
             on arms."Year" = imports."Year" ;''')
     else:
         return {'value': 'no data'}
 
-            
+
     try:
-        cursor = conn.execute(query, parameters = {'c': country_code})
-        result = cursor.fetchall()
-        
+        with db.connect() as conn:
+            cursor = conn.execute(query, parameters = {'c': country_code})
+            result = cursor.fetchall()
+
         if result == []:
             return {'value': 'no data'}
-      
+
         return [{'year': year[0], 'value': int(year[1])} for year in result]
-    
+
     except:
-        conn.close()
-        conn = db.connect()
         return {'value': 'no data'}
-    
-    
+
+
 # merchandise path endpoints
 # NOT IN USE CURRENTLY. Needs to be updatedd for USD values if reactivated
 @app.get("/merchandise/exports/total")
 async def exports_merchandise_year(country_code, year):
 
-    global conn
-    
     query = sql.text('''select SUM(export_value) from merchandise_exports
         join country_names as cn on "country_id" = cn."index"
         where "Alpha-2 code" = :c and year = :y;''')
-    
-    cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
-    
+
     try:
-        result = cursor.fetchall()
-  
+        with db.connect() as conn:
+            cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
+            result = cursor.fetchall()
+
         if result[0] == (None,):
             return {'value': 'no data'}
-        
-        return {'value': result[0][0]}    
+
+        return {'value': result[0][0]}
     except:
-        conn.close()
-        conn = db.connect()
         return {'value': 'no data'}
+
+
+# Lambda entrypoint - translates between API Gateway's event/context shape
+# and the ASGI interface FastAPI expects. Unused for local/container
+# deployment (api.Dockerfile runs uvicorn directly against `app`).
+handler = Mangum(app)
