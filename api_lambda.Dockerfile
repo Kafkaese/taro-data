@@ -19,7 +19,11 @@ RUN uv export --locked --no-dev --extra api --no-emit-project --format requireme
 
 COPY api/ "${LAMBDA_TASK_ROOT}/api"
 
-# ENVs needed to be provided at runtime (same as api.Dockerfile):
-# ENV, POSTGRES_HOST, POSTGRES_PORT, POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB
+# ENVs needed to be provided at runtime:
+# ENV, POSTGRES_HOST, POSTGRES_PORT, POSTGRES_USER, POSTGRES_DB,
+# POSTGRES_PASSWORD_PARAM (SSM parameter name - fetched+decrypted at module
+# load via the function's own IAM role, see aws_lambda.tf's api_ssm_param_read
+# policy in taro-tf; NOT the same contract as api.Dockerfile, which still
+# takes a plain POSTGRES_PASSWORD for local/docker-compose use)
 
 CMD ["api.country_data_api.handler"]
