@@ -37,7 +37,20 @@ host = os.environ['POSTGRES_HOST']
 port = os.environ.get('POSTGRES_PORT', 5432)
 dbname = os.environ['POSTGRES_DB']
 user = os.environ['POSTGRES_USER']
-password = os.environ['POSTGRES_PASSWORD']
+
+# In Lambda, the password isn't passed directly as an env var - only the
+# name of the SSM parameter holding it is, and this fetches+decrypts it at
+# module load time (once per execution environment, not per-request, since
+# Lambda reuses warm environments across invocations). Falls back to a
+# plain POSTGRES_PASSWORD for local/docker-compose dev, which has no SSM
+# access and no reason to need it.
+password_param = os.environ.get('POSTGRES_PASSWORD_PARAM')
+if password_param:
+    import boto3
+    ssm = boto3.client('ssm')
+    password = ssm.get_parameter(Name=password_param, WithDecryption=True)['Parameter']['Value']
+else:
+    password = os.environ['POSTGRES_PASSWORD']
 
 
 sslmode = "require"
