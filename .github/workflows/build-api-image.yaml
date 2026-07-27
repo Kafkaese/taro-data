@@ -41,6 +41,14 @@ jobs:
           file: api_lambda.Dockerfile
           platforms: linux/arm64
           push: true
+          # Lambda's container image support only understands the older
+          # Docker Image Manifest v2/Schema2 format, not OCI. build-push-action
+          # defaults to generating a provenance attestation, which forces the
+          # push into an OCI image index Lambda's CreateFunction rejects
+          # outright ("image manifest ... not supported") - unrelated to
+          # whether the image itself is otherwise correct.
+          provenance: false
+          sbom: false
           tags: |
             ${{ steps.ecr-login.outputs.registry }}/taro:api
             ${{ steps.ecr-login.outputs.registry }}/taro:api-${{ github.sha }}
