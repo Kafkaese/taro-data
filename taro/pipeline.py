@@ -407,7 +407,7 @@ if __name__ == "__main__":
 
     democracy_index_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path=s3_path('democracy_index.csv'))
 
-    peace_index_pipe(source='csv', dest='postgres', csv_path=s3_path('GPI-2022-overall-scores-and-domains-2008-2022.csv'), db_conn=conn)
+    #peace_index_pipe(source='csv', dest='postgres', csv_path=s3_path('GPI-2022-overall-scores-and-domains-2008-2022.csv'), db_conn=conn)
 
     merch_export_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path=s3_path('total_merchandise_exports.csv'))
 
