@@ -8,6 +8,7 @@ on:
       - 'taro/**'
       - 'pyproject.toml'
       - 'uv.lock'
+  workflow_dispatch: {}
 
 permissions:
   id-token: write   # required to request the OIDC token
