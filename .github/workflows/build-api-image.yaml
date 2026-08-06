@@ -9,6 +9,7 @@ on:
       - 'pyproject.toml'
       - 'uv.lock'
       - .github/workflows/build-api-image.yaml
+  workflow_dispatch: {}
 
 permissions:
   id-token: write   # required to request the OIDC token
