@@ -260,6 +260,27 @@ async def arms_exports_by_country(country_code, year, currency, limit=300):
     except:
         return {'value': 'no data'}
 
+# Gets the list of source countries that have any export data for a given
+# year, so the frontend can grey out countries with nothing to show without
+# a per-country round trip. Not currency-scoped: data presence doesn't
+# depend on display currency. Always returns a bare array (empty if none),
+# unlike the other endpoints above which return {'value': 'no data'}.
+@app.get("/arms/exports/available")
+async def arms_exports_available(year):
+
+    query = sql.text('''select distinct "Source country" from arms where "Year" = :y
+        union
+        select distinct "Source country" from exports where "Year" = :y;''')
+
+    try:
+        with db.connect() as conn:
+            cursor = conn.execute(query, parameters = {'y': year})
+            result = cursor.fetchall()
+
+        return [country[0] for country in result if country[0] is not None]
+    except:
+        return []
+
 # arms/import path endpoints
 
 @app.get("/arms/imports/total")
@@ -359,6 +380,25 @@ async def arms_imports_timeseries(country_code, currency):
 
     except:
         return {'value': 'no data'}
+
+# Gets the list of destination countries that have any import data for a
+# given year - see /arms/exports/available above for why this shape (bare
+# array, no currency param) differs from the other arms endpoints.
+@app.get("/arms/imports/available")
+async def arms_imports_available(year):
+
+    query = sql.text('''select distinct "Destination country" from arms where "Year" = :y
+        union
+        select distinct "Destination country" from imports where "Year" = :y;''')
+
+    try:
+        with db.connect() as conn:
+            cursor = conn.execute(query, parameters = {'y': year})
+            result = cursor.fetchall()
+
+        return [country[0] for country in result if country[0] is not None]
+    except:
+        return []
 
 
 # merchandise path endpoints
