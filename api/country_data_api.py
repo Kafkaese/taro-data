@@ -11,8 +11,13 @@ app = FastAPI()
 env = os.environ['ENV']
 
 if env == 'production':
+    # dev.arms-tracker.app deliberately shares this same backend rather than
+    # getting its own - the API is entirely read-only (allow_methods=["GET"]
+    # below), so there's no write-isolation reason to stand up a separate
+    # one just for a dev frontend to hit.
     origins = ["https://www.arms-tracker.app",
-               "https://arms-tracker.app"]
+               "https://arms-tracker.app",
+               "https://dev.arms-tracker.app"]
 
 else:
         origins = [
