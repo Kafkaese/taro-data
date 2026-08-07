@@ -1,4 +1,4 @@
-name: Build, push and deploy taro-data images
+name: Build, push and deploy API image
 
 on:
   push:
@@ -7,8 +7,6 @@ on:
       - 'api_lambda.Dockerfile'
       - 'api/**'
       - 'tests/**'
-      - 'pipeline.Dockerfile'
-      - 'taro/**'
       - 'pyproject.toml'
       - 'uv.lock'
       - .github/workflows/build-api-image.yaml
@@ -19,7 +17,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: taro-data-release
+  group: api-image-build
   cancel-in-progress: true
 
 jobs:
@@ -30,10 +28,14 @@ jobs:
   test:
     uses: ./.github/workflows/test.yaml
 
-  # Runs in parallel with test/ rather than after it, since both only need
-  # the checked-out code - deploy-dev is what actually waits on both
-  # succeeding.
-  build-api:
+  # A strictly linear chain (test -> build-dev -> deploy-dev -> build-prod
+  # -> deploy-prod) rather than build-once-promote: build-prod is a fresh
+  # build+push of the same commit, not a re-deploy of build-dev's image, and
+  # it's gated behind manual approval exactly like deploy-prod is - so
+  # nothing prod-bound (image included) happens without a human clicking
+  # approve first.
+  build-dev:
+    needs: test
     runs-on: ubuntu-latest
     outputs:
       image_uri: ${{ steps.image.outputs.uri }}
@@ -71,19 +73,19 @@ jobs:
             ${{ steps.ecr-login.outputs.registry }}/taro:api
             ${{ steps.ecr-login.outputs.registry }}/taro:api-${{ github.sha }}
 
-      # Digest-pinned rather than the moving :api tag - deploy-dev and
-      # deploy-prod below both deploy this exact reference directly via
-      # `aws lambda update-function-code --image-uri`, so which build is
-      # live is never ambiguous the way a shared mutable tag would be.
-      # Terraform's aws_lambda_function.api/.api_dev deliberately can't do
-      # this part - image_uri = "<repo>:api" is a tag string that never
-      # changes even as the tag's digest moves, so a plain `terraform apply`
-      # can never detect a new push. See MIGRATION.md.
+      # Digest-pinned rather than the moving :api tag - deploy-dev below
+      # deploys this exact reference directly via `aws lambda
+      # update-function-code --image-uri`, so which build is live is never
+      # ambiguous the way a shared mutable tag would be. Terraform's
+      # aws_lambda_function.api deliberately can't do this part - image_uri
+      # = "<repo>:api" is a tag string that never changes even as the tag's
+      # digest moves, so a plain `terraform apply` can never detect a new
+      # push. See MIGRATION.md.
       - id: image
         run: echo "uri=${{ steps.ecr-login.outputs.registry }}/taro@${{ steps.build.outputs.digest }}" >> "$GITHUB_OUTPUT"
 
   deploy-dev:
-    needs: [test, build-api]
+    needs: build-dev
     runs-on: ubuntu-latest
     steps:
       - uses: aws-actions/configure-aws-credentials@v4
@@ -96,31 +98,29 @@ jobs:
         run: |
           aws lambda update-function-code \
             --function-name taro-dev-api \
-            --image-uri ${{ needs.build-api.outputs.image_uri }} \
+            --image-uri ${{ needs.build-dev.outputs.image_uri }} \
             > /dev/null
           aws lambda wait function-updated --function-name taro-dev-api
 
-  # Folded in from the formerly-standalone build-pipeline-image.yaml -
-  # deliberately sequenced after deploy-dev rather than run in parallel
-  # with build-api/test like before: the dev API deploy having gone out
-  # cleanly is treated as this branch's basic health check, and the
-  # pipeline image shouldn't get pushed (nor prod get promoted) off a
-  # commit that failed it. Own IAM role (taro-github-actions-pipeline-build,
-  # separate from the API build/deploy role) - same "one identity per
-  # concern" reasoning as before, this just changes when the job runs, not
-  # which credential it runs as. No provenance:false/sbom:false here -
-  # that's a Lambda-specific OCI-format requirement; this image only ever
-  # runs via a plain `docker run` on the EC2 Postgres instance, which
-  # handles OCI images fine.
-  build-pipeline:
+  # Only starts once deploy-dev succeeds, and pauses for manual approval in
+  # the Actions UI before it does - the "production" environment has a
+  # required-reviewer protection rule configured in the repo settings (not
+  # something expressible in this YAML file itself), which is what actually
+  # creates the gate. Unlike build-dev, this build doesn't start - and
+  # nothing gets pushed to ECR under the :api tag as "the latest prod
+  # build" - until that approval happens.
+  build-prod:
     needs: deploy-dev
+    environment: production
     runs-on: ubuntu-latest
+    outputs:
+      image_uri: ${{ steps.image.outputs.uri }}
     steps:
       - uses: actions/checkout@v4
 
       - uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/taro-github-actions-pipeline-build
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/taro-github-actions-api-build
           aws-region: eu-central-1
           role-duration-seconds: 900
 
@@ -130,24 +130,24 @@ jobs:
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
 
-      - uses: docker/build-push-action@v6
+      - id: build
+        uses: docker/build-push-action@v6
         with:
           context: .
-          file: pipeline.Dockerfile
+          file: api_lambda.Dockerfile
           platforms: linux/arm64
           push: true
+          provenance: false
+          sbom: false
           tags: |
-            ${{ steps.ecr-login.outputs.registry }}/taro:pipeline
-            ${{ steps.ecr-login.outputs.registry }}/taro:pipeline-${{ github.sha }}
+            ${{ steps.ecr-login.outputs.registry }}/taro:api
+            ${{ steps.ecr-login.outputs.registry }}/taro:api-${{ github.sha }}
 
-  # Only runs once deploy-dev and build-pipeline succeed, and pauses for
-  # manual approval in the Actions UI before it does - the "production"
-  # environment has a required-reviewer protection rule configured in the
-  # repo settings (not something expressible in this YAML file itself),
-  # which is what actually creates the gate. Same pattern as taro-map's
-  # deploy-frontend.yaml.
+      - id: image
+        run: echo "uri=${{ steps.ecr-login.outputs.registry }}/taro@${{ steps.build.outputs.digest }}" >> "$GITHUB_OUTPUT"
+
   deploy-prod:
-    needs: [build-api, deploy-dev, build-pipeline]
+    needs: build-prod
     environment: production
     runs-on: ubuntu-latest
     steps:
@@ -161,6 +161,6 @@ jobs:
         run: |
           aws lambda update-function-code \
             --function-name taro-production-api \
-            --image-uri ${{ needs.build-api.outputs.image_uri }} \
+            --image-uri ${{ needs.build-prod.outputs.image_uri }} \
             > /dev/null
           aws lambda wait function-updated --function-name taro-production-api
