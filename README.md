@@ -28,14 +28,5 @@ The configuration consists of services for the API, a postgresql server and the 
  In order to be able to have ssl encryption in the development stage already, the neccesary files for this are also in this repository. This ssl certificate and key are locally trusted only and serve allow the development of ssl-encrypted content locally. The cerficate and key were created with <a href=https://github.com/FiloSottile/mkcert>mkcert</a>.
 
  <h4>Continious Integration</h4>
- Due to the microservice architecture of the appllication and the subsequent splitting of the code into several repositories, part of the CI pipeline is in this repository. Specifically, a Test Environment that is run every time a non-draft pull-request into the main branch of the taro-data respository is opened or synchronized. For this purpose a Github Actions workflow is used.
- The workflow uses <a href=https://www.terraform.io/>Terraform</a> to provision a Test Environment on <a href=https://www.terraform.io/>Microsoft Azure</a>. This includes:
- <br></br>
-
- - A Resource Group.
- - A Container Registry. 
- - A Postgresql Flexible Server
- - A Container Group
-
-After the environment has been provisioned, the images for the API and the Data Pipelines are build and pushed to the container registry and the Pipeline is run.  Then the  Container Group starts an instance of the API image and the tests can be run. In a final step, no matter what the outcome of any previous  steps, the Test Environment is destroyed. This is in  order to minimize the costs of the infrastructure. 
+ CI runs via Github Actions. A pytest suite runs against every pull request into the main branch (the DB layer is mocked, so no live infrastructure is provisioned for this). On push to main, the API and Pipeline images are built and pushed to ECR; the API image is then deployed to a dev Lambda function automatically and to production after manual approval. Persistent infrastructure (Lambda, ECR, Postgres, IAM, etc.) is provisioned separately via Terraform in the <a href=https://github.com/Kafkaese/taro-tf>taro-tf</a> repository, not in this one.
  
