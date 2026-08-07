@@ -92,25 +92,28 @@ def peace_index_pipe(source: str = 'csv', dest: str = 'postgres', **kwargs) -> b
     dest -- either one of ('postgres', 'csv')
     
     db_conn -- postgres database connection. Only if dest = 'postgres'
-    csv_src_path -- path to source csv file. Only if source = 'csv'
+    csv_path -- path to source csv file (GPI scores). Only if source = 'csv'
+    codes_csv_path -- path to country codes csv file, used to map iso3c -> Alpha-2 code. Only if source = 'csv'
     csv_dest_path -- path to destination csv. Only if dest = 'csv'
 
     Returns:
     0 if data was successfully written to dest, 1 if not
-    
+
     '''
 
     if source == 'csv':
         if 'csv_path' not in kwargs.keys():
             raise TypeError("If source = 'csv' is passed, keyword arguement csv_path is required")
-        
+
+        if 'codes_csv_path' not in kwargs.keys():
+            raise TypeError("If source = 'csv' is passed, keyword arguement codes_csv_path is required")
+
         csv_path = kwargs['csv_path']
-        
+        codes_csv_path = kwargs['codes_csv_path']
+
         peace_df = pd.read_csv(csv_path, header=3)
-        
-        # replace with corresponding pipe
-        codes = pd.read_csv(os.path.join(os.path.dirname(__file__),'../data/countries_info.csv'), index_col=0)
-        
+        codes = pd.read_csv(codes_csv_path, index_col=0)
+
         ''' 
         Gets dataframe with peace index values for years 2008 - 2022
         - merge on iso 3 country code column
@@ -407,7 +410,7 @@ if __name__ == "__main__":
 
     democracy_index_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path=s3_path('democracy_index.csv'))
 
-    #peace_index_pipe(source='csv', dest='postgres', csv_path=s3_path('GPI-2022-overall-scores-and-domains-2008-2022.csv'), db_conn=conn)
+    peace_index_pipe(source='csv', dest='postgres', csv_path=s3_path('GPI-2022-overall-scores-and-domains-2008-2022.csv'), codes_csv_path=s3_path('countries_info.csv'), db_conn=conn)
 
     merch_export_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path=s3_path('total_merchandise_exports.csv'))
 
