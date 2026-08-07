@@ -12,3 +12,15 @@ os.environ.setdefault("POSTGRES_PORT", "5432")
 os.environ.setdefault("POSTGRES_DB", "test")
 os.environ.setdefault("POSTGRES_USER", "test")
 os.environ.setdefault("POSTGRES_PASSWORD", "test")
+
+import pytest
+from sqlalchemy import create_engine
+
+
+@pytest.fixture
+def sqlite_conn():
+    """An in-memory SQLite connection standing in for a Postgres `db_conn` in
+    pipeline tests - exercises the same pandas to_sql/read_sql path the real
+    pipelines use, without needing a live database."""
+    with create_engine("sqlite:///:memory:").connect() as conn:
+        yield conn
