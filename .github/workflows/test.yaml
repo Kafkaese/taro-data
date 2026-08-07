@@ -1,0 +1,23 @@
+name: Test API
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch: {}
+  workflow_call: {}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.11.26"
+
+      # No Postgres, no S3, no live API needed - tests/test_api.py mocks the
+      # DB layer directly (see tests/conftest.py), so this is just pytest
+      # against the checked-out code.
+      - run: uv sync --locked --extra api
+      - run: uv run pytest tests/
