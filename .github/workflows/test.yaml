@@ -1,4 +1,4 @@
-name: Test API
+name: Pytest
 
 on:
   pull_request:
@@ -16,8 +16,12 @@ jobs:
         with:
           version: "0.11.26"
 
-      # No Postgres, no S3, no live API needed - tests/test_api.py mocks the
-      # DB layer directly (see tests/conftest.py), so this is just pytest
-      # against the checked-out code.
+      # No Postgres, no S3, no live API needed - test_api.py mocks the DB
+      # layer directly (see conftest.py) and test_pipeline.py runs against
+      # local CSV fixtures + an in-memory SQLite connection instead of S3/a
+      # real Postgres, so this is just pytest against the checked-out code.
+      # `--extra api` (rather than a bare sync) is still required even for
+      # the pipeline tests: country_data_api.py imports mangum at module
+      # level, and it's only pulled in by that extra.
       - run: uv sync --locked --extra api
       - run: uv run pytest tests/
