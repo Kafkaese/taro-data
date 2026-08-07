@@ -290,9 +290,55 @@ def test_arms_exports_by_country_request_missing():
     }
     
     response = requests.get(URL, params=PARAMS, verify=False)
-    
+
     assert response.json()['value'] == 'no data'
-    
+
+# tests for "/arms/exports/available" endpoint
+def test_arms_exports_available_endpoint_status_code():
+    ENDPOINT = "/arms/exports/available"
+    URL = f'https://{API_HOST}:{API_PORT}{ENDPOINT}'
+
+    response = requests.get(URL, verify=False)
+
+    assert response.status_code == 422
+
+def test_arms_exports_available_request_status_code():
+    ENDPOINT = "/arms/exports/available"
+    URL = f'https://{API_HOST}:{API_PORT}{ENDPOINT}'
+
+    PARAMS = {
+        "year": 2020
+    }
+
+    response = requests.get(URL, params=PARAMS, verify=False)
+
+    assert response.status_code == 200
+
+def test_arms_exports_available_request():
+    ENDPOINT = "/arms/exports/available"
+    URL = f'https://{API_HOST}:{API_PORT}{ENDPOINT}'
+
+    PARAMS = {
+        "year": 2020
+    }
+
+    response = requests.get(URL, params=PARAMS, verify=False).json()
+
+    assert type(response) == list
+    assert "CZ" in response
+
+def test_arms_exports_available_request_missing():
+    ENDPOINT = "/arms/exports/available"
+    URL = f'https://{API_HOST}:{API_PORT}{ENDPOINT}'
+
+    PARAMS = {
+        "year": 1778
+    }
+
+    response = requests.get(URL, params=PARAMS, verify=False)
+
+    assert response.json() == []
+
 # test for "/arms/imports/total" endpoint
 def test_arms_imports_total_endpoint_status_code():
     ENDPOINT = "/arms/imports/total"
@@ -442,9 +488,55 @@ def test_arms_imports_by_country_request_missing():
     }
     
     response = requests.get(URL, params=PARAMS, verify=False)
-    
+
     assert response.json()['value'] == 'no data'
-    
+
+# tests for "/arms/imports/available" endpoint
+def test_arms_imports_available_endpoint_status_code():
+    ENDPOINT = "/arms/imports/available"
+    URL = f'https://{API_HOST}:{API_PORT}{ENDPOINT}'
+
+    response = requests.get(URL, verify=False)
+
+    assert response.status_code == 422
+
+def test_arms_imports_available_request_status_code():
+    ENDPOINT = "/arms/imports/available"
+    URL = f'https://{API_HOST}:{API_PORT}{ENDPOINT}'
+
+    PARAMS = {
+        "year": 2020
+    }
+
+    response = requests.get(URL, params=PARAMS, verify=False)
+
+    assert response.status_code == 200
+
+def test_arms_imports_available_request():
+    ENDPOINT = "/arms/imports/available"
+    URL = f'https://{API_HOST}:{API_PORT}{ENDPOINT}'
+
+    PARAMS = {
+        "year": 2020
+    }
+
+    response = requests.get(URL, params=PARAMS, verify=False).json()
+
+    assert type(response) == list
+    assert "CA" in response
+
+def test_arms_imports_available_request_missing():
+    ENDPOINT = "/arms/imports/available"
+    URL = f'https://{API_HOST}:{API_PORT}{ENDPOINT}'
+
+    PARAMS = {
+        "year": 1778
+    }
+
+    response = requests.get(URL, params=PARAMS, verify=False)
+
+    assert response.json() == []
+
 # tests for "/merchandise/exports/total" endpoint
 def test_merchandise_exports_total_endpoint_status_code():
     ENDPOINT = "/merchandise/exports/total"
