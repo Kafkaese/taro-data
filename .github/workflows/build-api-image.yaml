@@ -1,4 +1,4 @@
-name: Build, push and deploy API image
+name: Build, push and deploy taro-data images
 
 on:
   push:
@@ -7,6 +7,8 @@ on:
       - 'api_lambda.Dockerfile'
       - 'api/**'
       - 'tests/**'
+      - 'pipeline.Dockerfile'
+      - 'taro/**'
       - 'pyproject.toml'
       - 'uv.lock'
       - .github/workflows/build-api-image.yaml
@@ -17,7 +19,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: api-image-build
+  group: taro-data-release
   cancel-in-progress: true
 
 jobs:
@@ -31,7 +33,7 @@ jobs:
   # Runs in parallel with test/ rather than after it, since both only need
   # the checked-out code - deploy-dev is what actually waits on both
   # succeeding.
-  build:
+  build-api:
     runs-on: ubuntu-latest
     outputs:
       image_uri: ${{ steps.image.outputs.uri }}
@@ -81,7 +83,7 @@ jobs:
         run: echo "uri=${{ steps.ecr-login.outputs.registry }}/taro@${{ steps.build.outputs.digest }}" >> "$GITHUB_OUTPUT"
 
   deploy-dev:
-    needs: [test, build]
+    needs: [test, build-api]
     runs-on: ubuntu-latest
     steps:
       - uses: aws-actions/configure-aws-credentials@v4
@@ -94,17 +96,58 @@ jobs:
         run: |
           aws lambda update-function-code \
             --function-name taro-dev-api \
-            --image-uri ${{ needs.build.outputs.image_uri }} \
+            --image-uri ${{ needs.build-api.outputs.image_uri }} \
             > /dev/null
           aws lambda wait function-updated --function-name taro-dev-api
 
-  # Only runs once deploy-dev succeeds, and pauses for manual approval in
-  # the Actions UI before it does - the "production" environment has a
-  # required-reviewer protection rule configured in the repo settings (not
-  # something expressible in this YAML file itself), which is what actually
-  # creates the gate. Same pattern as taro-map's deploy-frontend.yaml.
+  # Folded in from the formerly-standalone build-pipeline-image.yaml -
+  # deliberately sequenced after deploy-dev rather than run in parallel
+  # with build-api/test like before: the dev API deploy having gone out
+  # cleanly is treated as this branch's basic health check, and the
+  # pipeline image shouldn't get pushed (nor prod get promoted) off a
+  # commit that failed it. Own IAM role (taro-github-actions-pipeline-build,
+  # separate from the API build/deploy role) - same "one identity per
+  # concern" reasoning as before, this just changes when the job runs, not
+  # which credential it runs as. No provenance:false/sbom:false here -
+  # that's a Lambda-specific OCI-format requirement; this image only ever
+  # runs via a plain `docker run` on the EC2 Postgres instance, which
+  # handles OCI images fine.
+  build-pipeline:
+    needs: deploy-dev
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/taro-github-actions-pipeline-build
+          aws-region: eu-central-1
+          role-duration-seconds: 900
+
+      - id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: pipeline.Dockerfile
+          platforms: linux/arm64
+          push: true
+          tags: |
+            ${{ steps.ecr-login.outputs.registry }}/taro:pipeline
+            ${{ steps.ecr-login.outputs.registry }}/taro:pipeline-${{ github.sha }}
+
+  # Only runs once deploy-dev and build-pipeline succeed, and pauses for
+  # manual approval in the Actions UI before it does - the "production"
+  # environment has a required-reviewer protection rule configured in the
+  # repo settings (not something expressible in this YAML file itself),
+  # which is what actually creates the gate. Same pattern as taro-map's
+  # deploy-frontend.yaml.
   deploy-prod:
-    needs: [build, deploy-dev]
+    needs: [build-api, deploy-dev, build-pipeline]
     environment: production
     runs-on: ubuntu-latest
     steps:
@@ -118,6 +161,6 @@ jobs:
         run: |
           aws lambda update-function-code \
             --function-name taro-production-api \
-            --image-uri ${{ needs.build.outputs.image_uri }} \
+            --image-uri ${{ needs.build-api.outputs.image_uri }} \
             > /dev/null
           aws lambda wait function-updated --function-name taro-production-api
