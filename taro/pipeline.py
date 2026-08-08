@@ -90,10 +90,9 @@ def peace_index_pipe(source: str = 'csv', dest: str = 'postgres', **kwargs) -> b
     Keyword arguments:
     source -- either one of ('csv')
     dest -- either one of ('postgres', 'csv')
-    
+
     db_conn -- postgres database connection. Only if dest = 'postgres'
-    csv_path -- path to source csv file (GPI scores). Only if source = 'csv'
-    codes_csv_path -- path to country codes csv file, used to map iso3c -> Alpha-2 code. Only if source = 'csv'
+    csv_path -- path to source csv file (GPI scores, indexed by Alpha-2 code). Only if source = 'csv'
     csv_dest_path -- path to destination csv. Only if dest = 'csv'
 
     Returns:
@@ -105,24 +104,9 @@ def peace_index_pipe(source: str = 'csv', dest: str = 'postgres', **kwargs) -> b
         if 'csv_path' not in kwargs.keys():
             raise TypeError("If source = 'csv' is passed, keyword arguement csv_path is required")
 
-        if 'codes_csv_path' not in kwargs.keys():
-            raise TypeError("If source = 'csv' is passed, keyword arguement codes_csv_path is required")
-
         csv_path = kwargs['csv_path']
-        codes_csv_path = kwargs['codes_csv_path']
 
-        peace_df = pd.read_csv(csv_path, header=3)
-        codes = pd.read_csv(codes_csv_path, index_col=0)
-
-        ''' 
-        Gets dataframe with peace index values for years 2008 - 2022
-        - merge on iso 3 country code column
-        - select only first 21 columns, removes most of the irrelevant information
-        -  drop remaining unneeded columns
-        - set iso 2 country code as index
-        '''
-        peace_df = peace_df.merge(codes, left_on='iso3c', right_on='Alpha-3 code').loc[:,['Alpha-2 code', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016',
-       '2017', '2018', '2019', '2020', '2021', '2022']].set_index('Alpha-2 code')
+        peace_df = pd.read_csv(csv_path, index_col='Alpha-2 code')
 
     if dest == 'postgres':
         
@@ -410,7 +394,7 @@ if __name__ == "__main__":
 
     democracy_index_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path=s3_path('democracy_index.csv'))
 
-    peace_index_pipe(source='csv', dest='postgres', csv_path=s3_path('peace_index.csv'), codes_csv_path=s3_path('countries_info.csv'), db_conn=conn)
+    peace_index_pipe(source='csv', dest='postgres', csv_path=s3_path('peace_index.csv'), db_conn=conn)
 
     merch_export_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path=s3_path('total_merchandise_exports.csv'))
 
