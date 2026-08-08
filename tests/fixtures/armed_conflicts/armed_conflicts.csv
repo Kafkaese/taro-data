@@ -1,0 +1,3 @@
+conflict_id,name,start_year,total_deaths_low,total_deaths_high,total_deaths_est,military_deaths_est,civilian_deaths_est,refugees_est,idps_est,confidence,wikipedia_url,notes
+1,Arab-Israeli / Iran-Israel conflict,1948,254000,263000,258000,90000,168000,5900000,2000000,low,https://en.wikipedia.org/wiki/Arab%E2%80%93Israeli_conflict,"Cumulative fatalities 1948-present. Test fixture, trimmed notes."
+3,Sudanese civil wars,1955,1521000,1521000,1600000,240000,1360000,3500000,8860000,low,https://en.wikipedia.org/wiki/Sudanese_civil_war_(2023%E2%80%93present),"Cumulative fatalities across multiple wars. Test fixture, trimmed notes."

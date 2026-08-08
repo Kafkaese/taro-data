@@ -437,6 +437,76 @@ async def arms_imports_available(year):
         return []
 
 
+# conflicts path endpoints
+
+# Gets ongoing armed conflicts a country is a belligerent in, each with its
+# full belligerent list (not just the requested country) so the frontend can
+# render a flag cluster per conflict. Always a bare array, like the
+# arms/*/available endpoints above - the frontend's contract for this
+# section is "render nothing if empty", so there's no need for a distinct
+# "no data" sentinel.
+@app.get("/conflicts/by_country")
+async def conflicts_by_country(country_code):
+    '''
+    Gets ongoing armed conflicts that a country is a belligerent in.
+
+    Parameters:
+        country_code (string): Alpha-2 country code
+
+    Returns:
+        List of dictionaries, one per conflict the country is a belligerent
+        in (most severe first), each with a nested 'belligerents' list
+        covering every country in that conflict. Empty list if the country
+        isn't a belligerent in any tracked conflict, or on failure.
+    '''
+
+    query = sql.text('''select ac.conflict_id, ac.name, ac.start_year, ac.total_deaths_low,
+            ac.total_deaths_high, ac.total_deaths_est, ac.military_deaths_est,
+            ac.civilian_deaths_est, ac.refugees_est, ac.idps_est, ac.confidence,
+            ac.wikipedia_url, ac.notes, b.country_name, b."Alpha-2 code"
+        from armed_conflicts ac
+        join armed_conflicts_belligerents b on b.conflict_id = ac.conflict_id
+        where ac.conflict_id in (
+            select conflict_id from armed_conflicts_belligerents where "Alpha-2 code" = :c
+        )
+        order by ac.total_deaths_est desc, ac.conflict_id, b.country_name;''')
+
+    try:
+        with db.connect() as conn:
+            cursor = conn.execute(query, parameters = {'c': country_code})
+            result = cursor.fetchall()
+
+        # Grouped in Python rather than with a second query - dict insertion
+        # order (Python 3.7+) preserves the SQL query's own ordering, so no
+        # separate sort is needed after grouping.
+        conflicts = {}
+        for row in result:
+            conflict_id = row[0]
+            if conflict_id not in conflicts:
+                conflicts[conflict_id] = {
+                    'conflict_id': conflict_id,
+                    'name': row[1],
+                    'start_year': row[2],
+                    'total_deaths_low': row[3],
+                    'total_deaths_high': row[4],
+                    'total_deaths_est': row[5],
+                    'military_deaths_est': row[6],
+                    'civilian_deaths_est': row[7],
+                    'refugees_est': row[8],
+                    'idps_est': row[9],
+                    'confidence': row[10],
+                    'wikipedia_url': row[11],
+                    'notes': row[12],
+                    'belligerents': [],
+                }
+            conflicts[conflict_id]['belligerents'].append({'country_name': row[13], 'alpha2': row[14]})
+
+        return list(conflicts.values())
+    except Exception:
+        logger.exception("GET /conflicts/by_country failed")
+        return []
+
+
 # Lambda entrypoint - translates between API Gateway's event/context shape
 # and the ASGI interface FastAPI expects. Unused for local/container
 # deployment (api.Dockerfile runs uvicorn directly against `app`).
