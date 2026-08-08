@@ -72,6 +72,12 @@ services:
       dockerfile: ./pipeline.Dockerfile
     env_file:
       - ../.env
+    # Pipeline data now lives in S3 (see s3_path() in pipeline.py) rather
+    # than local CSVs. Locally there's no IAM role to fall back on like on
+    # EC2, so the host's named CLI profile is mounted in read-only and
+    # selected via AWS_PROFILE/AWS_REGION in .env.
+    volumes:
+      - ${HOME}/.aws:/root/.aws:ro
     networks:
       - taro
     depends_on:
