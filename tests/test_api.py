@@ -212,13 +212,34 @@ def test_available_returns_empty_array_for_no_data(endpoint, mock_conn):
     ("/arms/exports/available", {"year": 2020}, []),
     ("/arms/imports/available", {"year": 2020}, []),
 ])
-def test_db_error_degrades_gracefully(endpoint, params, expected, mock_conn):
-    # Every handler wraps its query in a bare try/except and returns a
-    # sentinel rather than letting a DB error surface as a 500 - e.g. the
-    # metadata endpoints hitting a year column that doesn't exist yet.
+def test_db_error_degrades_gracefully(endpoint, params, expected, mock_conn, caplog):
+    # Every handler wraps its query in a try/except and returns a sentinel
+    # rather than letting a DB error surface as a 500 - e.g. the metadata
+    # endpoints hitting a year column that doesn't exist yet. The error is
+    # still logged though, so it's visible in CloudWatch/stderr even though
+    # the client only ever sees the generic sentinel.
     mock_conn.execute.side_effect = Exception("boom")
 
-    response = client.get(endpoint, params=params)
+    with caplog.at_level("ERROR"):
+        response = client.get(endpoint, params=params)
 
     assert response.status_code == 200
     assert response.json() == expected
+    assert any(r.levelname == "ERROR" and "boom" in str(r.exc_info) for r in caplog.records)
+
+
+@pytest.mark.parametrize("endpoint, params", [
+    ("/metadata/name/short", {"country_code": "XX"}),
+    ("/arms/exports/available", {"year": 2020}),
+])
+def test_empty_result_does_not_log_anything(endpoint, params, mock_conn, caplog):
+    # A genuinely empty result set never reaches the except block, so unlike
+    # test_db_error_degrades_gracefully above, this must produce no log
+    # output - that silence is exactly what makes a real error stand out.
+    rows()(mock_conn)
+
+    with caplog.at_level("ERROR"):
+        response = client.get(endpoint, params=params)
+
+    assert response.status_code == 200
+    assert caplog.records == []
