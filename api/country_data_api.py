@@ -366,7 +366,7 @@ async def arms_imports_by_country(country_code, year, currency, limit=300):
 
     try:
         with db.connect() as conn:
-            cursor = conn.execute(query, parameters = {'c': country_code, 'v': currency, 'y': year, 'l': limit})
+            cursor = conn.execute(query, parameters = {'c': country_code, 'y': year, 'l': limit})
             result = cursor.fetchall()
 
         if result == []:
