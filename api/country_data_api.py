@@ -415,28 +415,6 @@ async def arms_imports_available(year):
         return []
 
 
-# merchandise path endpoints
-# NOT IN USE CURRENTLY. Needs to be updatedd for USD values if reactivated
-@app.get("/merchandise/exports/total")
-async def exports_merchandise_year(country_code, year):
-
-    query = sql.text('''select SUM(export_value) from merchandise_exports
-        join country_names as cn on "country_id" = cn."index"
-        where "Alpha-2 code" = :c and year = :y;''')
-
-    try:
-        with db.connect() as conn:
-            cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
-            result = cursor.fetchall()
-
-        if result[0] == (None,):
-            return {'value': 'no data'}
-
-        return {'value': result[0][0]}
-    except:
-        return {'value': 'no data'}
-
-
 # Lambda entrypoint - translates between API Gateway's event/context shape
 # and the ASGI interface FastAPI expects. Unused for local/container
 # deployment (api.Dockerfile runs uvicorn directly against `app`).

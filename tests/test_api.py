@@ -51,7 +51,6 @@ def test_root():
     ("/arms/imports/by_country", {"country_code": "CA", "year": 2020}),
     ("/arms/imports/timeseries", {"country_code": "CA"}),
     ("/arms/imports/available", {}),
-    ("/merchandise/exports/total", {"country_code": "CA"}),
 ])
 def test_missing_required_param_is_422(endpoint, params):
     response = client.get(endpoint, params=params)
@@ -108,7 +107,6 @@ def test_malformed_year_returns_no_data_without_querying(endpoint, year, mock_co
     ("/arms/imports/by_country", {"country_code": "XX", "year": 2020, "currency": "EUR"}),
     ("/arms/exports/timeseries", {"country_code": "XX", "currency": "EUR"}),
     ("/arms/imports/timeseries", {"country_code": "XX", "currency": "EUR"}),
-    ("/merchandise/exports/total", {"country_code": "XX", "year": 2020}),
 ])
 def test_empty_result_returns_no_data(endpoint, params, mock_conn):
     rows()(mock_conn)
