@@ -308,7 +308,18 @@ def arms_pipeline(source: str = 'scraper', dest: str = 'postgres', **kwargs) -> 
         
         db_conn = kwargs['db_conn']
 
-        data.to_sql('arms', db_conn, if_exists='replace')
+        # Without this, pandas infers 'Year' as BIGINT here vs. the
+        # INTEGER that import_data_pipeline/export_data_pipeline pin for
+        # the same column (reading the same source CSV) - Postgres compares
+        # bigint/integer across the API's `arms`/`exports`/`imports` joins
+        # without error, so this was never a correctness bug, just a
+        # confusing inconsistency worth matching for anyone querying the
+        # schema directly.
+        data.to_sql('arms', db_conn, if_exists='replace', dtype={
+            'Source country': types.VARCHAR,
+            'Destination country': types.VARCHAR,
+            'Year': types.INTEGER,
+        })
 
     else:
         pass
