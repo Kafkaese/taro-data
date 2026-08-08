@@ -77,6 +77,29 @@ def test_invalid_currency_returns_no_data(endpoint, mock_conn):
     mock_conn.execute.assert_not_called()
 
 
+@pytest.mark.parametrize("endpoint", [
+    "/metadata/democracy_index",
+    "/metadata/peace_index",
+])
+@pytest.mark.parametrize("year", [
+    "abc",
+    "2020; DROP TABLE peace_index;--",
+    '2020" --',
+    "202",
+    "20200",
+])
+def test_malformed_year_returns_no_data_without_querying(endpoint, year, mock_conn):
+    # `year` gets spliced into these two queries as a column identifier
+    # (SQLAlchemy can't bind identifiers as parameters) - anything that
+    # isn't exactly 4 digits must be rejected before it ever reaches the
+    # query string.
+    response = client.get(endpoint, params={"country_code": "CA", "year": year})
+
+    assert response.status_code == 200
+    assert response.json() == {"value": "no data"}
+    mock_conn.execute.assert_not_called()
+
+
 @pytest.mark.parametrize("endpoint, params", [
     ("/metadata/name/short", {"country_code": "XX"}),
     ("/metadata/democracy_index", {"country_code": "XX", "year": 2020}),

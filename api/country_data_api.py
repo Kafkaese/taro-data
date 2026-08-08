@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import create_engine, sql
 from mangum import Mangum
 import os
+import re
 
 app = FastAPI()
 
@@ -79,6 +80,13 @@ db = create_engine(conn_string, pool_pre_ping=True)
 # valid currencies
 VALID_CURRENCIES = ['EUR', 'USD']
 
+# `year` is spliced directly into a few queries below as a column
+# identifier (SQLAlchemy can't bind identifiers as parameters), so it needs
+# its own allow-list check the same way `currency` gets one - a bare regex
+# match rather than e.g. int(year) so it also rejects things like leading
+# '+'/whitespace that int() would silently accept.
+YEAR_RE = re.compile(r'^\d{4}$')
+
 # root endpoint
 
 @app.get("/")
@@ -110,6 +118,9 @@ async def short_name(country_code):
 @app.get("/metadata/democracy_index")
 async def democracy_index(country_code, year):
 
+    if not YEAR_RE.match(year):
+        return {'value': 'no data'}
+
     # columns cannot be passed as parameters
     query = sql.text(f'''select "{year}" from democracy_index where "Alpha-2 code" = :c;''')
 
@@ -129,6 +140,9 @@ async def democracy_index(country_code, year):
 
 @app.get("/metadata/peace_index")
 async def peace_index(country_code, year):
+
+    if not YEAR_RE.match(year):
+        return {'value': 'no data'}
 
     # columns cannot be passed as parameters
     query = sql.text(f'''select "{year}" from peace_index where "Alpha-2 code" = :c;''')
