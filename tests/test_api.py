@@ -51,7 +51,6 @@ def test_root():
     ("/arms/imports/by_country", {"country_code": "CA", "year": 2020}),
     ("/arms/imports/timeseries", {"country_code": "CA"}),
     ("/arms/imports/available", {}),
-    ("/merchandise/exports/total", {"country_code": "CA"}),
 ])
 def test_missing_required_param_is_422(endpoint, params):
     response = client.get(endpoint, params=params)
@@ -77,6 +76,29 @@ def test_invalid_currency_returns_no_data(endpoint, mock_conn):
     mock_conn.execute.assert_not_called()
 
 
+@pytest.mark.parametrize("endpoint", [
+    "/metadata/democracy_index",
+    "/metadata/peace_index",
+])
+@pytest.mark.parametrize("year", [
+    "abc",
+    "2020; DROP TABLE peace_index;--",
+    '2020" --',
+    "202",
+    "20200",
+])
+def test_malformed_year_returns_no_data_without_querying(endpoint, year, mock_conn):
+    # `year` gets spliced into these two queries as a column identifier
+    # (SQLAlchemy can't bind identifiers as parameters) - anything that
+    # isn't exactly 4 digits must be rejected before it ever reaches the
+    # query string.
+    response = client.get(endpoint, params={"country_code": "CA", "year": year})
+
+    assert response.status_code == 200
+    assert response.json() == {"value": "no data"}
+    mock_conn.execute.assert_not_called()
+
+
 @pytest.mark.parametrize("endpoint, params", [
     ("/metadata/name/short", {"country_code": "XX"}),
     ("/metadata/democracy_index", {"country_code": "XX", "year": 2020}),
@@ -85,7 +107,6 @@ def test_invalid_currency_returns_no_data(endpoint, mock_conn):
     ("/arms/imports/by_country", {"country_code": "XX", "year": 2020, "currency": "EUR"}),
     ("/arms/exports/timeseries", {"country_code": "XX", "currency": "EUR"}),
     ("/arms/imports/timeseries", {"country_code": "XX", "currency": "EUR"}),
-    ("/merchandise/exports/total", {"country_code": "XX", "year": 2020}),
 ])
 def test_empty_result_returns_no_data(endpoint, params, mock_conn):
     rows()(mock_conn)
@@ -191,13 +212,34 @@ def test_available_returns_empty_array_for_no_data(endpoint, mock_conn):
     ("/arms/exports/available", {"year": 2020}, []),
     ("/arms/imports/available", {"year": 2020}, []),
 ])
-def test_db_error_degrades_gracefully(endpoint, params, expected, mock_conn):
-    # Every handler wraps its query in a bare try/except and returns a
-    # sentinel rather than letting a DB error surface as a 500 - e.g. the
-    # metadata endpoints hitting a year column that doesn't exist yet.
+def test_db_error_degrades_gracefully(endpoint, params, expected, mock_conn, caplog):
+    # Every handler wraps its query in a try/except and returns a sentinel
+    # rather than letting a DB error surface as a 500 - e.g. the metadata
+    # endpoints hitting a year column that doesn't exist yet. The error is
+    # still logged though, so it's visible in CloudWatch/stderr even though
+    # the client only ever sees the generic sentinel.
     mock_conn.execute.side_effect = Exception("boom")
 
-    response = client.get(endpoint, params=params)
+    with caplog.at_level("ERROR"):
+        response = client.get(endpoint, params=params)
 
     assert response.status_code == 200
     assert response.json() == expected
+    assert any(r.levelname == "ERROR" and "boom" in str(r.exc_info) for r in caplog.records)
+
+
+@pytest.mark.parametrize("endpoint, params", [
+    ("/metadata/name/short", {"country_code": "XX"}),
+    ("/arms/exports/available", {"year": 2020}),
+])
+def test_empty_result_does_not_log_anything(endpoint, params, mock_conn, caplog):
+    # A genuinely empty result set never reaches the except block, so unlike
+    # test_db_error_degrades_gracefully above, this must produce no log
+    # output - that silence is exactly what makes a real error stand out.
+    rows()(mock_conn)
+
+    with caplog.at_level("ERROR"):
+        response = client.get(endpoint, params=params)
+
+    assert response.status_code == 200
+    assert caplog.records == []

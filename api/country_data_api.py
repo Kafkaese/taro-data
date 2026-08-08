@@ -2,9 +2,20 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import create_engine, sql
 from mangum import Mangum
+import logging
 import os
+import re
 
 app = FastAPI()
+
+# Every endpoint below catches its query in a bare `except: return {'value':
+# 'no data'}` (or `[]`) - genuinely missing data (an empty result set) never
+# reaches that except block, only real failures (DB errors, a nonexistent
+# year column, bad input that slipped past validation) do. Logging here
+# makes those two cases distinguishable from the outside: a client always
+# sees the same sentinel, but only a real failure leaves a trace in
+# CloudWatch/stderr.
+logger = logging.getLogger(__name__)
 
 ## CORS settings
 
@@ -79,6 +90,13 @@ db = create_engine(conn_string, pool_pre_ping=True)
 # valid currencies
 VALID_CURRENCIES = ['EUR', 'USD']
 
+# `year` is spliced directly into a few queries below as a column
+# identifier (SQLAlchemy can't bind identifiers as parameters), so it needs
+# its own allow-list check the same way `currency` gets one - a bare regex
+# match rather than e.g. int(year) so it also rejects things like leading
+# '+'/whitespace that int() would silently accept.
+YEAR_RE = re.compile(r'^\d{4}$')
+
 # root endpoint
 
 @app.get("/")
@@ -103,12 +121,15 @@ async def short_name(country_code):
 
         return {'value': result[0][0]}
 
-    # if year < 2008 throws error because columns does not exist
-    except:
+    except Exception:
+        logger.exception("GET /metadata/name/short failed")
         return {'value': 'no data'}
 
 @app.get("/metadata/democracy_index")
 async def democracy_index(country_code, year):
+
+    if not YEAR_RE.match(year):
+        return {'value': 'no data'}
 
     # columns cannot be passed as parameters
     query = sql.text(f'''select "{year}" from democracy_index where "Alpha-2 code" = :c;''')
@@ -123,12 +144,17 @@ async def democracy_index(country_code, year):
 
         return {'value': result[0][0]}
 
-    # if year < 2008 throws error because columns does not exist
-    except:
+    # Includes hitting a year column the table doesn't have (e.g. before the
+    # dataset's start year) - not just DB/connection errors.
+    except Exception:
+        logger.exception("GET /metadata/democracy_index failed")
         return {'value': 'no data'}
 
 @app.get("/metadata/peace_index")
 async def peace_index(country_code, year):
+
+    if not YEAR_RE.match(year):
+        return {'value': 'no data'}
 
     # columns cannot be passed as parameters
     query = sql.text(f'''select "{year}" from peace_index where "Alpha-2 code" = :c;''')
@@ -143,8 +169,10 @@ async def peace_index(country_code, year):
 
         return {'value': result[0][0]}
 
-    # if year < 2008 throws error because columns does not exist
-    except:
+    # Includes hitting a year column the table doesn't have (e.g. before the
+    # dataset's start year) - not just DB/connection errors.
+    except Exception:
+        logger.exception("GET /metadata/peace_index failed")
         return {'value': 'no data'}
 
 
@@ -182,7 +210,8 @@ async def arms_exports_total(country_code, year, currency):
                     return {'value': 'no data'}
 
         return {'value': result[0][0]}
-    except:
+    except Exception:
+        logger.exception("GET /arms/exports/total failed")
         return {'value': 'no data'}
 
 
@@ -219,7 +248,8 @@ async def arms_exports_timeseries(country_code, currency):
 
         return [{'year': year[0], 'value': int(year[1])} for year in result]
 
-    except:
+    except Exception:
+        logger.exception("GET /arms/exports/timeseries failed")
         return {'value': 'no data'}
 
 # Gets export data for a country on a given year, listing values for source counries seperately
@@ -257,7 +287,8 @@ async def arms_exports_by_country(country_code, year, currency, limit=300):
             return {'value': 'no data'}
 
         return [{'name': country[0], 'value': country[1], 'full_name': country[2]} for country in result]
-    except:
+    except Exception:
+        logger.exception("GET /arms/exports/by_country failed")
         return {'value': 'no data'}
 
 # Gets the list of source countries that have any export data for a given
@@ -278,7 +309,8 @@ async def arms_exports_available(year):
             result = cursor.fetchall()
 
         return [country[0] for country in result if country[0] is not None]
-    except:
+    except Exception:
+        logger.exception("GET /arms/exports/available failed")
         return []
 
 # arms/import path endpoints
@@ -302,7 +334,8 @@ async def arms_imports_total(country_code, currency, year):
                 return {'value': 'no data'}
 
         return {'value': result[0][0]}
-    except:
+    except Exception:
+        logger.exception("GET /arms/imports/total failed")
         return {'value': 'no data'}
 
 
@@ -333,14 +366,15 @@ async def arms_imports_by_country(country_code, year, currency, limit=300):
 
     try:
         with db.connect() as conn:
-            cursor = conn.execute(query, parameters = {'c': country_code, 'v': currency, 'y': year, 'l': limit})
+            cursor = conn.execute(query, parameters = {'c': country_code, 'y': year, 'l': limit})
             result = cursor.fetchall()
 
         if result == []:
             return {'value': 'no data'}
 
         return [{'name': country[0], 'value': country[1], 'full_name': country[2]} for country in result]
-    except:
+    except Exception:
+        logger.exception("GET /arms/imports/by_country failed")
         return {'value': 'no data'}
 
 # Gets time series of total import values per year for a given country
@@ -378,7 +412,8 @@ async def arms_imports_timeseries(country_code, currency):
 
         return [{'year': year[0], 'value': int(year[1])} for year in result]
 
-    except:
+    except Exception:
+        logger.exception("GET /arms/imports/timeseries failed")
         return {'value': 'no data'}
 
 # Gets the list of destination countries that have any import data for a
@@ -397,30 +432,9 @@ async def arms_imports_available(year):
             result = cursor.fetchall()
 
         return [country[0] for country in result if country[0] is not None]
-    except:
+    except Exception:
+        logger.exception("GET /arms/imports/available failed")
         return []
-
-
-# merchandise path endpoints
-# NOT IN USE CURRENTLY. Needs to be updatedd for USD values if reactivated
-@app.get("/merchandise/exports/total")
-async def exports_merchandise_year(country_code, year):
-
-    query = sql.text('''select SUM(export_value) from merchandise_exports
-        join country_names as cn on "country_id" = cn."index"
-        where "Alpha-2 code" = :c and year = :y;''')
-
-    try:
-        with db.connect() as conn:
-            cursor = conn.execute(query, parameters = {'c': country_code, 'y': year})
-            result = cursor.fetchall()
-
-        if result[0] == (None,):
-            return {'value': 'no data'}
-
-        return {'value': result[0][0]}
-    except:
-        return {'value': 'no data'}
 
 
 # Lambda entrypoint - translates between API Gateway's event/context shape

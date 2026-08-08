@@ -1,35 +1,31 @@
 import psycopg
 from sqlalchemy import create_engine, types
-from taro.scraper import democracy_index_scraper
 import pandas as pd
 import os
 
-def democracy_index_pipeline(source: str = 'scraper', dest: str = 'postgres', **kwargs) -> bool:
+def democracy_index_pipeline(source: str = 'csv', dest: str = 'postgres', **kwargs) -> bool:
     '''
     Gets democracy index data from source and writes to dest.
-    
+
     Keyword arguments:
-    source -- either one of ('scraper', 'csv')
+    source -- 'csv'
     dest -- either one of ('postgres', 'csv')
-    
+
     db_conn -- postgres database connection. Only if dest = 'postgres'
     csv_src_path -- path to source csv file. Only if source = 'csv'
     csv_dest_path -- path to destination csv. Only if dest = 'csv'
 
     Returns:
     0 if data was successfully written to dest, 1 if not
-    '''    
-    # Run scraper
-    if source == 'scraper':
-        data = democracy_index_scraper('df')
-    elif source == 'csv':
+    '''
+    if source == 'csv':
         if 'csv_path' not in kwargs.keys():
             raise TypeError("If source = 'csv' is passed, keyword arguement csv_path is required")
-        
+
         csv_path = kwargs['csv_path']
-        
+
         data = pd.read_csv(csv_path, header=0)
-    
+
     if dest == 'csv':
         data.to_csv('../data/dem_id_TEST.csv')
     
@@ -236,23 +232,22 @@ def export_data_pipeline(source: str = 'csv', dest: str = 'postgres', **kwargs) 
     else:
         pass
     
-def country_name_pipeline(source: str = 'scraper', dest: str = 'postgres', **kwargs) -> bool:
+def country_name_pipeline(source: str = 'csv', dest: str = 'postgres', **kwargs) -> bool:
     '''
     Gets cpuntry name data from source and writes to dest.
-    
+
     Keyword arguments:
-    source -- either one of ('scraper', 'csv')
+    source -- 'csv'
     dest -- either one of ('postgres', 'csv')
-    
+
     db_conn -- postgres database connection. Only if dest = 'postgres'
     csv_src_path -- path to source csv file. Only if source = 'csv'
     csv_dest_path -- path to destination csv. Only if dest = 'csv'
 
     Returns:
     0 if data was successfully written to dest, 1 if not
-    '''    
-    # Run scraper
-    
+    '''
+
     if source == 'csv':
         if 'csv_path' not in kwargs.keys():
             raise TypeError("If source = 'csv' is passed, keyword arguement csv_path is required")
@@ -276,49 +271,12 @@ def country_name_pipeline(source: str = 'scraper', dest: str = 'postgres', **kwa
     else:
         pass
     
-def merch_export_pipeline(source: str = 'scraper', dest: str = 'postgres', **kwargs) -> bool:
-    '''
-    Gets total merchandise export data from source and writes to dest.
-    
-    Keyword arguments:
-    source -- either one of ('scraper', 'csv')
-    dest -- either one of ('postgres', 'csv')
-    
-    db_conn -- postgres database connection. Only if dest = 'postgres'
-    csv_src_path -- path to source csv file. Only if source = 'csv'
-    csv_dest_path -- path to destination csv. Only if dest = 'csv'
-
-    Returns:
-    0 if data was successfully written to dest, 1 if not
-    '''    
-    
-    if source == 'csv':
-        if 'csv_path' not in kwargs.keys():
-            raise TypeError("If source = 'csv' is passed, keyword arguement csv_path is required")
-        
-        csv_path = kwargs['csv_path']
-        
-        data = pd.read_csv(csv_path, header=0, index_col=0)
-    
-    
-    if dest == 'postgres':
-        
-        if 'db_conn' not in kwargs.keys():
-            raise TypeError("If dest = 'postgres' is passed, keyword arguement db_conn is required")
-        
-        db_conn = kwargs['db_conn']
-
-        data.to_sql('merchandise_exports', db_conn, if_exists='replace')
-
-    else:
-        pass
-    
-def arms_pipeline(source: str = 'scraper', dest: str = 'postgres', **kwargs) -> bool:
+def arms_pipeline(source: str = 'csv', dest: str = 'postgres', **kwargs) -> bool:
     '''
     Gets total arms export and import for all years data from source and writes to dest.
-    
+
     Keyword arguments:
-    source -- either one of ('scraper', 'csv')
+    source -- 'csv'
     dest -- either one of ('postgres', 'csv')
     
     db_conn -- postgres database connection. Only if dest = 'postgres'
@@ -345,7 +303,18 @@ def arms_pipeline(source: str = 'scraper', dest: str = 'postgres', **kwargs) -> 
         
         db_conn = kwargs['db_conn']
 
-        data.to_sql('arms', db_conn, if_exists='replace')
+        # Without this, pandas infers 'Year' as BIGINT here vs. the
+        # INTEGER that import_data_pipeline/export_data_pipeline pin for
+        # the same column (reading the same source CSV) - Postgres compares
+        # bigint/integer across the API's `arms`/`exports`/`imports` joins
+        # without error, so this was never a correctness bug, just a
+        # confusing inconsistency worth matching for anyone querying the
+        # schema directly.
+        data.to_sql('arms', db_conn, if_exists='replace', dtype={
+            'Source country': types.VARCHAR,
+            'Destination country': types.VARCHAR,
+            'Year': types.INTEGER,
+        })
 
     else:
         pass
@@ -395,8 +364,6 @@ if __name__ == "__main__":
     democracy_index_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path=s3_path('democracy_index.csv'))
 
     peace_index_pipe(source='csv', dest='postgres', csv_path=s3_path('peace_index.csv'), db_conn=conn)
-
-    merch_export_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path=s3_path('total_merchandise_exports.csv'))
 
     arms_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path = s3_path('arms.csv'))
 
