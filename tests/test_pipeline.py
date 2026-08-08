@@ -5,6 +5,8 @@ import pytest
 
 from taro.pipeline import (
     arms_pipeline,
+    armed_conflicts_belligerents_pipeline,
+    armed_conflicts_pipeline,
     country_name_pipeline,
     democracy_index_pipeline,
     export_data_pipeline,
@@ -20,6 +22,7 @@ DEMOCRACY_INDEX_FIXTURES = os.path.join(os.path.dirname(__file__), "fixtures", "
 # arms_pipeline does (all three are sourced from arms.csv in __main__ too) -
 # reusing that fixture rather than duplicating it.
 COUNTRY_NAMES_FIXTURES = os.path.join(os.path.dirname(__file__), "fixtures", "country_names")
+ARMED_CONFLICTS_FIXTURES = os.path.join(os.path.dirname(__file__), "fixtures", "armed_conflicts")
 
 
 def test_peace_index_pipe_writes_expected_table(sqlite_conn):
@@ -134,3 +137,44 @@ def test_country_name_pipeline_writes_expected_table(sqlite_conn):
 def test_country_name_pipeline_requires_csv_path():
     with pytest.raises(TypeError):
         country_name_pipeline(source="csv", dest="postgres", db_conn=None)
+
+
+def test_armed_conflicts_pipeline_writes_expected_table(sqlite_conn):
+    armed_conflicts_pipeline(
+        source="csv",
+        dest="postgres",
+        csv_path=os.path.join(ARMED_CONFLICTS_FIXTURES, "armed_conflicts.csv"),
+        db_conn=sqlite_conn,
+    )
+
+    result = pd.read_sql("select * from armed_conflicts", sqlite_conn).set_index("conflict_id")
+
+    assert sorted(result.index) == [1, 3]
+    assert result.loc[1, "name"] == "Arab-Israeli / Iran-Israel conflict"
+    assert result.loc[3, "total_deaths_est"] == 1600000
+    assert result.loc[1, "confidence"] == "low"
+
+
+def test_armed_conflicts_pipeline_requires_csv_path():
+    with pytest.raises(TypeError):
+        armed_conflicts_pipeline(source="csv", dest="postgres", db_conn=None)
+
+
+def test_armed_conflicts_belligerents_pipeline_writes_expected_table(sqlite_conn):
+    armed_conflicts_belligerents_pipeline(
+        source="csv",
+        dest="postgres",
+        csv_path=os.path.join(ARMED_CONFLICTS_FIXTURES, "armed_conflicts_belligerents.csv"),
+        db_conn=sqlite_conn,
+    )
+
+    result = pd.read_sql("select * from armed_conflicts_belligerents", sqlite_conn)
+
+    assert "index" not in result.columns
+    assert len(result) == 6
+    assert sorted(result.loc[result["conflict_id"] == 1, "Alpha-2 code"]) == ["EG", "IL", "PS"]
+
+
+def test_armed_conflicts_belligerents_pipeline_requires_csv_path():
+    with pytest.raises(TypeError):
+        armed_conflicts_belligerents_pipeline(source="csv", dest="postgres", db_conn=None)

@@ -51,6 +51,7 @@ def test_root():
     ("/arms/imports/by_country", {"country_code": "CA", "year": 2020}),
     ("/arms/imports/timeseries", {"country_code": "CA"}),
     ("/arms/imports/available", {}),
+    ("/conflicts/by_country", {}),
 ])
 def test_missing_required_param_is_422(endpoint, params):
     response = client.get(endpoint, params=params)
@@ -211,6 +212,7 @@ def test_available_returns_empty_array_for_no_data(endpoint, mock_conn):
     ("/arms/exports/total", {"country_code": "CA", "year": 2020, "currency": "EUR"}, {"value": "no data"}),
     ("/arms/exports/available", {"year": 2020}, []),
     ("/arms/imports/available", {"year": 2020}, []),
+    ("/conflicts/by_country", {"country_code": "EG"}, []),
 ])
 def test_db_error_degrades_gracefully(endpoint, params, expected, mock_conn, caplog):
     # Every handler wraps its query in a try/except and returns a sentinel
@@ -243,3 +245,47 @@ def test_empty_result_does_not_log_anything(endpoint, params, mock_conn, caplog)
 
     assert response.status_code == 200
     assert caplog.records == []
+
+
+def test_conflicts_by_country_returns_empty_array_for_no_data(mock_conn):
+    rows()(mock_conn)
+
+    response = client.get("/conflicts/by_country", params={"country_code": "FR"})
+
+    assert response.status_code == 200
+    assert response.json() == []
+
+
+def test_conflicts_by_country_groups_belligerents_under_each_conflict(mock_conn):
+    # The query joins conflicts to *every* belligerent in each matching
+    # conflict (not just the requested country), so a country in one
+    # conflict with 2 other belligerents produces 3 rows to group into 1
+    # conflict object with a 3-item 'belligerents' list.
+    rows(
+        (3, "Sudanese civil wars", 1955, 1521000, 1521000, 1600000, 240000, 1360000,
+         3500000, 8860000, "low", "https://en.wikipedia.org/wiki/Sudanese_civil_war", "notes",
+         "Egypt", "EG"),
+        (3, "Sudanese civil wars", 1955, 1521000, 1521000, 1600000, 240000, 1360000,
+         3500000, 8860000, "low", "https://en.wikipedia.org/wiki/Sudanese_civil_war", "notes",
+         "Sudan", "SD"),
+        (1, "Arab-Israeli / Iran-Israel conflict", 1948, 254000, 263000, 258000, 90000, 168000,
+         5900000, 2000000, "low", "https://en.wikipedia.org/wiki/Arab-Israeli_conflict", "notes",
+         "Egypt", "EG"),
+    )(mock_conn)
+
+    response = client.get("/conflicts/by_country", params={"country_code": "EG"})
+
+    assert response.status_code == 200
+    body = response.json()
+    assert len(body) == 2
+
+    sudan = next(c for c in body if c["conflict_id"] == 3)
+    assert sudan["name"] == "Sudanese civil wars"
+    assert sudan["total_deaths_est"] == 1600000
+    assert sudan["belligerents"] == [
+        {"country_name": "Egypt", "alpha2": "EG"},
+        {"country_name": "Sudan", "alpha2": "SD"},
+    ]
+
+    israel = next(c for c in body if c["conflict_id"] == 1)
+    assert israel["belligerents"] == [{"country_name": "Egypt", "alpha2": "EG"}]

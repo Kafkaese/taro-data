@@ -240,7 +240,83 @@ def arms_pipeline(source: str = 'csv', dest: str = 'postgres', **kwargs) -> bool
 
     else:
         pass
-       
+
+def armed_conflicts_pipeline(source: str = 'csv', dest: str = 'postgres', **kwargs) -> bool:
+    '''
+    Gets armed conflict data (one row per conflict) from source and writes to dest.
+
+    Keyword arguments:
+    source -- 'csv'
+    dest -- either one of ('postgres', 'csv')
+
+    db_conn -- postgres database connection. Only if dest = 'postgres'
+    csv_path -- path to source csv file, indexed by conflict_id. Only if source = 'csv'
+    csv_dest_path -- path to destination csv. Only if dest = 'csv'
+
+    Returns:
+    0 if data was successfully written to dest, 1 if not
+    '''
+
+    if source == 'csv':
+        if 'csv_path' not in kwargs.keys():
+            raise TypeError("If source = 'csv' is passed, keyword arguement csv_path is required")
+
+        csv_path = kwargs['csv_path']
+
+        data = pd.read_csv(csv_path, index_col='conflict_id')
+
+    if dest == 'postgres':
+
+        if 'db_conn' not in kwargs.keys():
+            raise TypeError("If dest = 'postgres' is passed, keyword arguement db_conn is required")
+
+        db_conn = kwargs['db_conn']
+
+        data.to_sql('armed_conflicts', db_conn, if_exists='replace')
+
+    else:
+        pass
+
+def armed_conflicts_belligerents_pipeline(source: str = 'csv', dest: str = 'postgres', **kwargs) -> bool:
+    '''
+    Gets the armed-conflict-to-belligerent-country mapping (many rows per
+    conflict_id, one per country) from source and writes to dest.
+
+    Keyword arguments:
+    source -- 'csv'
+    dest -- either one of ('postgres', 'csv')
+
+    db_conn -- postgres database connection. Only if dest = 'postgres'
+    csv_path -- path to source csv file (conflict_id, country_name, Alpha-2 code). Only if source = 'csv'
+    csv_dest_path -- path to destination csv. Only if dest = 'csv'
+
+    Returns:
+    0 if data was successfully written to dest, 1 if not
+    '''
+
+    if source == 'csv':
+        if 'csv_path' not in kwargs.keys():
+            raise TypeError("If source = 'csv' is passed, keyword arguement csv_path is required")
+
+        csv_path = kwargs['csv_path']
+
+        data = pd.read_csv(csv_path, header=0)
+
+    if dest == 'postgres':
+
+        if 'db_conn' not in kwargs.keys():
+            raise TypeError("If dest = 'postgres' is passed, keyword arguement db_conn is required")
+
+        db_conn = kwargs['db_conn']
+
+        # No single column uniquely identifies a row here (rows share
+        # conflict_id) - index=False avoids writing pandas' default
+        # RangeIndex as a spurious extra column.
+        data.to_sql('armed_conflicts_belligerents', db_conn, if_exists='replace', index=False)
+
+    else:
+        pass
+
 if __name__ == "__main__":
 
     # Connection string info
@@ -290,3 +366,7 @@ if __name__ == "__main__":
     arms_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path = s3_path('arms.csv'))
 
     country_name_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path = s3_path('countries_info.csv'))
+
+    armed_conflicts_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path = s3_path('armed_conflicts.csv'))
+
+    armed_conflicts_belligerents_pipeline(source='csv', dest='postgres', db_conn = conn, csv_path = s3_path('armed_conflicts_belligerents.csv'))
